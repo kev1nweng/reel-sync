@@ -12,7 +12,7 @@
 
 ![ReelSync Screenshot](docs/screenshot.en.png)
 
-As mentioned in the introduction, this is a real-time video streaming sharing tool **based on modern Web technologies (such as WebRTC)**.
+As mentioned in the introduction, this is a real-time video streaming tool **based on modern Web technologies (e.g. WebRTC)**.
 - With TURN/STUN servers configured, it allows users to **share local videos (or online video streams) with any other user on the Internet**, without worrying about cross-platform, cross-device, or cross-network issues.
 - Due to its working principle, users do not need to register or log in, and video stream data will not be stored on the server because it is a **peer-to-peer** application.
 - In the future, more features will be added, such as **screen sharing, real-time chat**, etc.
