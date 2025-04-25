@@ -23,6 +23,8 @@
 
 - [x] Peer-to-peer mode
   - [x] WebRTC real-time video streaming
+  - [ ] Screen sharing ←
+  - [ ] Webcam streaming
 
 - [ ] Same-origin mode
   - [x] WebRTC playback progress and behavior communication
