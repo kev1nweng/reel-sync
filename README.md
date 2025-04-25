@@ -10,16 +10,41 @@
 
 随时随地和另一个人同时观看一个视频 | Watch videos with someone in sync, anytime, anywhere.
 
+## 许可证
+
+该项目在 **GPL-3.0 许可证** 下发布。
+
+> GNU 通用公共许可证第三版（GPL-3.0）是由自由软件基金会（FSF）于2007年发布的自由软件许可证，旨在保障用户运行、研究、共享及修改软件的自由。
+> 其核心条款基于Copyleft机制，要求任何使用或分发GPL 3.0授权代码的衍生作品必须采用相同许可证公开源码，以防止专有软件对自由软件的限制。
+> 该协议还强化了对数字版权管理（DRM）的技术中立性约束，并提升了与其他开源许可证的兼容性。
+
+有关更多信息，请参阅 [LICENSE](LICENSE) 文件。
+
+## 部署
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/kev1nweng/reel-sync&env=VITE_NODE_SERVER_URL&env=VITE_MAX_ACCEPTABLE_DELAY_SECONDS&project-name=reel-sync&repository-name=reel-sync)⠀←⠀点击这个按钮部署到 Vercel（推荐），**或者：**
+
+```bash
+git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run build && npm run preview
+```
+
+## 环境变量
+
+- `VITE_NODE_SERVER_URL` - 你的 `iceServer` 服务器列表地址（API 格式参考 Cloudflare Call）
+- `VITE_MAX_ACCEPTABLE_DELAY_SECONDS` - 最大可接受延迟时间（秒）
+- `VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS` - 同源模式下视频进度同步间隔时间（秒）
+
+
 ## 路线图
 
 ***上学比较忙，进度可能推进缓慢。欢迎 Fork 并贡献。***
 
 - [ ] 浏览器适配
   - [x] Mozilla Firefox
-    - [x] 因不支持 `captureStream()` 可接收不可发送的问题 *（考虑 `mozCaptureStream()`）*
+    - [x] 因不支持 `captureStream()` 可接收不可发送的问题
     - [x] 主页样式错误问题（`padding` 未被正确显示）
   - [ ] Safari (以及所有利用 Apple Webkit 的浏览器)
-    - [ ] 因不支持 `captureStream()` 可接收不可发送的问题 *（难以修复...`MediaRecorder`？）*
+    - [ ] 因不支持 `captureStream()` 可接收不可发送的问题
 
 - [x] 点对点模式
   - [x] WebRTC 实时视频流传输
@@ -55,26 +80,14 @@
   - [ ] 分享直链
   - [ ] 自定义背景图
 
-## 许可证
+## 一行命令开始开发
 
-该程序在 **GPL-3.0 许可证** 下发布。有关更多信息，请参阅 [LICENSE](LICENSE) 文件。
-
-## 部署
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/kev1nweng/reel-sync&env=VITE_NODE_SERVER_URL&env=VITE_MAX_ACCEPTABLE_DELAY_SECONDS&project-name=reel-sync&repository-name=reel-sync)⠀←⠀点击这个按钮部署到 Vercel（推荐）
-
-## 部署环境变量
-
-- `VITE_NODE_SERVER_URL` - 你的 `iceServer` 服务器列表地址（API 格式参考 Cloudflare Call）
-- `VITE_MAX_ACCEPTABLE_DELAY_SECONDS` - 最大可接受延迟时间（秒）
-- `VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS` - 同源模式下视频进度同步间隔时间（秒）
-
-## 推荐的开发环境
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (禁用 Vetur).
-
-## 开发环境设置
+推荐使用 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (禁用 Vetur).
 
 ```bash
 git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm i
 ```
+
+## 星标历史记录
+
+[![Star History Chart](https://api.star-history.com/svg?repos=kev1nweng/reel-sync&type=Date)](https://www.star-history.com/#kev1nweng/reel-sync&Date)

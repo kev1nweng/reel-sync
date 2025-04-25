@@ -10,16 +10,41 @@
 
 随时随地和另一个人同时观看一个视频 | Watch videos with someone in sync, anytime, anywhere.
 
+## License
+
+The source code of this project is released under the **GPL-3.0 License**. 
+
+> The GNU General Public License version 3 (GPL-3.0), released by the Free Software Foundation (FSF) in 2007, is a copyleft license designed to safeguard users' freedoms to run, study, share, and modify software. 
+> It mandates that derivative works incorporating GPL 3.0-licensed code must adopt the same license, ensuring source code availability and preventing proprietary restrictions. 
+> The license also addresses technical neutrality in digital rights management (DRM) and enhances compatibility with other open-source licenses.
+
+For more information, please refer to the [LICENSE](LICENSE) file.
+
+## Deployment
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/kev1nweng/reel-sync&env=VITE_NODE_SERVER_URL&env=VITE_MAX_ACCEPTABLE_DELAY_SECONDS&project-name=reel-sync&repository-name=reel-sync)⠀←⠀Click this button to deploy on Vercel (recommended), **or:**
+
+```bash
+git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run build && npm run preview
+```
+
+## Environment Variables
+
+- `VITE_NODE_SERVER_URL` - Your `iceServer` server list address (Refer to Cloudflare Call for API documentation)
+- `VITE_MAX_ACCEPTABLE_DELAY_SECONDS` - Maximum acceptable delay time (seconds)
+- `VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS` - Sync interval time for video progress in same-origin mode (seconds)
+
+
 ## Roadmap
 
 ***School is quite busy, progress may be slow. Feel free to fork and contribute.***
 
 - [ ] Browser Compatibility
   - [x] Mozilla Firefox
-    - [x] Issue with receiving but not sending due to lack of `captureStream()` support *(Consider `mozCaptureStream()`)*
+    - [x] Issue with receiving but not sending due to lack of `captureStream()` support
     - [x] Homepage style issue (`padding` not displaying correctly)
   - [ ] Safari (and all browsers using Apple Webkit)
-    - [ ] Issue with receiving but not sending due to lack of `captureStream()` support *(Hard to fix... `MediaRecorder`?)*
+    - [ ] Issue with receiving but not sending due to lack of `captureStream()` support
 
 - [x] Peer-to-peer mode
   - [x] WebRTC real-time video streaming
@@ -55,26 +80,14 @@
   - [ ] Direct share link
   - [ ] Background image customization
 
-## License
+## Start Developing In One Line
 
-This program is released under the **GPL-3.0 License**. For more information, please refer to the [LICENSE](LICENSE) file.
-
-## Deployment
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/kev1nweng/reel-sync&env=VITE_NODE_SERVER_URL&env=VITE_MAX_ACCEPTABLE_DELAY_SECONDS&project-name=reel-sync&repository-name=reel-sync)⠀←⠀Click this button to deploy on Vercel (recommended)
-
-## Deployment Environment Variables
-
-- `VITE_NODE_SERVER_URL` - Your `iceServer` server list address (Refer to Cloudflare Call for API documentation)
-- `VITE_MAX_ACCEPTABLE_DELAY_SECONDS` - Maximum acceptable delay time (seconds)
-- `VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS` - Sync interval time for video progress in same-origin mode (seconds)
-
-## Recommended Development Environment
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Development Environment Setup
+[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) are recommended.
 
 ```bash
 git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm i
 ```
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=kev1nweng/reel-sync&type=Date)](https://www.star-history.com/#kev1nweng/reel-sync&Date)
