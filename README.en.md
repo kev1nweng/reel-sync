@@ -10,6 +10,13 @@
 
 随时随地和另一个人同时观看一个视频 | Watch videos with someone in sync, anytime, anywhere.
 
+![ReelSync Screenshot](docs/screenshot.en.png)
+
+As mentioned in the introduction, this is a real-time video streaming sharing tool **based on modern Web technologies (such as WebRTC)**.
+- With TURN/STUN servers configured, it allows users to **share local videos (or online video streams) with any other user on the Internet**, without worrying about cross-platform, cross-device, or cross-network issues.
+- Due to its working principle, users do not need to register or log in, and video stream data will not be stored on the server because it is a **peer-to-peer** application.
+- In the future, more features will be added, such as **screen sharing, real-time chat**, etc.
+
 ## License
 
 The source code of this project is released under the **GPL-3.0 License**. 
