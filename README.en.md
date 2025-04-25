@@ -75,7 +75,7 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
 
 - [ ] Cross-platform applications
   - [ ] Capacitor Android application
-  - [ ] Capacitor iOS application
+  - [ ] ~~Capacitor iOS application~~
 
 - [ ] i18n multilingual support ←
   - [x] StartView UI (CN/EN)

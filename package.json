@@ -11,9 +11,6 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@capacitor/android": "^7.0.1",
-    "@capacitor/cli": "^7.0.1",
-    "@capacitor/core": "^7.0.1",
     "@mdui/icons": "^1.0.2",
     "crypto-js": "^4.2.0",
     "mdui": "^2.1.3",
