@@ -17,16 +17,6 @@ As mentioned in the introduction, this is a real-time video streaming tool **bas
 - Due to its working principle, users do not need to register or log in, and video stream data will not be stored on the server because it is a **peer-to-peer** application.
 - In the future, more features will be added, such as **screen sharing, real-time chat**, etc.
 
-## License
-
-The source code of this project is released under the **GPL-3.0 License**. 
-
-> The GNU General Public License version 3 (GPL-3.0), released by the Free Software Foundation (FSF) in 2007, is a copyleft license designed to safeguard users' freedoms to run, study, share, and modify software. 
-> It mandates that derivative works incorporating GPL 3.0-licensed code must adopt the same license, ensuring source code availability and preventing proprietary restrictions. 
-> The license also addresses technical neutrality in digital rights management (DRM) and enhances compatibility with other open-source licenses.
-
-For more information, please refer to the [LICENSE](LICENSE) file.
-
 ## Deployment
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/kev1nweng/reel-sync&env=VITE_NODE_SERVER_URL&env=VITE_MAX_ACCEPTABLE_DELAY_SECONDS&project-name=reel-sync&repository-name=reel-sync)⠀←⠀Click this button to deploy on Vercel (recommended), **or:**
@@ -86,6 +76,16 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
 - [ ] Other features
   - [ ] Direct share link
   - [ ] Background image customization
+
+## License
+
+The source code of this project is released under the **GPL-3.0 License**. 
+
+> The GNU General Public License version 3 (GPL-3.0), released by the Free Software Foundation (FSF) in 2007, is a copyleft license designed to safeguard users' freedoms to run, study, share, and modify software. 
+> It mandates that derivative works incorporating GPL 3.0-licensed code must adopt the same license, ensuring source code availability and preventing proprietary restrictions. 
+> The license also addresses technical neutrality in digital rights management (DRM) and enhances compatibility with other open-source licenses.
+
+For more information, please refer to the [LICENSE](LICENSE) file.
 
 ## Start Developing In One Line
 

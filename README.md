@@ -17,16 +17,6 @@
 - 出于她 **端到端** 的工作原理，用户不需要有任何形式的注册登录行为，视频流数据也不会被存储在服务器上。
 - 在未来，更多特性将会被加入，如 **屏幕共享、实时聊天** 等。
 
-## 许可证
-
-该项目在 **GPL-3.0 许可证** 下发布。
-
-> GNU 通用公共许可证第三版（GPL-3.0）是由自由软件基金会（FSF）于2007年发布的自由软件许可证，旨在保障用户运行、研究、共享及修改软件的自由。
-> 其核心条款基于 Copyleft 机制，要求任何使用或分发 GPL-3.0 授权代码的衍生作品必须采用相同许可证公开源码，以防止专有软件对自由软件的限制。
-> 该协议还强化了对数字版权管理（DRM）的技术中立性约束，并提升了与其他开源许可证的兼容性。
-
-有关更多信息，请参阅 [LICENSE](LICENSE) 文件。
-
 ## 部署
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/kev1nweng/reel-sync&env=VITE_NODE_SERVER_URL&env=VITE_MAX_ACCEPTABLE_DELAY_SECONDS&project-name=reel-sync&repository-name=reel-sync)⠀←⠀点击这个按钮部署到 Vercel（推荐），**或者：**
@@ -86,6 +76,16 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
 - [ ] 其他功能
   - [ ] 分享直链
   - [ ] 自定义背景图
+
+## 许可证
+
+该项目在 **GPL-3.0 许可证** 下发布。
+
+> GNU 通用公共许可证第三版（GPL-3.0）是由自由软件基金会（FSF）于2007年发布的自由软件许可证，旨在保障用户运行、研究、共享及修改软件的自由。
+> 其核心条款基于 Copyleft 机制，要求任何使用或分发 GPL-3.0 授权代码的衍生作品必须采用相同许可证公开源码，以防止专有软件对自由软件的限制。
+> 该协议还强化了对数字版权管理（DRM）的技术中立性约束，并提升了与其他开源许可证的兼容性。
+
+有关更多信息，请参阅 [LICENSE](LICENSE) 文件。
 
 ## 一行命令开始开发
 
