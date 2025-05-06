@@ -1,7 +1,7 @@
 <script setup>
 import { RouterView } from "vue-router";
-import { confirm } from "mdui/functions/confirm";
-import { alert } from "mdui/functions/alert";
+import { confirm as mduiConfirm } from "mdui/functions/confirm";
+import { alert as mduiAlert } from "mdui/functions/alert";
 </script>
 
 <template>
@@ -36,7 +36,7 @@ export default {
   name: "App",
   methods: {
     showLanguageSwitchConfirmation() {
-      confirm({
+      mduiConfirm({
         headline: this.$t("App.languageSwitch.headline"),
         description: this.$t("App.languageSwitch.description"),
         confirmText: this.$t("App.languageSwitch.confirmText"),
@@ -50,7 +50,7 @@ export default {
       });
     },
     showSettingsDialog() {
-      alert({
+      mduiAlert({
         headline: this.$t("App.settingsDialog.title"),
         description: this.$t("App.settingsDialog.content"),
         confirmText: this.$t("App.settingsDialog.confirmText"),

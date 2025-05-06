@@ -13,6 +13,7 @@
 ![ReelSync 截图](docs/screenshot.png)
 
 如简介所言，这是一个 **基于现代 Web 技术（如 WebRTC）的** 实时视频流共享工具。
+
 - 在配置了 TURN / STUN 服务器的条件下，她允许用户 **向互联网上任意其他用户分享本地的视频（或在线视频流）**，而无需担心跨平台、跨设备、跨网络的问题。
 - 出于她 **端到端** 的工作原理，用户不需要有任何形式的注册登录行为，视频流数据也不会被存储在服务器上。
 - 在未来，更多特性将会被加入，如 **屏幕共享、实时聊天** 等。
@@ -30,7 +31,6 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
 - `VITE_NODE_SERVER_URL` - 你的 `iceServer` 服务器列表地址（API 格式参考 Cloudflare Call）
 - `VITE_MAX_ACCEPTABLE_DELAY_SECONDS` - 最大可接受延迟时间（秒）
 - `VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS` - 同源模式下视频进度同步间隔时间（秒）
-
 
 ## 路线图
 
@@ -74,7 +74,7 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
   - [x] 手动切换
 
 - [ ] 其他功能
-  - [ ] 分享直链
+  - [x] 分享直链
   - [ ] 自定义背景图
 
 ## 许可证

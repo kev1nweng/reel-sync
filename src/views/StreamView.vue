@@ -14,18 +14,21 @@ import BlankPadding from "@/components/BlankPadding.vue";
     <span class="monospace" id="room-id-indicator">{{
       $t("StreamView.messages.roomID", { roleDescription, roomID })
     }}</span>
+    <span class="monospace" v-if="!isSlave" id="share-link-indicator"
+      >{{ locationOrigin }}/?join={{ roomID }}</span
+    >
     <span v-if="!isReady">{{ hint }}</span
     ><reelsync-padding></reelsync-padding>
     <div v-if="!isReady">
       <reelsync-padding></reelsync-padding>
-      <loading-ring id="loading"></loading-ring><br />
+      <reelsync-loading-ring id="loading"></reelsync-loading-ring><br />
       <h3>{{ loadingDescription }}</h3>
     </div>
     <br />
-    <video-player
+    <reelsync-video-player
       id="video-player-stream"
       :style="{ display: isReady ? 'block' : 'none' }"
-    ></video-player
+    ></reelsync-video-player
     ><reelsync-padding></reelsync-padding>
     <span id="status"
       ><s :style="{ color: isReady ? 'green' : 'red' }">⬤</s>
@@ -64,6 +67,7 @@ export default {
       maxAttempts: 3,
       isReady: false,
       playbackDelta: null,
+      locationOrigin: location.origin,
       get method() {
         return shared.app.method;
       },
@@ -293,8 +297,8 @@ export default {
     if (shared.app.pingThread) clearInterval(shared.app.pingThread);
   },
   components: {
-    "loading-ring": LoadingRing,
-    "video-player": VideoPlayer,
+    "reelsync-loading-ring": LoadingRing,
+    "reelsync-video-player": VideoPlayer,
     "reelsync-padding": BlankPadding,
   },
 };
@@ -309,6 +313,10 @@ export default {
 
 #room-id-indicator {
   color: gray;
+}
+
+#share-link-indicator {
+  color: slategray;
 }
 
 #loading {

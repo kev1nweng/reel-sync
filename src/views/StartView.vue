@@ -7,10 +7,13 @@ import Peer from "peerjs";
 import VideoInput from "@/components/VideoInput.vue";
 import VideoPlayer from "@/components/VideoPlayer.vue";
 import BlankPadding from "@/components/BlankPadding.vue";
+import LoadingRing from "@/components/LoadingRing.vue";
+
+import { alert as mduiAlert } from "mdui/functions/alert";
 </script>
 
 <template>
-  <div class="container-c">
+  <div class="container-c" v-if="!isShareIncoming">
     <h1>{{ $t("StartView.title") }}</h1>
     <span>{{ $t("StartView.description") }}<br />{{ modeDescription }}</span>
     <reelsync-padding></reelsync-padding>
@@ -96,6 +99,11 @@ import BlankPadding from "@/components/BlankPadding.vue";
       >
     </div>
   </div>
+  <div class="container-c" v-else>
+    <reelsync-loading-ring style="margin: 0 auto"></reelsync-loading-ring>
+    <reelsync-padding></reelsync-padding>
+    <h3>{{ $t("StartView.messages.connectingToTURN") }}</h3>
+  </div>
 </template>
 
 <script>
@@ -110,6 +118,7 @@ export default {
       isOriginReady: false,
       isLoading: false,
       isRoomReady: false,
+      isShareIncoming: false,
       get methodName() {
         return this.method === 0
           ? shared.app.i18n.t("StartView.methods.name.p2p")
@@ -273,6 +282,27 @@ export default {
   },
   mounted() {
     window.addEventListener("keypress", this.handleKeyPress);
+    const urlParams = new URLSearchParams(window.location.search);
+    const joinParam = urlParams.get("join");
+    if (joinParam) {
+      if (joinParam.length === 16) {
+        this.isShareIncoming = true;
+        this.isLoading = true;
+        shared.app.roomID = joinParam;
+        shared.app.mode = 1;
+        this.isRoomReady = true;
+        this.joinRoom();
+        this.isLoading = false;
+      } else {
+        (async () => {
+          await mduiAlert({
+            headline: this.$t("StartView.messages.invalidRoomIDParam.headline"),
+            description: this.$t("StartView.messages.invalidRoomIDParam.description"),
+          });
+          location.replace(location.origin);
+        })();
+      }
+    }
   },
   unmounted() {
     window.removeEventListener("keypress", this.handleKeyPress);
@@ -297,10 +327,7 @@ export default {
         roomIDInput.setAttribute("helper", this.$t("StartView.roomIDInput.helper.empty"));
       } else {
         this.isRoomReady = false;
-        roomIDInput.setAttribute(
-          "helper",
-          this.$t("StartView.roomIDInput.helper.invalid"),
-        );
+        roomIDInput.setAttribute("helper", this.$t("StartView.roomIDInput.helper.invalid"));
       }
     },
     originURL(value) {
@@ -323,7 +350,8 @@ export default {
   components: {
     "reelsync-video-input": VideoInput,
     "reelsync-video-player": VideoPlayer,
-    "reelsync-padding": BlankPadding
+    "reelsync-padding": BlankPadding,
+    "reelsync-loading-ring": LoadingRing,
   },
 };
 </script>

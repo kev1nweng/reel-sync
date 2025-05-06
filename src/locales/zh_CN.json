@@ -23,7 +23,12 @@
     "title": "开始",
     "description": "⠀调整选项并开始分享您的视频流。",
     "messages": {
-      "toggleUnavailable": "选项不可用"
+      "toggleUnavailable": "选项不可用",
+      "invalidRoomIDParam": {
+        "headline": "链接无效",
+        "description": "分享链接中给出的房间 ID 无效。请核对来自您伙伴的链接是否被完整地复制。"
+      },
+      "connectingToTURN": "正在连接到服务器"
     },
     "buttons": {
       "uploadVideo": "加载视频文件",
@@ -60,7 +65,7 @@
   "StreamView": {
     "title": "流式传输",
     "hint": {
-      "master": "⠀号码已复制。请您将号码发送给您的伙伴。",
+      "master": "⠀号码已复制。请您将号码或链接发送给您的伙伴。",
       "slave": "⠀请耐心等待。正在全球互联网寻找您的伙伴..."
     },
     "roleDescription": {
@@ -79,7 +84,8 @@
       "sameOriginLiteral": "同源",
       "p2pLiteral": "点对点",
       "delta": "视频进度差异",
-      "latency": "网络延迟"
+      "latency": "网络延迟",
+      "shareLink": "分享链接"
     }
   }
 }

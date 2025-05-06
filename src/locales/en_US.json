@@ -23,7 +23,12 @@
     "title": "Start",
     "description": "Toggle the options to your needs and start sharing your media stream.",
     "messages": {
-      "toggleUnavailable": "Unavailable"
+      "toggleUnavailable": "Unavailable",
+      "invalidRoomIDParam": {
+        "description": "The Room ID given in your URL is invalid. Please check whether the share link is correctly pasted. ",
+        "headline": "Invalid URL"
+      },
+      "connectingToTURN": "Connecting"
     },
     "buttons": {
       "uploadVideo": "Load Your Video",
@@ -60,7 +65,7 @@
   "StreamView": {
     "title": "Stream",
     "hint": {
-      "master": "Your Room ID is copied. Send it to your partner.",
+      "master": "Your Room ID is copied. Send the ID or the URL to your partner.",
       "slave": "Please wait patiently as we are looking for your partner on the Internet."
     },
     "roleDescription": {
@@ -79,7 +84,8 @@
       "sameOriginLiteral": "same-origin",
       "p2pLiteral": "peer-to-peer",
       "delta": "Video progress difference",
-      "latency": "Network latency"
+      "latency": "Network latency",
+      "shareLink": "Share Link"
     }
   }
 }
