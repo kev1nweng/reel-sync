@@ -14,9 +14,11 @@
     },
     "settingsButton": "设置",
     "settingsDialog": {
-      "title": "功能未完成",
-      "content": "前面的区域，以后再来探索吧！",
-      "confirmText": "好的"
+      "title": "设置",
+      "description": "键入配置文件（功能未完成）",
+      "confirmText": "提交",
+      "cancelText": "取消",
+      "helper": "此处键入的配置会被存储，但不会被利用。"
     }
   },
   "StartView": {
@@ -28,7 +30,8 @@
         "headline": "链接无效",
         "description": "分享链接中给出的房间 ID 无效。请核对来自您伙伴的链接是否被完整地复制。"
       },
-      "connectingToTURN": "正在连接到服务器"
+      "connectingToTURN": "正在连接到服务器",
+      "turnNodeError": "请求信使节点失败：您可能无法在 NAT 受限网络间建立连接。"
     },
     "buttons": {
       "uploadVideo": "加载视频文件",
@@ -85,7 +88,8 @@
       "p2pLiteral": "点对点",
       "delta": "视频进度差异",
       "latency": "网络延迟",
-      "shareLink": "分享链接"
+      "shareLink": "分享链接",
+      "connectionRestricted": "连接受限：信使节点不可用"
     }
   }
 }

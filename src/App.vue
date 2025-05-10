@@ -1,7 +1,7 @@
 <script setup>
 import { RouterView } from "vue-router";
 import { confirm as mduiConfirm } from "mdui/functions/confirm";
-import { alert as mduiAlert } from "mdui/functions/alert";
+import { prompt as mduiPrompt } from "mdui/functions/prompt";
 </script>
 
 <template>
@@ -50,11 +50,25 @@ export default {
       });
     },
     showSettingsDialog() {
-      mduiAlert({
+      mduiPrompt({
         headline: this.$t("App.settingsDialog.title"),
-        description: this.$t("App.settingsDialog.content"),
+        description: this.$t("App.settingsDialog.description"),
         confirmText: this.$t("App.settingsDialog.confirmText"),
-        onConfirm: () => null,
+        cancelText: this.$t("App.settingsDialog.cancelText"),
+        closeOnEsc: true,
+        onConfirm: (value) => {
+          localStorage.setItem("reelsync-settings", value);
+        },
+        onCancel: () => null,
+        textFieldOptions: {
+          label: "JSON",
+          value: localStorage.getItem("reelsync-settings") ?? "",
+          type: "text",
+          variant: "outlined",
+          required: true,
+          helper: this.$t("App.settingsDialog.helper"),
+          clearable: true,
+        },
       });
     },
   },

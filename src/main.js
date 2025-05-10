@@ -36,6 +36,7 @@ export const shared = {
   app: {
     mode: 0,
     method: 0,
+    isConnectionRestricted: false,
     roomID: "",
     guestID: "",
     videoURL: "",

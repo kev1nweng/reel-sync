@@ -23,6 +23,9 @@ import BlankPadding from "@/components/BlankPadding.vue";
       <reelsync-padding></reelsync-padding>
       <reelsync-loading-ring id="loading"></reelsync-loading-ring><br />
       <h3>{{ loadingDescription }}</h3>
+      <h4 style="color: crimson" v-if="isConnectionRestricted">
+        {{ $t("StreamView.messages.connectionRestricted") }}
+      </h4>
     </div>
     <br />
     <reelsync-video-player
@@ -91,6 +94,9 @@ export default {
       },
       get isSlave() {
         return shared.app.mode == 1;
+      },
+      get isConnectionRestricted() {
+        return shared.app.isConnectionRestricted;
       },
     };
   },

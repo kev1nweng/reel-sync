@@ -10,6 +10,7 @@ import BlankPadding from "@/components/BlankPadding.vue";
 import LoadingRing from "@/components/LoadingRing.vue";
 
 import { alert as mduiAlert } from "mdui/functions/alert";
+import { snackbar as mduiSnackbar } from "mdui/functions/snackbar";
 </script>
 
 <template>
@@ -212,21 +213,39 @@ export default {
 
     // 创建新房间(主控端)
     async createRoom() {
-      const cfg = (await this.getTurnNode()) ?? {};
+      const cfg = (await this.getTurnNode()) ?? null;
       const id = new PeerID().id;
+
+      if (!cfg) {
+        mduiSnackbar({
+          message: this.$t("StartView.messages.turnNodeError"),
+          closeOnOutsideClick: true,
+        });
+        shared.app.isConnectionRestricted = true;
+      }
+
       shared.app.roomID = id.raw;
-      shared.peers.local.data = new Peer(id.data, { config: cfg });
-      shared.peers.local.video = new Peer(id.video, { config: cfg });
+      shared.peers.local.data = new Peer(id.data, cfg ? { config: cfg } : null);
+      shared.peers.local.video = new Peer(id.video, cfg ? { config: cfg } : null);
       this.$router.push("/stream");
     },
 
     // 加入已有房间(从属端)
     async joinRoom() {
-      const cfg = (await this.getTurnNode()) ?? {};
+      const cfg = (await this.getTurnNode()) ?? null;
       const id = new PeerID().id;
+
+      if (!cfg) {
+        mduiSnackbar({
+          message: this.$t("StartView.messages.turnNodeError"),
+          closeOnOutsideClick: true,
+        });
+        shared.app.isConnectionRestricted = true;
+      }
+
       shared.app.guestID = id.raw;
-      shared.peers.local.data = new Peer(id.data, { config: cfg });
-      shared.peers.local.video = new Peer(id.video, { config: cfg });
+      shared.peers.local.data = new Peer(id.data, cfg ? { config: cfg } : null);
+      shared.peers.local.video = new Peer(id.video, cfg ? { config: cfg } : null);
       this.$router.push("/stream");
     },
 

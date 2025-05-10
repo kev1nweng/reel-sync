@@ -14,9 +14,11 @@
     },
     "settingsButton": "Settings",
     "settingsDialog": {
-      "content": "The area ahead, let's explore it later!",
-      "confirmText": "OK",
-      "title": "Feature Undone"
+      "title": "Settings",
+      "confirmText": "Submit",
+      "cancelText": "Cancel",
+      "description": "Insert your configuration (WIP)",
+      "helper": "The configuration you type here will be stored but not utilized."
     }
   },
   "StartView": {
@@ -28,7 +30,8 @@
         "description": "The Room ID given in your URL is invalid. Please check whether the share link is correctly pasted. ",
         "headline": "Invalid URL"
       },
-      "connectingToTURN": "Connecting"
+      "connectingToTURN": "Connecting",
+      "turnNodeError": "Failed to request TURN / STUN node: You may not be able to connect between NAT-restricted networks."
     },
     "buttons": {
       "uploadVideo": "Load Your Video",
@@ -85,7 +88,8 @@
       "p2pLiteral": "peer-to-peer",
       "delta": "Video progress difference",
       "latency": "Network latency",
-      "shareLink": "Share Link"
+      "shareLink": "Share Link",
+      "connectionRestricted": "Limited connection: Relay node unavailable"
     }
   }
 }
