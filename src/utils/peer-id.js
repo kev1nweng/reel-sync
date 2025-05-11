@@ -1,10 +1,8 @@
 import CryptoJS from "crypto-js";
-import { msg } from "./msg";
 
 export class PeerID {
   constructor() {
     const seq = this.generate();
-    msg.d(`PeerID: ${seq}`);
     this.id.raw = seq;
     this.id.data = `${seq}-data`;
     this.id.video = `${seq}-video`;
@@ -15,6 +13,9 @@ export class PeerID {
     video: "",
   };
   generate() {
-    return `${CryptoJS.HmacSHA1(Math.random().toString(), "whyisthisnotworking")}`.substring(0, 16);
+    return `${CryptoJS.HmacSHA1(Math.random().toString(), "tungtungtungtungsahur")}`.substring(
+      0,
+      16,
+    );
   }
 }

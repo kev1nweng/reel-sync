@@ -1,5 +1,5 @@
 <script setup>
-import { PeerID } from "@/utils/PeerID";
+import { PeerID } from "@/utils/peer-id";
 import { shared } from "@/main";
 import { msg } from "@/utils/msg";
 
@@ -165,7 +165,7 @@ export default {
     // 检查选择的视频文件是否有效
     checkVideoValidity() {
       const videoInput = document.querySelector("#video-input");
-      msg.i(`已获得视频文件：${videoInput.value}`);
+      msg.i(`Acquired video file: ${videoInput.value}`);
       if (videoInput.value) {
         return true;
       } else {
@@ -188,7 +188,7 @@ export default {
           body: JSON.stringify(data),
         });
         if (!response.ok) {
-          msg.e("TURN 节点请求失败");
+          msg.e("Failed to request TURN / STUN node:", response.statusText);
           return false;
         }
         const result = await response.json();
@@ -206,7 +206,7 @@ export default {
         };
         return cfg;
       } catch (error) {
-        msg.e("TURN 节点请求失败：", error);
+        msg.e("Failed to request TURN / STUN node:", error);
         return false;
       }
     },
@@ -329,11 +329,11 @@ export default {
   watch: {
     mode(value) {
       shared.app.mode = value;
-      msg.i(`全局模式改变：${shared.app.mode === 0 ? "master" : "slave"}`);
+      msg.i(`Role changed: ${shared.app.mode === 0 ? "master" : "slave"}`);
     },
     method(value) {
       shared.app.method = value;
-      msg.i(`传输方式改变：${shared.app.method === 0 ? "p2p" : "same-origin"}`);
+      msg.i(`Method changed: ${shared.app.method === 0 ? "p2p" : "same-origin"}`);
     },
     roomID(value) {
       const roomIDInput = document.getElementById("room-id-input");
@@ -357,7 +357,7 @@ export default {
           /^(?:(http|https|ftp):\/\/)?((|[\w-]+\.)+[a-z0-9]+)(?:(\/[^/?#]+)*)?(\?[^#]+)?(#.+)?$/i,
         )
       ) {
-        msg.d("video ready");
+        msg.i("Video is ready");
         this.isOriginReady = true;
         originURLInput.removeAttribute("helper");
         shared.app.videoURL = value;

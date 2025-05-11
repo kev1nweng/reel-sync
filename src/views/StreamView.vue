@@ -1,7 +1,7 @@
 <script setup>
 import { shared } from "@/main";
 import { msg } from "@/utils/msg";
-// import { transformSdp } from "@/utils/sdp";
+import { Comm } from "@/utils/comm";
 
 import LoadingRing from "@/components/LoadingRing.vue";
 import VideoPlayer from "@/components/VideoPlayer.vue";
@@ -104,13 +104,14 @@ export default {
     connectToPeer() {
       const remotePeerId = `${shared.app.roomID}-data`;
       const dataPeer = shared.peers.local.data;
+      const comm = new Comm();
 
       // 确保peer已经就绪
       if (dataPeer.disconnected) {
         dataPeer.reconnect();
       }
 
-      msg.i(`尝试连接到 ${remotePeerId} (第 ${this.connectionAttempts + 1} 次)`);
+      msg.i(`Connecting to ${remotePeerId} (Attempt ${this.connectionAttempts + 1})`);
 
       // 建立数据通道连接
       const conn = dataPeer.connect(remotePeerId, {
@@ -119,12 +120,12 @@ export default {
 
       // 连接成功回调
       conn.on("open", () => {
-        conn.send(`connected@${shared.app.guestID}`);
-        msg.i(`和 ${shared.app.roomID} 的连接已建立`);
+        conn.send(comm.slave.greet(shared.app.guestID));
+        msg.i(`Connection established with ${shared.app.roomID}.`);
         shared.peers.local.video.on("call", (call) => {
           call.answer();
           call.on("stream", (stream) => {
-            msg.i("收到视频流");
+            msg.i("Received video stream");
             const video = document.getElementById("video-player-stream");
             video.srcObject = stream;
             video.load();
@@ -137,42 +138,48 @@ export default {
 
       // 数据接收处理
       conn.on("data", (data) => {
+        const commMsg = comm.resolve(data.toString());
         const video = document.getElementById("video-player-stream");
-        if (data.toString().startsWith("origin")) {
-          shared.app.method = 1;
-          const origin = data.toString().split("@")[1];
-          video.src = origin;
-          shared.app.syncThread = setInterval(
-            () => {
-              msg.i(`发送当前视频进度: ${video.currentTime}`);
-              conn.send(`video@sync:${video.currentTime}&timestamp=${Date.now()}`);
-            },
-            import.meta.env.VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS * 1e3,
-          );
-        } else if (data.toString().startsWith("video")) {
-          const command = data.toString().split("@")[1];
-          if (command === "play") {
+        switch (commMsg.command) {
+          case "origin":
+            shared.app.method = 1;
+            video.src = commMsg.data.ori;
+            shared.app.syncThread = setInterval(
+              () => {
+                msg.i(`Sending playback progress: ${video.currentTime}`);
+                conn.send(comm.slave.progress(video.currentTime, Date.now()));
+              },
+              import.meta.env.VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS * 1e3,
+            );
+            break;
+          case "play":
             video.play();
-          } else if (command === "pause") {
+            break;
+          case "pause":
             video.pause();
-          } else if (command.startsWith("seek")) {
-            const time = data.toString().split("@")[1].split(":")[1];
-            video.currentTime = time;
+            break;
+          case "seek":
+            video.currentTime = commMsg.data.time;
+            break;
+          case "latency":
+            this.playbackDelta = parseFloat(commMsg.data.lat);
+            break;
+          case "timestamp": {
+            const timestamp = parseFloat(commMsg.data.atu);
+            const latency = (Date.now() - timestamp) / 1000;
+            this.playbackDelta = latency;
+            conn.send(comm.slave.latency(latency));
+            break;
           }
-        } else if (data.toString().startsWith("latency")) {
-          const latency = parseFloat(data.toString().split("@")[1]);
-          this.playbackDelta = latency;
-        } else if (data.toString().startsWith("timestamp")) {
-          const timestamp = parseFloat(data.toString().split("@")[1]);
-          const latency = (Date.now() - timestamp) / 1000;
-          this.playbackDelta = latency;
-          conn.send(`latency@${latency}`);
+          default:
+            msg.w(`Invalid message: ${data}`);
+            break;
         }
       });
 
       // 错误处理和重试
       conn.on("error", (err) => {
-        msg.e(`和 ${shared.app.roomID} 的连接建立失败: ${err.message}`);
+        msg.e(`Failed to establish connection with ${shared.app.roomID}: ${err.message}`);
         console.error(err);
         this.connectionAttempts++;
         // 延迟重试
@@ -181,7 +188,7 @@ export default {
 
       // 连接关闭处理
       conn.on("close", () => {
-        msg.w("连接已关闭");
+        msg.w("Connection closed");
         shared.peers.remote.data = null;
         this.isReady = false;
         const video = document.getElementById("video-player-stream");
@@ -212,80 +219,86 @@ export default {
       }
     } else {
       navigator.clipboard.writeText(this.roomID);
+      const comm = new Comm();
 
       // 处理连接请求
       shared.peers.local.data.on("connection", (conn) => {
         conn.on("open", function () {
-          msg.i(`已收到来自 ${conn.peer} 的连接`);
+          msg.i(`Received connection from ${conn.peer}`);
           shared.peers.remote.data = conn;
         });
 
         // 数据接收处理
         conn.on("data", function (data) {
-          const status = data.toString().split("@")[0];
-          const peerID = data.toString().split("@")[1];
-          if (status === "connected") {
-            msg.i(`和 ${conn.peer} 的连接已建立`);
-            that.isReady = true;
-            if (shared.app.method == 0) {
-              const videoPlayer = document.querySelector("#video-player-stream");
-              let stream;
-              try {
-                stream = videoPlayer.captureStream();
-              } catch (e) {
-                stream = videoPlayer.mozCaptureStream();
-                msg.w(`由于错误: ${e} 尝试使用 mozCaptureStream()...`);
-              }
-              // eslint-disable-next-line no-unused-vars
-              const call = shared.peers.local.video.call(`${peerID}-video`, stream);
-              shared.app.pingThread = setInterval(
-                () => {
-                  conn.send(`timestamp@${Date.now()}`);
-                },
-                import.meta.env.VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS * 1e3,
-              );
-            } else {
-              const video = document.getElementById("video-player-stream");
-              conn.send(`origin@${shared.app.videoURL}`);
-              video.addEventListener("play", () => {
-                conn.send("video@play");
-              });
-              video.addEventListener("pause", () => {
-                conn.send("video@pause");
-              });
-              video.addEventListener("seeking", () => {
-                conn.send(`video@seek:${video.currentTime}`);
-              });
-            }
-          } else if (status == "video") {
-            const video = document.getElementById("video-player-stream");
-            const message = data.toString().split("@")[1];
-            if (message.startsWith("sync")) {
-              // this is really garbage code but i dont have time for a cleaner implementaion
-              const time = message.split(":")[1].split("&")[0];
-              const offset = (Date.now() - message.split(":")[1].split("&")[1].split("=")[1]) / 1e3;
-              const delta = time - video.currentTime - offset;
-              if (Math.abs(delta) > (import.meta.env.VITE_MAX_ACCEPTABLE_DELAY_SECONDS ?? 3)) {
-                msg.w(`时间差过大，尝试同步。时间差：${delta}`);
-                that.playbackDelta = delta;
-                conn.send(`video@seek:${video.currentTime}`);
+          const commMsg = comm.resolve(data.toString());
+          const status = commMsg.command;
+          const peerID = commMsg.data ? commMsg.data.gid : undefined;
+          switch (status) {
+            case "connected": {
+              msg.i(`Connection established with ${conn.peer}`);
+              that.isReady = true;
+              if (shared.app.method == 0) {
+                const videoPlayer = document.querySelector("#video-player-stream");
+                let stream;
+                try {
+                  stream = videoPlayer.captureStream();
+                } catch (e) {
+                  stream = videoPlayer.mozCaptureStream();
+                  msg.w(`Error: ${e} Attempting mozCaptureStream()...`);
+                }
+                // eslint-disable-next-line no-unused-vars
+                const call = shared.peers.local.video.call(`${peerID}-video`, stream);
+                shared.app.pingThread = setInterval(
+                  () => {
+                    conn.send(comm.master.timestamp());
+                  },
+                  import.meta.env.VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS * 1e3,
+                );
               } else {
-                msg.i(`收到从节点报告的播放进度。时间差：${delta}`);
+                const video = document.getElementById("video-player-stream");
+                conn.send(comm.master.origin(shared.app.videoURL));
+                video.addEventListener("play", () => {
+                  conn.send(comm.master.play());
+                });
+                video.addEventListener("pause", () => {
+                  conn.send(comm.master.pause());
+                });
+                video.addEventListener("seeking", () => {
+                  conn.send(comm.master.seek(video.currentTime));
+                });
+              }
+              break;
+            }
+            case "progress": {
+              const video = document.getElementById("video-player-stream");
+              const time = parseFloat(commMsg.data.cur);
+              const atu = parseFloat(commMsg.data.atu);
+              const offset = (Date.now() - atu) / 1e3;
+              const delta = video.currentTime - (time + offset);
+              if (Math.abs(delta) > (import.meta.env.VITE_MAX_ACCEPTABLE_DELAY_SECONDS ?? 3)) {
+                msg.w(`Attempting to force sync due to too much latency: ${delta}`);
+                that.playbackDelta = delta;
+                conn.send(comm.master.seek(video.currentTime + offset));
+              } else {
+                msg.i(`Received status report from the peer. Delta: ${delta}`);
                 that.playbackDelta = delta;
               }
-              conn.send(`latency@${delta}`);
+              conn.send(comm.master.latency(delta));
+              break;
             }
-          } else if (status == "latency") {
-            const latency = data.toString().split("@")[1];
-            that.playbackDelta = latency;
-          } else {
-            msg.e(`收到无效消息：${data}`);
+            case "latency": {
+              that.playbackDelta = commMsg.data.lat;
+              break;
+            }
+            default: {
+              msg.e(`Invalid message: ${data}`);
+            }
           }
         });
 
         // 连接关闭处理
         conn.on("close", () => {
-          msg.w("连接已关闭");
+          msg.w("Connection closed");
           shared.peers.remote.data = null;
           this.isReady = false;
           const video = document.getElementById("video-player-stream");

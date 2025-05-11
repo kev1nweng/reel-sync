@@ -61,16 +61,16 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
 
 - [ ] 用户设置
   - [ ] 自定义设置 UI
-  - [ ] `localStorage API` 配置存储
+  - [x] `localStorage API` 配置存储
 
 - [ ] 跨平台应用
   - [ ] 原生 WebView 安卓应用
   - [ ] ~~Capacitor iOS 应用~~
 
-- [ ] i18n 多语言支持 ←
+- [x] i18n 多语言支持
   - [x] StartView UI (CN/EN)
   - [x] StreamView UI (CN/EN)
-  - [ ] ~~msg (CN/EN)~~
+  - [x] ~~msg (CN/EN)~~
   - [x] 手动切换
 
 - [ ] 其他功能

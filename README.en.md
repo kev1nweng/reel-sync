@@ -61,16 +61,16 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
 
 - [ ] User settings
   - [ ] Custom settings UI
-  - [ ] `localStorage API` configuration storage
+  - [x] `localStorage API` configuration storage
 
 - [ ] Cross-platform applications
   - [ ] Capacitor Android application
   - [ ] ~~Capacitor iOS application~~
 
-- [ ] i18n multilingual support ←
+- [x] i18n multilingual support
   - [x] StartView UI (CN/EN)
   - [x] StreamView UI (CN/EN)
-  - [ ] ~~msg (CN/EN)~~
+  - [x] ~~msg (CN/EN)~~
   - [x] Manual switch
 
 - [ ] Other features
