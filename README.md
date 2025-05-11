@@ -28,6 +28,11 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
 
 ## 环境变量
 
+> [!Warning]
+> ReelSync 的自动同步目标为 **现实世界中的同步**；因此，**双方设备时间准确** 是一个关键因素。
+> 您可以使用时间服务器统一校时来达到这一点。
+> 若无法保证时间的精确同步，请将最大可接受延迟时间调高一些（至少 1 秒钟）。
+
 - `VITE_NODE_SERVER_URL` - 你的 `iceServer` 服务器列表地址（API 格式参考 Cloudflare Call）
 - `VITE_MAX_ACCEPTABLE_DELAY_SECONDS` - 最大可接受延迟时间（秒）
 - `VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS` - 同源模式下视频进度同步间隔时间（秒）

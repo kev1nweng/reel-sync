@@ -28,6 +28,11 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
 
 ## Environment Variables
 
+> [!Warning]
+> The goal of ReelSync's auto-sync is **real-world synchronization**; therefore, **accurate device time on both sides** is a key factor.
+> You can use a time server to synchronize clocks.
+> If precise time synchronization cannot be guaranteed, please increase the maximum acceptable delay (at least 1 second).
+
 - `VITE_NODE_SERVER_URL` - Your `iceServer` server list address (Refer to Cloudflare Call for API documentation)
 - `VITE_MAX_ACCEPTABLE_DELAY_SECONDS` - Maximum acceptable delay time (seconds)
 - `VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS` - Sync interval time for video progress in same-origin mode (seconds)
@@ -64,7 +69,7 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
   - [x] `localStorage API` configuration storage
 
 - [ ] Cross-platform applications
-  - [ ] Capacitor Android application
+  - [ ] Native WebView Android application
   - [ ] ~~Capacitor iOS application~~
 
 - [x] i18n multilingual support
