@@ -81,6 +81,7 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
 - [ ] Other features
   - [x] Direct share link
   - [ ] Background image customization
+  - [ ] Advanced synchronization based on RTT (Round-Trip Time)
 
 ## License
 
