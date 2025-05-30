@@ -18,7 +18,11 @@
       "confirmText": "Submit",
       "cancelText": "Cancel",
       "description": "Insert your configuration (WIP)",
-      "helper": "The configuration you type here will be stored but not utilized."
+      "helper": "The configuration you type here will be stored but not utilized.",
+      "error": {
+        "headline": "Error saving configuration",
+        "description": "The format of your configuration is incorrect, thus not loaded. Error message: "
+      }
     }
   },
   "StartView": {

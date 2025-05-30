@@ -54,4 +54,5 @@ export const shared = {
       video: null,
     },
   },
+  preferences: null,
 };

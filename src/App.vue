@@ -2,25 +2,18 @@
 import { RouterView } from "vue-router";
 import { confirm as mduiConfirm } from "mdui/functions/confirm";
 import { prompt as mduiPrompt } from "mdui/functions/prompt";
+import { alert as mduiAlert } from "mdui/functions/alert";
+import { shared } from "./main";
+import { msg } from "./utils/msg";
 </script>
 
 <template>
   <div class="topbar">
-    <mdui-chip
-      icon="language--rounded"
-      class="topbar-lbtn"
-      elevated
-      @click="showLanguageSwitchConfirmation"
-      >{{ $t("App.languageSwitch.indicatorButton") }}</mdui-chip
-    >
+    <mdui-chip icon="language--rounded" class="topbar-lbtn" elevated @click="showLanguageSwitchConfirmation">{{
+      $t("App.languageSwitch.indicatorButton") }}</mdui-chip>
     <img src="./assets/logo.png" alt="ReelSync Logo" id="logo" />
-    <mdui-chip
-      end-icon="settings--rounded"
-      class="topbar-rbtn"
-      elevated
-      @click="showSettingsDialog"
-      >{{ $t("App.settingsButton") }}</mdui-chip
-    >
+    <mdui-chip end-icon="settings--rounded" class="topbar-rbtn" elevated @click="showSettingsDialog">{{
+      $t("App.settingsButton") }}</mdui-chip>
     <div id="title">ReelSync</div>
   </div>
   <RouterView />
@@ -34,7 +27,25 @@ import { prompt as mduiPrompt } from "mdui/functions/prompt";
 <script>
 export default {
   name: "App",
+  mounted() {
+    document.addEventListener("DOMContentLoaded", () => { // delay a bit so that shared is initialized
+      this.updatePreferences(
+        localStorage.getItem("reelsync-settings") ?? "{}"
+      )
+      msg.i("User preferences loaded")
+    });
+  },
   methods: {
+    updatePreferences(value) {
+      try {
+        shared.preferences = JSON.parse(value);
+      } catch (e) {
+        mduiAlert({
+          headline: this.$t("App.settingsDialog.error.headline"),
+          description: `${this.$t("App.settingsDialog.error.description")}${e.message}`,
+        });
+      }
+    },
     showLanguageSwitchConfirmation() {
       mduiConfirm({
         headline: this.$t("App.languageSwitch.headline"),
@@ -58,6 +69,7 @@ export default {
         closeOnEsc: true,
         onConfirm: (value) => {
           localStorage.setItem("reelsync-settings", value);
+          this.updatePreferences(value);
         },
         onCancel: () => null,
         textFieldOptions: {
@@ -133,11 +145,11 @@ footer {
   pointer-events: none;
 }
 
-.topbar > img {
+.topbar>img {
   padding: 6px;
 }
 
-.topbar > div {
+.topbar>div {
   padding: 6px;
 }
 
