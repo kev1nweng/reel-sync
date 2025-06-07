@@ -29,18 +29,22 @@
     "title": "开始",
     "description": "⠀调整选项并开始分享您的视频流。",
     "messages": {
+      "or": "或者",
       "toggleUnavailable": "选项不可用",
       "invalidRoomIDParam": {
         "headline": "链接无效",
         "description": "分享链接中给出的房间 ID 无效。请核对来自您伙伴的链接是否被完整地复制。"
       },
       "connectingToTURN": "正在连接到服务器",
-      "turnNodeError": "请求信使节点失败：您可能无法在 NAT 受限网络间建立连接。"
+      "turnNodeError": "请求信使节点失败：您可能无法在 NAT 受限网络间建立连接。",
+      "screenShareError": "请求桌面视频流失败。请检查您的浏览器是否自动拒绝了请求？",
+      "screenShareNotSupported": "请求桌面视频流失败。您的浏览器似乎不支持屏幕共享。"
     },
     "buttons": {
       "uploadVideo": "加载视频文件",
       "createRoom": "创建房间",
-      "joinRoom": "加入房间"
+      "joinRoom": "加入房间",
+      "requestScreenShare": "开始共享屏幕"
     },
     "labels": {
       "sourceURL": "源 URL",

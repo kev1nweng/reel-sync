@@ -9,11 +9,21 @@ import { msg } from "./utils/msg";
 
 <template>
   <div class="topbar">
-    <mdui-chip icon="language--rounded" class="topbar-lbtn" elevated @click="showLanguageSwitchConfirmation">{{
-      $t("App.languageSwitch.indicatorButton") }}</mdui-chip>
+    <mdui-chip
+      icon="language--rounded"
+      class="topbar-lbtn"
+      elevated
+      @click="showLanguageSwitchConfirmation"
+      >{{ $t("App.languageSwitch.indicatorButton") }}</mdui-chip
+    >
     <img src="./assets/logo.png" alt="ReelSync Logo" id="logo" />
-    <mdui-chip end-icon="settings--rounded" class="topbar-rbtn" elevated @click="showSettingsDialog">{{
-      $t("App.settingsButton") }}</mdui-chip>
+    <mdui-chip
+      end-icon="settings--rounded"
+      class="topbar-rbtn"
+      elevated
+      @click="showSettingsDialog"
+      >{{ $t("App.settingsButton") }}</mdui-chip
+    >
     <div id="title">ReelSync</div>
   </div>
   <RouterView />
@@ -28,11 +38,10 @@ import { msg } from "./utils/msg";
 export default {
   name: "App",
   mounted() {
-    document.addEventListener("DOMContentLoaded", () => { // delay a bit so that shared is initialized
-      this.updatePreferences(
-        localStorage.getItem("reelsync-settings") ?? "{}"
-      )
-      msg.i("User preferences loaded")
+    document.addEventListener("DOMContentLoaded", () => {
+      // delay a bit so that shared is initialized
+      this.updatePreferences(localStorage.getItem("reelsync-settings") ?? "{}");
+      msg.i("User preferences loaded");
     });
   },
   methods: {
@@ -145,11 +154,11 @@ footer {
   pointer-events: none;
 }
 
-.topbar>img {
+.topbar > img {
   padding: 6px;
 }
 
-.topbar>div {
+.topbar > div {
   padding: 6px;
 }
 

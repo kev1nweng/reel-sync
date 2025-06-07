@@ -50,7 +50,7 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
 
 - [x] Peer-to-peer mode
   - [x] WebRTC real-time video streaming
-  - [ ] Screen sharing ←
+  - [x] Screen sharing
   - [ ] Webcam streaming
 
 - [ ] Same-origin mode

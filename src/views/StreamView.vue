@@ -180,7 +180,6 @@ export default {
       // 错误处理和重试
       conn.on("error", (err) => {
         msg.e(`Failed to establish connection with ${shared.app.roomID}: ${err.message}`);
-        console.error(err);
         this.connectionAttempts++;
         // 延迟重试
         setTimeout(() => this.connectToPeer(), 1000);
@@ -305,8 +304,11 @@ export default {
           video.pause();
         });
       });
+
       ((el) => {
-        el.src = shared.app.videoURL;
+        if (typeof el === "object") {
+          el.srcObject = shared.app.videoStream;
+        } else el.src = shared.app.videoURL;
         el.load();
       })(document.querySelector("#video-player-stream"));
     }

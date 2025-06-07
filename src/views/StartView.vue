@@ -48,27 +48,41 @@ import { snackbar as mduiSnackbar } from "mdui/functions/snackbar";
     <reelsync-padding></reelsync-padding>
     <div v-if="isMaster">
       <reelsync-video-input id="video-input" @change="onVideoUpload"></reelsync-video-input>
-      <mdui-fab
-        extended
-        id="video-upload-button"
-        v-if="isP2P"
-        size="normal"
-        variant="surface"
-        icon="upload--rounded"
-        @click="uploadVideo"
-      >
-        {{ $t("StartView.buttons.uploadVideo") }}
-      </mdui-fab>
-      <mdui-text-field
-        v-else
-        id="origin-url-input"
-        class="monospace"
-        v-model="originURL"
-        :label="$t('StartView.labels.sourceURL')"
-        variant="outlined"
-        clearable
-        counter
-      ></mdui-text-field>
+      <div id="fab-container">
+        <mdui-fab
+          extended
+          id="video-upload-button"
+          v-if="isP2P"
+          size="normal"
+          variant="surface"
+          icon="upload--rounded"
+          @click="uploadVideo"
+        >
+          {{ $t("StartView.buttons.uploadVideo") }}
+        </mdui-fab>
+        <h4>{{ $t("StartView.messages.or") }}</h4>
+        <mdui-fab
+          extended
+          id="screen-sharing-button"
+          v-if="isP2P"
+          size="normal"
+          variant="surface"
+          icon="laptop--rounded"
+          @click="requestScreenShare"
+        >
+          {{ $t("StartView.buttons.requestScreenShare") }}
+        </mdui-fab>
+        <mdui-text-field
+          v-else
+          id="origin-url-input"
+          class="monospace"
+          v-model="originURL"
+          :label="$t('StartView.labels.sourceURL')"
+          variant="outlined"
+          clearable
+          counter
+        ></mdui-text-field>
+      </div>
       <reelsync-video-player style="display: none" id="video-player"></reelsync-video-player>
       <reelsync-padding></reelsync-padding>
       <mdui-button
@@ -160,6 +174,30 @@ export default {
     // 触发文件选择对话框
     uploadVideo() {
       document.querySelector("#video-input").click();
+    },
+
+    async requestScreenShare() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+        msg.e("Screen sharing is not supported in this browser.");
+        mduiSnackbar({
+          message: this.$t("StartView.messages.screenShareNotSupported"),
+          closeOnOutsideClick: true,
+        });
+        return;
+      }
+      try {
+        shared.app.videoStream = await navigator.mediaDevices.getDisplayMedia({
+          video: true,
+          audio: false,
+        });
+        this.onScreenShareRequested();
+      } catch (error) {
+        msg.e("Failed to request screen share:", error);
+        mduiSnackbar({
+          message: this.$t("StartView.messages.screenShareError"),
+          closeOnOutsideClick: true,
+        });
+      }
     },
 
     // 检查选择的视频文件是否有效
@@ -282,6 +320,17 @@ export default {
       } else this.isVideoReady = false;
     },
 
+    onScreenShareRequested() {
+      const createRoomButton = document.getElementById("create-room-button");
+      if (shared.app.videoStream) {
+        createRoomButton.removeAttribute("disabled");
+        this.isVideoReady = true;
+      } else {
+        createRoomButton.setAttribute("disabled", true);
+        this.isVideoReady = false;
+      }
+    },
+
     // 处理回车键快捷操作
     handleKeyPress(event) {
       if (event.key === "Enter") {
@@ -396,5 +445,13 @@ mdui-text-field {
   justify-content: center;
   align-items: center;
   text-align: center;
+}
+
+#fab-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
 }
 </style>

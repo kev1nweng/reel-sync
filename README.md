@@ -50,7 +50,7 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
 
 - [x] 点对点模式
   - [x] WebRTC 实时视频流传输
-  - [ ] 屏幕共享（桌面视频流传输）←
+  - [x] 屏幕共享（桌面视频流传输）
   - [ ] 用户摄像头视频流传输
 
 - [ ] 同源模式
