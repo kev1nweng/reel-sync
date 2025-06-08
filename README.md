@@ -41,24 +41,24 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
 
 ***上学比较忙，进度可能推进缓慢。欢迎 Fork 并贡献。***
 
-- [ ] 浏览器适配
+- [x] 浏览器适配
   - [x] Mozilla Firefox
     - [x] 因不支持 `captureStream()` 可接收不可发送的问题
     - [x] 主页样式错误问题（`padding` 未被正确显示）
-  - [ ] Safari (以及所有利用 Apple Webkit 的浏览器)
-    - [ ] 因不支持 `captureStream()` 可接收不可发送的问题
+  - [ ] ~~Safari (以及所有利用 Apple Webkit 的浏览器)~~
+    - [ ] ~~因不支持 `captureStream()` 可接收不可发送的问题~~
 
 - [x] 点对点模式
   - [x] WebRTC 实时视频流传输
   - [x] 屏幕共享（桌面视频流传输）
   - [ ] 用户摄像头视频流传输
 
-- [ ] 同源模式
+- [x] 同源模式
   - [x] WebRTC 播放进度和行为通讯
   - [x] 端到端播放进度同步
   - [x] 延迟测量
   - [x] 考虑网络延迟的播放进度同步
-  - [ ] 从节点视频操作请求
+  - [ ] ~~从节点视频操作请求~~
 
 - [ ] 实时聊天
   - [ ] WebRTC 文字消息传输

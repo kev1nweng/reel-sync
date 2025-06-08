@@ -45,20 +45,20 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
   - [x] Mozilla Firefox
     - [x] Issue with receiving but not sending due to lack of `captureStream()` support
     - [x] Homepage style issue (`padding` not displaying correctly)
-  - [ ] Safari (and all browsers using Apple Webkit)
-    - [ ] Issue with receiving but not sending due to lack of `captureStream()` support
+  - [ ] ~~Safari (and all browsers using Apple Webkit)~~
+    - [ ] ~~Issue with receiving but not sending due to lack of `captureStream()` support~~
 
 - [x] Peer-to-peer mode
   - [x] WebRTC real-time video streaming
   - [x] Screen sharing
   - [ ] Webcam streaming
 
-- [ ] Same-origin mode
+- [x] Same-origin mode
   - [x] WebRTC playback progress and behavior communication
   - [x] End-to-end playback progress synchronization
   - [x] Delay measurement
   - [x] Playback progress synchronization considering network delay
-  - [ ] Slave node video operation requests
+  - [ ] ~~Slave node video operation requests~~
 
 - [ ] Real-time chat
   - [ ] WebRTC text message transmission
