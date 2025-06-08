@@ -11,7 +11,7 @@
   text-align: center;
   justify-content: center;
   min-height: 100vh;
-  overflow: scroll;
+  overflow: auto;
 }
 
 .container-c {
