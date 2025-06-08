@@ -52,7 +52,7 @@ import { snackbar as mduiSnackbar } from "mdui/functions/snackbar";
         <mdui-fab
           extended
           id="video-upload-button"
-          v-if="isP2P"
+          v-if="isP2P && !isScreenStreamReady"
           size="normal"
           variant="surface"
           icon="upload--rounded"
@@ -60,7 +60,7 @@ import { snackbar as mduiSnackbar } from "mdui/functions/snackbar";
         >
           {{ $t("StartView.buttons.uploadVideo") }}
         </mdui-fab>
-        <h4>{{ $t("StartView.messages.or") }}</h4>
+        <h4 v-if="isP2P && !isScreenStreamReady">{{ $t("StartView.messages.or") }}</h4>
         <mdui-fab
           extended
           id="screen-sharing-button"
@@ -155,6 +155,9 @@ export default {
       get isP2P() {
         return this.method === 0;
       },
+      get isScreenStreamReady() {
+        return shared.app.screenStream
+      },
     };
   },
   methods: {
@@ -186,9 +189,9 @@ export default {
         return;
       }
       try {
-        shared.app.videoStream = await navigator.mediaDevices.getDisplayMedia({
+        shared.app.screenStream = await navigator.mediaDevices.getDisplayMedia({
           video: true,
-          audio: false,
+          audio: true,
         });
         this.onScreenShareRequested();
       } catch (error) {
@@ -322,9 +325,9 @@ export default {
 
     onScreenShareRequested() {
       const createRoomButton = document.getElementById("create-room-button");
-      if (shared.app.videoStream) {
-        createRoomButton.removeAttribute("disabled");
+      if (shared.app.screenStream) {
         this.isVideoReady = true;
+        createRoomButton.removeAttribute("disabled");
       } else {
         createRoomButton.setAttribute("disabled", true);
         this.isVideoReady = false;

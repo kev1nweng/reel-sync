@@ -40,7 +40,7 @@ export const shared = {
     roomID: "",
     guestID: "",
     videoURL: "",
-    videoStream: {},
+    screenStream: null,
     syncThread: null,
     pingThread: null,
     i18n: i18n.global,

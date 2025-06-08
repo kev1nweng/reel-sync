@@ -306,8 +306,8 @@ export default {
       });
 
       ((el) => {
-        if (typeof el === "object") {
-          el.srcObject = shared.app.videoStream;
+        if (shared.app.screenStream) {
+          el.srcObject = shared.app.screenStream;
         } else el.src = shared.app.videoURL;
         el.load();
       })(document.querySelector("#video-player-stream"));
