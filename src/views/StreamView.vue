@@ -71,6 +71,10 @@ export default {
       isReady: false,
       playbackDelta: null,
       locationOrigin: location.origin,
+      rttHistory: [], // 存储最近的 RTT 测量值
+      rttWindow: 5, // RTT 测量窗口大小
+      rttMeasureInterval: 2000, // RTT 测量间隔（毫秒）
+      toleranceRange: parseFloat(import.meta.env.VITE_MAX_ACCEPTABLE_DELAY_SECONDS || 2), // 容忍范围（秒）
       get method() {
         return shared.app.method;
       },
@@ -97,6 +101,11 @@ export default {
       },
       get isConnectionRestricted() {
         return shared.app.isConnectionRestricted;
+      },
+      get averageRTT() {
+        return this.rttHistory.length > 0
+          ? this.rttHistory.reduce((a, b) => a + b, 0) / this.rttHistory.length
+          : 0;
       },
     };
   },
@@ -134,6 +143,7 @@ export default {
         });
         this.isReady = true;
         shared.peers.remote.data = conn;
+        this.startRTTMeasurement();
       });
 
       // 数据接收处理
@@ -161,14 +171,34 @@ export default {
           case "seek":
             video.currentTime = commMsg.data.time;
             break;
-          case "latency":
-            this.playbackDelta = parseFloat(commMsg.data.lat);
+          case "rtts": {
+            // RTT 同步请求
+            const receivedAt = Date.now();
+            const timestamp = parseFloat(commMsg.data.ts);
+            conn.send(comm.slave.rttm(timestamp, receivedAt));
             break;
-          case "timestamp": {
+          }
+          case "rttm": {
+            // RTT 同步中间响应
+            const receivedAt = parseFloat(commMsg.data.ra);
+            const timestamp = parseFloat(commMsg.data.ts);
+            conn.send(comm.master.rttc(timestamp, receivedAt));
+            break;
+          }
+          case "rttc": {
+            // RTT 同步完成
+            const now = Date.now();
+            const originalTimestamp = parseFloat(commMsg.data.ts);
+            const remoteReceivedAt = parseFloat(commMsg.data.ra);
+            const rtt = (now - originalTimestamp) - (now - remoteReceivedAt);
+            this.updateRTT(rtt);
+            msg.i(`RTT: ${rtt}ms, Average: ${this.averageRTT}ms`);
+            break;
+          }
+          case "progress": {
+            const currentTime = parseFloat(commMsg.data.cur);
             const timestamp = parseFloat(commMsg.data.atu);
-            const latency = (Date.now() - timestamp) / 1000;
-            this.playbackDelta = latency;
-            conn.send(comm.slave.latency(latency));
+            this.handleVideoSync(currentTime, timestamp);
             break;
           }
           default:
@@ -193,6 +223,34 @@ export default {
         const video = document.getElementById("video-player-stream");
         video.pause();
       });
+    },
+    startRTTMeasurement() {
+      if (!this.isSlave && this.method === 0) { // 仅在P2P模式下的主节点进行测量
+        this.rttHistory = [];
+        shared.app.rttThread = setInterval(() => {
+          const timestamp = Date.now();
+          shared.peers.remote.data.send(new Comm().master.rtts(timestamp));
+        }, this.rttMeasureInterval);
+      }
+    },
+    updateRTT(rtt) {
+      this.rttHistory.push(rtt);
+      if (this.rttHistory.length > this.rttWindow) {
+        this.rttHistory.shift();
+      }
+      this.playbackDelta = this.averageRTT / 2000; // 转换为秒
+    },
+    handleVideoSync(currentTime) {
+      const video = document.getElementById("video-player-stream");
+      if (!video) return;
+
+      const expectedTime = parseFloat(currentTime);
+      const currentDelta = Math.abs(video.currentTime - expectedTime);
+
+      // 如果时差超过容忍范围，则进行同步
+      if (currentDelta > this.toleranceRange) {
+        video.currentTime = expectedTime + (this.method === 0 ? this.averageRTT / 2000 : 0);
+      }
     },
   },
   mounted() {
@@ -315,7 +373,8 @@ export default {
   },
   beforeUnmount() {
     if (shared.app.syncThread) clearInterval(shared.app.syncThread);
-    if (shared.app.pingThread) clearInterval(shared.app.pingThread);
+    if (shared.app.rttThread) clearInterval(shared.app.rttThread);
+    if (shared.app.rttThread) clearInterval(shared.app.rttThread);
   },
   components: {
     "reelsync-loading-ring": LoadingRing,
