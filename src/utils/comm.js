@@ -33,12 +33,6 @@ export class Comm {
     latency(latency) {
       return `latency|lat=${latency}`;
     },
-    rtts(timestamp) {
-      return `rtts|ts=${timestamp}`; // RTT Sync Request
-    },
-    rttc(timestamp, receivedAt) {
-      return `rttc|ts=${timestamp}&ra=${receivedAt}`; // RTT Sync Complete
-    }
   };
   slave = {
     greet(guestID) {
@@ -50,8 +44,5 @@ export class Comm {
     latency(latency) {
       return `latency|lat=${latency}`;
     },
-    rttm(timestamp, receivedAt) {
-      return `rttm|ts=${timestamp}&ra=${receivedAt}`; // RTT Sync Middle
-    }
   };
 }
