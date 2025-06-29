@@ -39,8 +39,6 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
 
 ## 路线图
 
-***上学比较忙，进度可能推进缓慢。欢迎 Fork 并贡献。***
-
 - [x] 浏览器适配
   - [x] Mozilla Firefox
     - [x] 因不支持 `captureStream()` 可接收不可发送的问题

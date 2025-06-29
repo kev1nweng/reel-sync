@@ -39,8 +39,6 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
 
 ## Roadmap
 
-***School is quite busy, progress may be slow. Feel free to fork and contribute.***
-
 - [ ] Browser Compatibility
   - [x] Mozilla Firefox
     - [x] Issue with receiving but not sending due to lack of `captureStream()` support
