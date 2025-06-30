@@ -1,6 +1,6 @@
 {
   "name": "reel-sync",
-  "version": "25w23c",
+  "version": "25w27a",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@mdui/icons": "^1.0.2",
+    "bowser": "^2.11.0",
     "crypto-js": "^4.2.0",
     "mdui": "^2.1.3",
     "peerjs": "^1.5.4",
