@@ -11,6 +11,7 @@ import LoadingRing from "@/components/LoadingRing.vue";
 
 import { alert as mduiAlert } from "mdui/functions/alert";
 import { snackbar as mduiSnackbar } from "mdui/functions/snackbar";
+import Bowser from "bowser";
 </script>
 
 <template>
@@ -156,7 +157,7 @@ export default {
         return this.method === 0;
       },
       get isScreenStreamReady() {
-        return shared.app.screenStream
+        return shared.app.screenStream;
       },
     };
   },
@@ -373,6 +374,15 @@ export default {
           location.replace(location.origin);
         })();
       }
+    }
+    const browser = Bowser.getParser(window.navigator.userAgent);
+    if (browser.getBrowserName() === "Safari") {
+      mduiAlert({
+        description: this.$t("StartView.messages.safariWarning"),
+        onClose: () => {
+          msg.w("Safari detected, some features may not work as expected.");
+        },
+      });
     }
   },
   unmounted() {

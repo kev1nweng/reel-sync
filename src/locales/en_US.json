@@ -38,7 +38,8 @@
       "connectingToTURN": "Connecting",
       "turnNodeError": "Failed to request TURN / STUN node: You may not be able to connect between NAT-restricted networks.",
       "screenShareError": "Failed to request for the video stream. Please check whether the privacy preferences of your browser has led to this. ",
-      "screenShareNotSupported": "Failed to requst for the video stream. It seems that screen sharing is not supported by your browser. "
+      "screenShareNotSupported": "Failed to requst for the video stream. It seems that screen sharing is not supported by your browser. ",
+      "safariWarning": "You are detected using Safari. \nDue to browser API limitations, you cannot properly perform peer-to-peer push with others (including loading local videos and screen sharing) even with the latest Safari. \nTo get the full functionality, switch to a Chromium or Firefox-based browser."
     },
     "buttons": {
       "uploadVideo": "Load Your Video",
