@@ -30,3 +30,8 @@
     Consolas, "DejaVu Sans Mono", monospace;
   user-select: all;
 }
+
+mdui-dialog {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
