@@ -52,10 +52,14 @@ import BlankPadding from "@/components/BlankPadding.vue";
           method == 1 ? $t("StreamView.messages.delta") : $t("StreamView.messages.latency")
         }}:
         {{
-          playbackDelta
-            ? Math.round(playbackDelta * 1e3)
-            : $t("StreamView.messages.measuringLiteral")
-        }}{{ playbackDelta ? "ms" : "" }})
+          method == 1
+            ? playbackDelta !== null
+              ? Math.round(playbackDelta * 1e3) + "ms"
+              : $t("StreamView.messages.measuringLiteral")
+            : rtt !== null
+              ? Math.round(rtt * 1e3) + "ms"
+              : $t("StreamView.messages.measuringLiteral")
+        }})
       </div></span
     >
   </div>
@@ -69,7 +73,8 @@ export default {
       connectionAttempts: 0,
       maxAttempts: 3,
       isReady: false,
-      playbackDelta: null,
+      playbackDelta: null, // 同源模式下为同步偏差，点对点下为null
+      rtt: null, // 点对点模式下为RTT，单位秒
       locationOrigin: location.origin,
       get method() {
         return shared.app.method;
@@ -134,6 +139,18 @@ export default {
         });
         this.isReady = true;
         shared.peers.remote.data = conn;
+        // 启动RTT定时测量（点对点模式）
+        if (shared.app.method == 0) {
+          if (this.rttTimer) clearInterval(this.rttTimer);
+          const rttInterval =
+            (import.meta.env.VITE_LATENCY_MEASUREMENT_INTERVAL_SECONDS
+              ? parseFloat(import.meta.env.VITE_LATENCY_MEASUREMENT_INTERVAL_SECONDS)
+              : 2) * 1e3;
+          this.rttTimer = setInterval(() => {
+            conn.send(comm.slave.rttPing(Date.now()));
+            this._rttPingSent = Date.now();
+          }, rttInterval);
+        }
       });
 
       // 数据接收处理
@@ -171,6 +188,19 @@ export default {
             conn.send(comm.slave.latency(latency));
             break;
           }
+          case "rtt-ping":
+            // 对方发起RTT测量，立即回复pong
+            conn.send(comm.slave.rttPong(commMsg.data.ts));
+            break;
+          case "rtt-pong":
+            // 收到pong，计算RTT
+            if (commMsg.data.ts && commMsg.data.ts2) {
+              const sent = parseInt(commMsg.data.ts);
+              const now = Date.now();
+              // RTT = (now - sent) - (ts2 - sent)
+              this.rtt = (now - sent) / 1000;
+            }
+            break;
           default:
             msg.w(`Invalid message: ${data}`);
             break;
@@ -192,6 +222,8 @@ export default {
         this.isReady = false;
         const video = document.getElementById("video-player-stream");
         video.pause();
+        if (this.rttTimer) clearInterval(this.rttTimer);
+        this.rtt = null;
       });
     },
   },
@@ -225,6 +257,18 @@ export default {
         conn.on("open", function () {
           msg.i(`Received connection from ${conn.peer}`);
           shared.peers.remote.data = conn;
+          // 启动RTT定时测量（点对点模式）
+          if (shared.app.method == 0) {
+            if (that.rttTimer) clearInterval(that.rttTimer);
+            const rttInterval =
+              (import.meta.env.VITE_LATENCY_MEASUREMENT_INTERVAL_SECONDS
+                ? parseFloat(import.meta.env.VITE_LATENCY_MEASUREMENT_INTERVAL_SECONDS)
+                : 2) * 1e3;
+            that.rttTimer = setInterval(() => {
+              conn.send(comm.master.rttPing(Date.now()));
+              that._rttPingSent = Date.now();
+            }, rttInterval);
+          }
         });
 
         // 数据接收处理
@@ -289,6 +333,19 @@ export default {
               that.playbackDelta = commMsg.data.lat;
               break;
             }
+            case "rtt-ping":
+              // 对方发起RTT测量，立即回复pong
+              conn.send(comm.master.rttPong(commMsg.data.ts));
+              break;
+            case "rtt-pong":
+              // 收到pong，计算RTT
+              if (commMsg.data.ts && commMsg.data.ts2) {
+                const sent = parseInt(commMsg.data.ts);
+                const now = Date.now();
+                // RTT = (now - sent) - (ts2 - sent)
+                that.rtt = (now - sent) / 1000;
+              }
+              break;
             default: {
               msg.e(`Invalid message: ${data}`);
             }
@@ -302,6 +359,8 @@ export default {
           this.isReady = false;
           const video = document.getElementById("video-player-stream");
           video.pause();
+          if (that.rttTimer) clearInterval(that.rttTimer);
+          that.rtt = null;
         });
       });
 
@@ -316,6 +375,7 @@ export default {
   beforeUnmount() {
     if (shared.app.syncThread) clearInterval(shared.app.syncThread);
     if (shared.app.pingThread) clearInterval(shared.app.pingThread);
+    if (this.rttTimer) clearInterval(this.rttTimer);
   },
   components: {
     "reelsync-loading-ring": LoadingRing,

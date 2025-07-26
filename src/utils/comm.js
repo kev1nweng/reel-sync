@@ -33,6 +33,12 @@ export class Comm {
     latency(latency) {
       return `latency|lat=${latency}`;
     },
+    rttPing(ts) {
+      return `rtt-ping|ts=${ts}`;
+    },
+    rttPong(ts) {
+      return `rtt-pong|ts=${ts}&ts2=${Date.now()}`;
+    },
   };
   slave = {
     greet(guestID) {
@@ -43,6 +49,12 @@ export class Comm {
     },
     latency(latency) {
       return `latency|lat=${latency}`;
+    },
+    rttPing(ts) {
+      return `rtt-ping|ts=${ts}`;
+    },
+    rttPong(ts) {
+      return `rtt-pong|ts=${ts}&ts2=${Date.now()}`;
     },
   };
 }
