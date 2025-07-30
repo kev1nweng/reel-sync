@@ -29,13 +29,13 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
 ## Environment Variables
 
 > [!Warning]
-> The goal of ReelSync's auto-sync is **real-world synchronization**; therefore, **accurate device time on both sides** is a key factor.
-> You can use a time server to synchronize clocks.
-> If precise time synchronization cannot be guaranteed, please increase the maximum acceptable delay (at least 1 second).
+> In same-origin mode, video playback synchronization has high network requirements; high network latency may cause frequent forced synchronization.
+> If a stable network environment cannot be guaranteed, please increase the maximum acceptable latency (at least 1 second).
 
 - `VITE_NODE_SERVER_URL` - Your `iceServer` server list address (Refer to Cloudflare Call for API documentation)
-- `VITE_MAX_ACCEPTABLE_DELAY_SECONDS` - Maximum acceptable delay time (seconds)
-- `VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS` - Sync interval time for video progress in same-origin mode (seconds)
+- `VITE_MAX_ACCEPTABLE_DELAY_SECONDS` - Maximum acceptable delay time (in seconds)
+- `VITE_LATENCY_MEASUREMENT_INTERVAL_SECONDS` - RTT latency measurement interval (in seconds)
+- `VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS` - Sync interval time for video progress in same-origin mode (in seconds)
 
 ## Roadmap
 
@@ -76,10 +76,10 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
   - [x] ~~msg (CN/EN)~~
   - [x] Manual switch
 
-- [ ] Other features
+- [ ] Other features  
   - [x] Direct share link
   - [ ] Background image customization
-  - [ ] Advanced synchronization based on RTT (Round-Trip Time)
+  - [x] Advanced synchronization based on RTT (Round-Trip Time)
 
 ## License
 
