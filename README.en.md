@@ -8,7 +8,7 @@
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
 ![Vercel](https://img.shields.io/badge/vercel-%23000000.svg?style=for-the-badge&logo=vercel&logoColor=white)
 
-随时随地和另一个人同时观看一个视频 | Watch videos with someone in sync, anytime, anywhere.
+随时随地与他人同步观看视频或共享屏幕 | Watch videos in sync or share your screen with others anytime, anywhere.
 
 ![ReelSync Screenshot](docs/screenshot.en.png)
 
