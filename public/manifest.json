@@ -1,7 +1,7 @@
 {
   "name": "ReelSync",
   "short_name": "ReelSync",
-  "description": "ReelSync - 随时随地和另一个人同时观看一个视频 | Watch videos with someone in sync, anytime, anywhere. ",
+  "description": "随时随地与他人同步观看视频或共享屏幕 | Watch videos in sync or share your screen with others anytime, anywhere.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#fafdfd",
