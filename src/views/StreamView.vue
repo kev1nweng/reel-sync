@@ -368,7 +368,7 @@ export default {
   },
   mounted() {
     // 初始化检查
-    if (this.roomID === "") {
+    if (this.roomID === "" || !this.roomID) {
       this.$router.replace("/");
       return;
     }
