@@ -11,26 +11,34 @@ import BlankPadding from "@/components/BlankPadding.vue";
 <template>
   <div class="container-c">
     <h1>{{ $t("StreamView.title") }}</h1>
-    <span class="monospace" id="room-id-indicator">{{
+    
+    <!-- Room ID with Voice Toggle when ready, otherwise just Room ID -->
+    <div v-if="isReady" class="monospace" id="room-info-with-voice">
+      <span id="room-id-indicator">{{
+        $t("StreamView.messages.roomID", { roleDescription, roomID })
+      }}</span>
+      <div id="voice-control">
+        <mdui-switch
+          id="voice-switch"
+          @change="toggleVoice"
+          :checked="isVoiceEnabled"
+          checked-icon="mic--rounded"
+          unchecked-icon="mic_off--rounded"
+        ></mdui-switch>
+        <label id="voice-indicator">{{ $t("StreamView.labels.voiceToggle") }}</label>
+      </div>
+    </div>
+    
+    <!-- Original Room ID display when not ready -->
+    <span v-else class="monospace" id="room-id-indicator">{{
       $t("StreamView.messages.roomID", { roleDescription, roomID })
     }}</span>
+    
     <span class="monospace" v-if="!isSlave" id="share-link-indicator"
       >{{ locationOrigin }}/?join={{ roomID }}</span
     >
     <span v-if="!isReady">{{ hint }}</span
     ><reelsync-padding></reelsync-padding>
-    
-    <!-- Voice Call Toggle -->
-    <div v-if="isReady" id="voice-control">
-      <mdui-switch
-        id="voice-switch"
-        @change="toggleVoice"
-        :checked="isVoiceEnabled"
-        checked-icon="mic--rounded"
-        unchecked-icon="mic_off--rounded"
-      ></mdui-switch>
-      <label id="voice-indicator">{{ $t("StreamView.labels.voiceToggle") }}</label>
-    </div>
     
     <div v-if="!isReady">
       <reelsync-padding></reelsync-padding>
@@ -585,18 +593,25 @@ export default {
   font-size: 0.65em;
 }
 
+#room-info-with-voice {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
 #voice-control {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
   align-items: center;
-  text-align: center;
-  margin: 1rem 0;
+  gap: 0.5rem;
 }
 
 #voice-indicator {
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #666;
+  white-space: nowrap;
 }
 </style>
