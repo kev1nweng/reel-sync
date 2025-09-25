@@ -21,7 +21,7 @@ import BlankPadding from "@/components/BlankPadding.vue";
         checked-icon="mic--rounded"
         unchecked-icon="mic_off--rounded"
       ></mdui-switch>
-      <label id="voice-indicator">&nbsp;&nbsp;{{ $t("StreamView.labels.voiceToggle") }}</label>
+      <label id="voice-indicator">{{ $t("StreamView.labels.voiceToggle") }}</label>
     </div>
 
     <span v-else class="monospace" id="room-id-indicator">{{
@@ -596,7 +596,7 @@ export default {
 }
 
 #voice-indicator {
-  font-size: 1.5rem;
+  font-size: 1.35rem;
   color: #666;
   white-space: nowrap;
 }
