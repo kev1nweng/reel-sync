@@ -11,7 +11,7 @@ import BlankPadding from "@/components/BlankPadding.vue";
 <template>
   <div class="container-c">
     <h1>{{ $t("StreamView.title") }}</h1>
-    
+
     <!-- Voice Toggle replaces Room ID when ready -->
     <div v-if="isReady" class="monospace" id="voice-control-main">
       <mdui-switch
@@ -23,18 +23,17 @@ import BlankPadding from "@/components/BlankPadding.vue";
       ></mdui-switch>
       <label id="voice-indicator">{{ $t("StreamView.labels.voiceToggle") }}</label>
     </div>
-    
-    <!-- Original Room ID display when not ready -->
+
     <span v-else class="monospace" id="room-id-indicator">{{
       $t("StreamView.messages.roomID", { roleDescription, roomID })
     }}</span>
-    
+
     <span class="monospace" v-if="!isSlave" id="share-link-indicator"
       >{{ locationOrigin }}/?join={{ roomID }}</span
     >
     <span v-if="!isReady">{{ hint }}</span
     ><reelsync-padding></reelsync-padding>
-    
+
     <div v-if="!isReady">
       <reelsync-padding></reelsync-padding>
       <reelsync-loading-ring id="loading"></reelsync-loading-ring><br />
@@ -76,8 +75,8 @@ import BlankPadding from "@/components/BlankPadding.vue";
               ? Math.round(rtt * 1e3) + "ms"
               : $t("StreamView.messages.measuringLiteral")
         }})
-      </div></span
-    >
+      </div>
+    </span>
   </div>
 </template>
 
@@ -128,17 +127,17 @@ export default {
     async toggleVoice() {
       shared.app.isVoiceEnabled = document.getElementById("voice-switch").checked;
       const comm = new Comm();
-      
+
       if (shared.app.isVoiceEnabled) {
         try {
           // Request microphone access
           shared.app.audioStream = await navigator.mediaDevices.getUserMedia({
             audio: true,
-            video: false
+            video: false,
           });
-          
+
           msg.i("Microphone access granted, starting voice call");
-          
+
           // Notify the remote peer about voice enablement
           if (shared.peers.remote.data) {
             if (this.isSlave) {
@@ -147,10 +146,9 @@ export default {
               shared.peers.remote.data.send(comm.master.voiceEnabled());
             }
           }
-          
+
           // Start audio call if we have a remote peer
           this.startAudioCall();
-          
         } catch (error) {
           msg.e("Failed to access microphone:", error);
           shared.app.isVoiceEnabled = false;
@@ -159,7 +157,7 @@ export default {
       } else {
         // Disable voice call
         this.stopAudioCall();
-        
+
         // Notify the remote peer about voice disablement
         if (shared.peers.remote.data) {
           if (this.isSlave) {
@@ -168,35 +166,35 @@ export default {
             shared.peers.remote.data.send(comm.master.voiceDisabled());
           }
         }
-        
+
         msg.i("Voice call disabled");
       }
     },
 
     startAudioCall() {
       if (!shared.app.audioStream || !shared.peers.remote.data) return;
-      
+
       const peerID = this.isSlave ? shared.app.roomID : shared.app.guestID;
-      
+
       if (shared.peers.local.audio && shared.app.audioStream) {
         // Make an audio call to the remote peer
         const audioCall = shared.peers.local.audio.call(`${peerID}-audio`, shared.app.audioStream);
-        
-        audioCall.on('stream', (remoteAudioStream) => {
+
+        audioCall.on("stream", (remoteAudioStream) => {
           msg.i("Received remote audio stream");
-          
+
           // Create audio element to play remote audio
-          let audioElement = document.getElementById('remote-audio');
+          let audioElement = document.getElementById("remote-audio");
           if (!audioElement) {
-            audioElement = document.createElement('audio');
-            audioElement.id = 'remote-audio';
+            audioElement = document.createElement("audio");
+            audioElement.id = "remote-audio";
             audioElement.autoplay = true;
             document.body.appendChild(audioElement);
           }
-          
+
           audioElement.srcObject = remoteAudioStream;
         });
-        
+
         shared.peers.remote.audio = audioCall;
       }
     },
@@ -204,18 +202,18 @@ export default {
     stopAudioCall() {
       // Stop local audio stream
       if (shared.app.audioStream) {
-        shared.app.audioStream.getTracks().forEach(track => track.stop());
+        shared.app.audioStream.getTracks().forEach((track) => track.stop());
         shared.app.audioStream = null;
       }
-      
+
       // Close remote audio call
       if (shared.peers.remote.audio) {
         shared.peers.remote.audio.close();
         shared.peers.remote.audio = null;
       }
-      
+
       // Remove remote audio element
-      const audioElement = document.getElementById('remote-audio');
+      const audioElement = document.getElementById("remote-audio");
       if (audioElement) {
         audioElement.remove();
       }
@@ -251,25 +249,25 @@ export default {
             video.play();
           });
         });
-        
+
         // Handle incoming audio calls
         shared.peers.local.audio.on("call", (call) => {
           call.answer();
           call.on("stream", (remoteAudioStream) => {
             msg.i("Received remote audio stream");
-            
+
             // Create audio element to play remote audio
-            let audioElement = document.getElementById('remote-audio');
+            let audioElement = document.getElementById("remote-audio");
             if (!audioElement) {
-              audioElement = document.createElement('audio');
-              audioElement.id = 'remote-audio';
+              audioElement = document.createElement("audio");
+              audioElement.id = "remote-audio";
               audioElement.autoplay = true;
               document.body.appendChild(audioElement);
             }
-            
+
             audioElement.srcObject = remoteAudioStream;
           });
-          
+
           shared.peers.remote.audio = call;
         });
         this.isReady = true;
@@ -411,25 +409,25 @@ export default {
             }, rttInterval);
           }
         });
-        
+
         // Handle incoming audio calls
         shared.peers.local.audio.on("call", (call) => {
           call.answer();
           call.on("stream", (remoteAudioStream) => {
             msg.i("Received remote audio stream");
-            
+
             // Create audio element to play remote audio
-            let audioElement = document.getElementById('remote-audio');
+            let audioElement = document.getElementById("remote-audio");
             if (!audioElement) {
-              audioElement = document.createElement('audio');
-              audioElement.id = 'remote-audio';
+              audioElement = document.createElement("audio");
+              audioElement.id = "remote-audio";
               audioElement.autoplay = true;
               document.body.appendChild(audioElement);
             }
-            
+
             audioElement.srcObject = remoteAudioStream;
           });
-          
+
           shared.peers.remote.audio = call;
         });
 
@@ -544,7 +542,7 @@ export default {
     if (shared.app.syncThread) clearInterval(shared.app.syncThread);
     if (shared.app.pingThread) clearInterval(shared.app.pingThread);
     if (this.rttTimer) clearInterval(this.rttTimer);
-    
+
     // Clean up voice call resources
     this.stopAudioCall();
   },
@@ -598,7 +596,7 @@ export default {
 }
 
 #voice-indicator {
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: #666;
   white-space: nowrap;
 }
