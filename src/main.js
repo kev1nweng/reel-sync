@@ -44,15 +44,20 @@ export const shared = {
     syncThread: null,
     pingThread: null,
     i18n: i18n.global,
+    // Voice call related state
+    isVoiceEnabled: false,
+    audioStream: null,
   },
   peers: {
     local: {
       data: null,
       video: null,
+      audio: null,
     },
     remote: {
       data: null,
       video: null,
+      audio: null,
     },
   },
   preferences: null,
