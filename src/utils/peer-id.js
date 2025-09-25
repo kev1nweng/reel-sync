@@ -6,11 +6,13 @@ export class PeerID {
     this.id.raw = seq;
     this.id.data = `${seq}-data`;
     this.id.video = `${seq}-video`;
+    this.id.audio = `${seq}-audio`;
   }
   id = {
     raw: "",
     data: "",
     video: "",
+    audio: "",
   };
   generate() {
     return `${CryptoJS.HmacSHA1(Math.random().toString(), "tungtungtungtungsahur")}`.substring(

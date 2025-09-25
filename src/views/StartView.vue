@@ -269,6 +269,7 @@ export default {
       shared.app.roomID = id.raw;
       shared.peers.local.data = new Peer(id.data, cfg ? { config: cfg } : null);
       shared.peers.local.video = new Peer(id.video, cfg ? { config: cfg } : null);
+      shared.peers.local.audio = new Peer(id.audio, cfg ? { config: cfg } : null);
       this.$router.push("/stream");
     },
 
@@ -288,6 +289,7 @@ export default {
       shared.app.guestID = id.raw;
       shared.peers.local.data = new Peer(id.data, cfg ? { config: cfg } : null);
       shared.peers.local.video = new Peer(id.video, cfg ? { config: cfg } : null);
+      shared.peers.local.audio = new Peer(id.audio, cfg ? { config: cfg } : null);
       this.$router.push("/stream");
     },
 

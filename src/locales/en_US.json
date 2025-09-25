@@ -98,7 +98,12 @@
       "delta": "Video progress difference",
       "latency": "Network latency",
       "shareLink": "Share Link",
-      "connectionRestricted": "Limited connection: Relay node unavailable"
+      "connectionRestricted": "Limited connection: Relay node unavailable",
+      "voiceCallEnabled": "Voice call enabled",
+      "voiceCallDisabled": "Voice call disabled"
+    },
+    "labels": {
+      "voiceToggle": "Voice Call"
     }
   }
 }

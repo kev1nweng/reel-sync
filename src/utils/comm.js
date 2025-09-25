@@ -39,6 +39,12 @@ export class Comm {
     rttPong(ts) {
       return `rtt-pong|ts=${ts}&ts2=${Date.now()}`;
     },
+    voiceEnabled() {
+      return "voice-enabled";
+    },
+    voiceDisabled() {
+      return "voice-disabled";
+    },
   };
   slave = {
     greet(guestID) {
@@ -55,6 +61,12 @@ export class Comm {
     },
     rttPong(ts) {
       return `rtt-pong|ts=${ts}&ts2=${Date.now()}`;
+    },
+    voiceEnabled() {
+      return "voice-enabled";
+    },
+    voiceDisabled() {
+      return "voice-disabled";
     },
   };
 }
