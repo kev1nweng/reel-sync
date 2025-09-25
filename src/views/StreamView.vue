@@ -12,21 +12,16 @@ import BlankPadding from "@/components/BlankPadding.vue";
   <div class="container-c">
     <h1>{{ $t("StreamView.title") }}</h1>
     
-    <!-- Room ID with Voice Toggle when ready, otherwise just Room ID -->
-    <div v-if="isReady" class="monospace" id="room-info-with-voice">
-      <span id="room-id-indicator">{{
-        $t("StreamView.messages.roomID", { roleDescription, roomID })
-      }}</span>
-      <div id="voice-control">
-        <mdui-switch
-          id="voice-switch"
-          @change="toggleVoice"
-          :checked="isVoiceEnabled"
-          checked-icon="mic--rounded"
-          unchecked-icon="mic_off--rounded"
-        ></mdui-switch>
-        <label id="voice-indicator">{{ $t("StreamView.labels.voiceToggle") }}</label>
-      </div>
+    <!-- Voice Toggle replaces Room ID when ready -->
+    <div v-if="isReady" class="monospace" id="voice-control-main">
+      <mdui-switch
+        id="voice-switch"
+        @change="toggleVoice"
+        :checked="isVoiceEnabled"
+        checked-icon="mic--rounded"
+        unchecked-icon="mic_off--rounded"
+      ></mdui-switch>
+      <label id="voice-indicator">{{ $t("StreamView.labels.voiceToggle") }}</label>
     </div>
     
     <!-- Original Room ID display when not ready -->
@@ -593,20 +588,13 @@ export default {
   font-size: 0.65em;
 }
 
-#room-info-with-voice {
+#voice-control-main {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-#voice-control {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
   gap: 0.5rem;
+  margin: 0.5rem 0;
 }
 
 #voice-indicator {
