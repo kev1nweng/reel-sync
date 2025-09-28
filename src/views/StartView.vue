@@ -49,41 +49,44 @@ import Bowser from "bowser";
     <reelsync-padding></reelsync-padding>
     <div v-if="isMaster">
       <reelsync-video-input id="video-input" @change="onVideoUpload"></reelsync-video-input>
-      <div id="fab-container">
-        <mdui-fab
-          extended
-          id="video-upload-button"
-          v-if="isP2P && !isScreenStreamReady"
-          size="normal"
-          variant="surface"
-          icon="upload--rounded"
-          @click="uploadVideo"
-        >
-          {{ $t("StartView.buttons.uploadVideo") }}
-        </mdui-fab>
-        <h4 v-if="isP2P && !isScreenStreamReady">{{ $t("StartView.messages.or") }}</h4>
-        <mdui-fab
-          extended
-          id="screen-sharing-button"
-          v-if="isP2P"
-          size="normal"
-          variant="surface"
-          icon="laptop--rounded"
-          @click="requestScreenShare"
-        >
-          {{ $t("StartView.buttons.requestScreenShare") }}
-        </mdui-fab>
-        <mdui-fab
-          extended
-          id="video-call-button"
-          v-if="isP2P"
-          size="normal"
-          variant="surface"
-          icon="videocam--rounded"
-          @click="requestVideoCall"
-        >
-          {{ $t("StartView.buttons.startVideoCall") }}
-        </mdui-fab>
+      <div id="fab-container" class="fab-container-vertical">
+        <div class="fab-row-upload" v-if="isP2P && !isScreenStreamReady">
+          <mdui-fab
+            extended
+            id="video-upload-button"
+            size="small"
+            variant="surface"
+            icon="upload--rounded"
+            @click="uploadVideo"
+            style="width: calc(2 * 160px + 1rem); max-width: 100%; margin-bottom: 1rem;"
+          >
+            {{ $t("StartView.buttons.uploadVideo") }}
+          </mdui-fab>
+        </div>
+        <div class="fab-row-actions" v-if="isP2P">
+          <mdui-fab
+            extended
+            id="screen-sharing-button"
+            size="small"
+            variant="surface"
+            icon="laptop--rounded"
+            @click="requestScreenShare"
+            style="width: 160px;"
+          >
+            {{ $t("StartView.buttons.requestScreenShare") }}
+          </mdui-fab>
+          <mdui-fab
+            extended
+            id="video-call-button"
+            size="small"
+            variant="surface"
+            icon="videocam--rounded"
+            @click="requestVideoCall"
+            style="width: 160px;"
+          >
+            {{ $t("StartView.buttons.startVideoCall") }}
+          </mdui-fab>
+        </div>
         <mdui-text-field
           v-else
           id="origin-url-input"
@@ -438,10 +441,10 @@ export default {
   },
   unmounted() {
     window.removeEventListener("keypress", this.handleKeyPress);
-    
+
     // Clean up camera stream when leaving start view
     if (shared.app.cameraStream) {
-      shared.app.cameraStream.getTracks().forEach(track => track.stop());
+      shared.app.cameraStream.getTracks().forEach((track) => track.stop());
       shared.app.cameraStream = null;
     }
   },
@@ -517,11 +520,26 @@ mdui-text-field {
   text-align: center;
 }
 
-#fab-container {
+#fab-container.fab-container-vertical {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 0;
+}
+
+.fab-row-upload {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.fab-row-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
   gap: 1rem;
+  width: 100%;
 }
 </style>
