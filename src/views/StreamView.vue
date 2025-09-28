@@ -533,6 +533,8 @@ export default {
       ((el) => {
         if (shared.app.screenStream) {
           el.srcObject = shared.app.screenStream;
+        } else if (shared.app.cameraStream) {
+          el.srcObject = shared.app.cameraStream;
         } else el.src = shared.app.videoURL;
         el.load();
       })(document.querySelector("#video-player-stream"));
@@ -545,6 +547,12 @@ export default {
 
     // Clean up voice call resources
     this.stopAudioCall();
+    
+    // Clean up camera stream
+    if (shared.app.cameraStream) {
+      shared.app.cameraStream.getTracks().forEach(track => track.stop());
+      shared.app.cameraStream = null;
+    }
   },
   components: {
     "reelsync-loading-ring": LoadingRing,

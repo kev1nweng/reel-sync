@@ -41,6 +41,7 @@ export const shared = {
     guestID: "",
     videoURL: "",
     screenStream: null,
+    cameraStream: null,
     syncThread: null,
     pingThread: null,
     i18n: i18n.global,

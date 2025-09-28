@@ -73,6 +73,17 @@ import Bowser from "bowser";
         >
           {{ $t("StartView.buttons.requestScreenShare") }}
         </mdui-fab>
+        <mdui-fab
+          extended
+          id="video-call-button"
+          v-if="isP2P"
+          size="normal"
+          variant="surface"
+          icon="videocam--rounded"
+          @click="requestVideoCall"
+        >
+          {{ $t("StartView.buttons.startVideoCall") }}
+        </mdui-fab>
         <mdui-text-field
           v-else
           id="origin-url-input"
@@ -159,6 +170,9 @@ export default {
       get isScreenStreamReady() {
         return shared.app.screenStream;
       },
+      get isCameraStreamReady() {
+        return shared.app.cameraStream;
+      },
     };
   },
   methods: {
@@ -199,6 +213,30 @@ export default {
         msg.e("Failed to request screen share:", error);
         mduiSnackbar({
           message: this.$t("StartView.messages.screenShareError"),
+          closeOnOutsideClick: true,
+        });
+      }
+    },
+
+    async requestVideoCall() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        msg.e("Camera access is not supported in this browser.");
+        mduiSnackbar({
+          message: this.$t("StartView.messages.videoCallNotSupported"),
+          closeOnOutsideClick: true,
+        });
+        return;
+      }
+      try {
+        shared.app.cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true,
+        });
+        this.onVideoCallRequested();
+      } catch (error) {
+        msg.e("Failed to request video call:", error);
+        mduiSnackbar({
+          message: this.$t("StartView.messages.videoCallError"),
           closeOnOutsideClick: true,
         });
       }
@@ -337,6 +375,17 @@ export default {
       }
     },
 
+    onVideoCallRequested() {
+      const createRoomButton = document.getElementById("create-room-button");
+      if (shared.app.cameraStream) {
+        this.isVideoReady = true;
+        createRoomButton.removeAttribute("disabled");
+      } else {
+        createRoomButton.setAttribute("disabled", true);
+        this.isVideoReady = false;
+      }
+    },
+
     // 处理回车键快捷操作
     handleKeyPress(event) {
       if (event.key === "Enter") {
@@ -389,6 +438,12 @@ export default {
   },
   unmounted() {
     window.removeEventListener("keypress", this.handleKeyPress);
+    
+    // Clean up camera stream when leaving start view
+    if (shared.app.cameraStream) {
+      shared.app.cameraStream.getTracks().forEach(track => track.stop());
+      shared.app.cameraStream = null;
+    }
   },
   watch: {
     mode(value) {

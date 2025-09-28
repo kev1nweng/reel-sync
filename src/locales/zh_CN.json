@@ -39,13 +39,16 @@
       "turnNodeError": "请求信使节点失败：您可能无法在 NAT 受限网络间建立连接。",
       "screenShareError": "请求桌面视频流失败。请检查您的浏览器是否自动拒绝了请求？",
       "screenShareNotSupported": "请求桌面视频流失败。您的浏览器似乎不支持屏幕共享。",
+      "videoCallError": "请求摄像头视频流失败。请检查您的浏览器是否自动拒绝了请求？",
+      "videoCallNotSupported": "请求摄像头视频流失败。您的浏览器似乎不支持摄像头访问。",
       "safariWarning": "检测到您正在使用 Safari。由于浏览器 API 限制，即使使用最新的 Safari，您也无法正常地与他人进行点对点推流（包括加载本地视频和屏幕共享）。若要获得完整的功能，请切换到基于 Chromium 或 Firefox 的浏览器。"
     },
     "buttons": {
       "uploadVideo": "加载视频文件",
       "createRoom": "创建房间",
       "joinRoom": "加入房间",
-      "requestScreenShare": "开始共享屏幕"
+      "requestScreenShare": "开始共享屏幕",
+      "startVideoCall": "开始视频通话"
     },
     "labels": {
       "sourceURL": "源 URL",
