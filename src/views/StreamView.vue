@@ -45,9 +45,10 @@ import BlankPadding from "@/components/BlankPadding.vue";
     <br />
     <reelsync-video-player
       id="video-player-stream"
+      :mediaStream="videoStream"
       :style="{ display: isReady ? 'block' : 'none' }"
-    ></reelsync-video-player
-    ><reelsync-padding></reelsync-padding>
+    ></reelsync-video-player>
+    <reelsync-padding></reelsync-padding>
     <span id="status"
       ><s :style="{ color: isReady ? 'green' : 'red' }">⬤</s>
       {{
@@ -91,6 +92,7 @@ export default {
       playbackDelta: null, // 同源模式下为同步偏差，点对点下为null
       rtt: null, // 点对点模式下为RTT，单位秒
       locationOrigin: location.origin,
+      videoStream: null, // 新增: 用于传递给 VideoPlayer 的 MediaStream
       get method() {
         return shared.app.method;
       },
@@ -243,10 +245,7 @@ export default {
           call.answer();
           call.on("stream", (stream) => {
             msg.i("Received video stream");
-            const video = document.getElementById("video-player-stream");
-            video.srcObject = stream;
-            video.load();
-            video.play();
+            this.videoStream = stream;
           });
         });
 
@@ -558,7 +557,7 @@ export default {
 
     // Clean up voice call resources
     this.stopAudioCall();
-    
+
     // Clean up camera stream
     if (shared.app.cameraStream) {
       shared.app.cameraStream.getTracks().forEach(track => track.stop());
