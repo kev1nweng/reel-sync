@@ -441,13 +441,24 @@ export default {
               msg.i(`Connection established with ${conn.peer}`);
               that.isReady = true;
               if (shared.app.method == 0) {
-                const videoPlayer = document.querySelector("#video-player-stream");
                 let stream;
-                try {
-                  stream = videoPlayer.captureStream();
-                } catch (e) {
-                  stream = videoPlayer.mozCaptureStream();
-                  msg.w(`Error: ${e} Attempting mozCaptureStream()...`);
+                // Use camera stream directly if available, otherwise capture from video player
+                if (shared.app.cameraStream) {
+                  stream = shared.app.cameraStream;
+                  msg.i("Using camera stream for P2P video call");
+                } else if (shared.app.screenStream) {
+                  stream = shared.app.screenStream;
+                  msg.i("Using screen stream for P2P sharing");
+                } else {
+                  // Fallback to capturing from video player for file-based videos
+                  const videoPlayer = document.querySelector("#video-player-stream");
+                  try {
+                    stream = videoPlayer.captureStream();
+                  } catch (e) {
+                    stream = videoPlayer.mozCaptureStream();
+                    msg.w(`Error: ${e} Attempting mozCaptureStream()...`);
+                  }
+                  msg.i("Using captured stream from video player");
                 }
                 // eslint-disable-next-line no-unused-vars
                 const call = shared.peers.local.video.call(`${peerID}-video`, stream);
