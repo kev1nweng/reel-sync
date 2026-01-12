@@ -13,7 +13,7 @@ import VideoPlayer from "@/components/VideoPlayer.vue";
       <div class="title-group">
         <h1>{{ $t("StreamView.title") }}</h1>
         <div id="status">
-          <span :style="{ color: isReady ? '#4caf50' : '#f44336' }">⬤</span>
+          <span class="status-dot" :style="{ color: isReady ? '#4caf50' : '#f44336' }">⬤</span>
           {{ isReady ? $t("StreamView.messages.connected") : $t("StreamView.messages.disconnected") }}
         </div>
       </div>
@@ -67,8 +67,7 @@ import VideoPlayer from "@/components/VideoPlayer.vue";
                   m: method == 1 ? $t("StreamView.messages.sameOriginLiteral") : $t("StreamView.messages.p2pLiteral"),
                 })
               : $t("StreamView.messages.watching")
-          }}
-          <span v-if="playbackDelta !== null || rtt !== null" class="latency">
+          }}<span v-if="playbackDelta !== null || rtt !== null" class="latency">
             ({{ method == 1 ? $t("StreamView.messages.delta") : $t("StreamView.messages.latency") }}:
             {{
               method == 1
@@ -594,6 +593,10 @@ export default {
   margin-top: 0.25rem;
 }
 
+.status-dot {
+  font-size: 0.65rem;
+}
+
 .voice-controls {
   display: flex;
   align-items: center;
@@ -659,9 +662,10 @@ export default {
 }
 
 .latency {
+  display: block;
   color: #666;
   font-size: 0.85rem;
-  margin-left: 0.5rem;
+  margin-top: 0.25rem;
 }
 
 .error-text {
