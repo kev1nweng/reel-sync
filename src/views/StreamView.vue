@@ -681,7 +681,27 @@ export default {
 
 @media (max-width: 600px) {
   .stream-container {
+    padding: 0;
+    gap: 0;
+  }
+
+  .header-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .video-card {
+    border-radius: 0;
+    border: none;
+  }
+
+  .info-section {
     padding: 1rem;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .info-group {
+    border-radius: 12px;
   }
 }
 </style>

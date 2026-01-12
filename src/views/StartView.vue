@@ -646,22 +646,38 @@ export default {
 
 /* Responsive adjustments */
 @media (max-width: 840px) {
+  .page-container {
+    padding: 0;
+  }
+
   .card-content {
     flex-direction: column;
   }
 
   .brand-section {
-    padding-bottom: 24px;
+    padding: 24px;
   }
 
   .form-section {
-    padding-top: 24px;
-    padding-bottom: 40px;
+    padding: 24px 24px 40px 24px;
   }
 
   .login-card {
-    max-width: 450px;
-    margin: 2rem 0;
+    max-width: none;
+    margin: 0;
+    border-radius: 0;
+    border: none;
+    min-height: 100vh;
+    box-shadow: none;
+  }
+
+  .loading-card {
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+    border: none;
+    min-height: 100vh;
+    box-shadow: none;
   }
 }
 </style>
