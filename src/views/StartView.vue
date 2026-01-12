@@ -655,7 +655,7 @@ export default {
   }
 
   .brand-section {
-    padding: 24px;
+    padding: 64px 24px;
   }
 
   .form-section {
