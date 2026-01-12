@@ -36,7 +36,7 @@
     "title": "开始",
     "description": "调整选项并开始分享您的视频流。",
     "messages": {
-      "noRegistration": "无需注册，将创建临时会话。",
+      "noRegistration": "无需注册，我们将为您创建临时会话。",
       "or": "或者",
       "toggleUnavailable": "选项不可用",
       "invalidRoomIDParam": {

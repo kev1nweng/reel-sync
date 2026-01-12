@@ -36,7 +36,7 @@
     "title": "Start",
     "description": "Adjust the options to suit your needs and start sharing your media stream.",
     "messages": {
-      "noRegistration": "No registration required. A temporary session will be created.",
+      "noRegistration": "No registration required. A temporary session will be created for you.",
       "or": "or",
       "toggleUnavailable": "Unavailable",
       "invalidRoomIDParam": {
