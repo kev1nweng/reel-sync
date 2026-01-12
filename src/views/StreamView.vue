@@ -96,6 +96,8 @@ export default {
       playbackDelta: null, // 同源模式下为同步偏差，点对点下为null
       rtt: null, // 点对点模式下为RTT，单位秒
       locationOrigin: location.origin,
+      audioCallListenerRegistered: false, // 防止重复注册音频来电监听器
+      remoteVoiceEnabled: false, // 追踪对方是否启用了语音
       get method() {
         return shared.app.method;
       },
@@ -135,13 +137,34 @@ export default {
 
       if (shared.app.isVoiceEnabled) {
         try {
-          // Request microphone access
-          shared.app.audioStream = await navigator.mediaDevices.getUserMedia({
-            audio: true,
+          // Check for getUserMedia support with fallback for older browsers
+          const getUserMedia = navigator.mediaDevices?.getUserMedia?.bind(navigator.mediaDevices)
+            || ((constraints) => new Promise((resolve, reject) => {
+              const legacyGetUserMedia = navigator.getUserMedia
+                || navigator.webkitGetUserMedia
+                || navigator.mozGetUserMedia
+                || navigator.msGetUserMedia;
+              if (!legacyGetUserMedia) {
+                reject(new Error("getUserMedia is not supported in this browser"));
+                return;
+              }
+              legacyGetUserMedia.call(navigator, constraints, resolve, reject);
+            }));
+
+          // Request microphone access with compatibility options
+          shared.app.audioStream = await getUserMedia({
+            audio: {
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true,
+            },
             video: false,
           });
 
           msg.i("Microphone access granted, starting voice call");
+
+          // Setup audio call listener before notifying peer
+          this.setupAudioCallListener();
 
           // Notify the remote peer about voice enablement
           if (shared.peers.remote.data) {
@@ -152,8 +175,10 @@ export default {
             }
           }
 
-          // Start audio call if we have a remote peer
-          this.startAudioCall();
+          // Start audio call if remote peer has also enabled voice
+          if (this.remoteVoiceEnabled) {
+            this.startAudioCall();
+          }
         } catch (error) {
           msg.e("Failed to access microphone:", error);
           shared.app.isVoiceEnabled = false;
@@ -176,31 +201,110 @@ export default {
       }
     },
 
+    setupAudioCallListener() {
+      // Prevent duplicate registration
+      if (this.audioCallListenerRegistered || !shared.peers.local.audio) return;
+      this.audioCallListenerRegistered = true;
+
+      shared.peers.local.audio.on("call", (call) => {
+        msg.i("Incoming audio call");
+
+        // Answer with local audio stream if available, otherwise answer without stream
+        if (shared.app.audioStream) {
+          call.answer(shared.app.audioStream);
+        } else {
+          // If no local stream, just answer to receive remote audio
+          call.answer();
+        }
+
+        call.on("stream", (remoteAudioStream) => {
+          msg.i("Received remote audio stream from incoming call");
+          this.playRemoteAudio(remoteAudioStream);
+        });
+
+        call.on("error", (err) => {
+          msg.e("Audio call error:", err);
+        });
+
+        call.on("close", () => {
+          msg.i("Audio call closed");
+        });
+
+        shared.peers.remote.audio = call;
+      });
+    },
+
+    playRemoteAudio(remoteAudioStream) {
+      // Create or reuse audio element to play remote audio
+      let audioElement = document.getElementById("remote-audio");
+      if (!audioElement) {
+        audioElement = document.createElement("audio");
+        audioElement.id = "remote-audio";
+        audioElement.autoplay = true;
+        audioElement.playsInline = true; // iOS compatibility
+        document.body.appendChild(audioElement);
+      }
+
+      // For some browsers, we need to handle autoplay restrictions
+      audioElement.srcObject = remoteAudioStream;
+      const playPromise = audioElement.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+          msg.w("Audio autoplay was prevented:", error);
+          // Audio will play when user interacts with the page
+        });
+      }
+    },
+
     startAudioCall() {
-      if (!shared.app.audioStream || !shared.peers.remote.data) return;
+      if (!shared.app.audioStream || !shared.peers.remote.data) {
+        msg.w("Cannot start audio call: missing audio stream or data connection");
+        return;
+      }
+
+      if (!shared.peers.local.audio) {
+        msg.e("Audio peer not initialized");
+        return;
+      }
 
       const peerID = this.isClient ? shared.app.roomID : shared.app.guestID;
 
-      if (shared.peers.local.audio && shared.app.audioStream) {
+      if (!peerID) {
+        msg.e("Cannot start audio call: peer ID not available");
+        return;
+      }
+
+      // Close existing audio call if any
+      if (shared.peers.remote.audio) {
+        shared.peers.remote.audio.close();
+      }
+
+      try {
         // Make an audio call to the remote peer
         const audioCall = shared.peers.local.audio.call(`${peerID}-audio`, shared.app.audioStream);
 
+        if (!audioCall) {
+          msg.e("Failed to initiate audio call");
+          return;
+        }
+
         audioCall.on("stream", (remoteAudioStream) => {
-          msg.i("Received remote audio stream");
+          msg.i("Received remote audio stream from outgoing call");
+          this.playRemoteAudio(remoteAudioStream);
+        });
 
-          // Create audio element to play remote audio
-          let audioElement = document.getElementById("remote-audio");
-          if (!audioElement) {
-            audioElement = document.createElement("audio");
-            audioElement.id = "remote-audio";
-            audioElement.autoplay = true;
-            document.body.appendChild(audioElement);
-          }
+        audioCall.on("error", (err) => {
+          msg.e("Audio call error:", err);
+        });
 
-          audioElement.srcObject = remoteAudioStream;
+        audioCall.on("close", () => {
+          msg.i("Outgoing audio call closed");
         });
 
         shared.peers.remote.audio = audioCall;
+        msg.i(`Audio call initiated to ${peerID}-audio`);
+      } catch (error) {
+        msg.e("Failed to start audio call:", error);
       }
     },
 
@@ -255,26 +359,8 @@ export default {
           });
         });
 
-        // Handle incoming audio calls
-        shared.peers.local.audio.on("call", (call) => {
-          call.answer();
-          call.on("stream", (remoteAudioStream) => {
-            msg.i("Received remote audio stream");
-
-            // Create audio element to play remote audio
-            let audioElement = document.getElementById("remote-audio");
-            if (!audioElement) {
-              audioElement = document.createElement("audio");
-              audioElement.id = "remote-audio";
-              audioElement.autoplay = true;
-              document.body.appendChild(audioElement);
-            }
-
-            audioElement.srcObject = remoteAudioStream;
-          });
-
-          shared.peers.remote.audio = call;
-        });
+        // Setup audio call listener (will be used when voice is enabled)
+        this.setupAudioCallListener();
         this.isReady = true;
         shared.peers.remote.data = conn;
         // 启动RTT定时测量（点对点模式）
@@ -341,9 +427,17 @@ export default {
             break;
           case "voice-enabled":
             msg.i("Remote peer enabled voice call");
+            this.remoteVoiceEnabled = true;
+            // Setup listener to receive incoming audio calls
+            this.setupAudioCallListener();
+            // If we also have voice enabled, initiate the call
+            if (shared.app.isVoiceEnabled && shared.app.audioStream) {
+              this.startAudioCall();
+            }
             break;
           case "voice-disabled":
             msg.i("Remote peer disabled voice call");
+            this.remoteVoiceEnabled = false;
             break;
           default:
             msg.w(`Invalid message: ${data}`);
@@ -364,10 +458,13 @@ export default {
         msg.w("Connection closed");
         shared.peers.remote.data = null;
         this.isReady = false;
+        this.remoteVoiceEnabled = false;
         const video = document.getElementById("video-player-stream");
         video.pause();
         if (this.rttTimer) clearInterval(this.rttTimer);
         this.rtt = null;
+        // Clean up voice call on disconnect
+        this.stopAudioCall();
       });
     },
   },
@@ -413,27 +510,8 @@ export default {
               that._rttPingSent = Date.now();
             }, rttInterval);
           }
-        });
-
-        // Handle incoming audio calls
-        shared.peers.local.audio.on("call", (call) => {
-          call.answer();
-          call.on("stream", (remoteAudioStream) => {
-            msg.i("Received remote audio stream");
-
-            // Create audio element to play remote audio
-            let audioElement = document.getElementById("remote-audio");
-            if (!audioElement) {
-              audioElement = document.createElement("audio");
-              audioElement.id = "remote-audio";
-              audioElement.autoplay = true;
-              document.body.appendChild(audioElement);
-            }
-
-            audioElement.srcObject = remoteAudioStream;
-          });
-
-          shared.peers.remote.audio = call;
+          // Setup audio call listener (will be used when voice is enabled)
+          that.setupAudioCallListener();
         });
 
         // 数据接收处理
@@ -544,9 +622,17 @@ export default {
               break;
             case "voice-enabled":
               msg.i("Remote peer enabled voice call");
+              that.remoteVoiceEnabled = true;
+              // Setup listener to receive incoming audio calls
+              that.setupAudioCallListener();
+              // If we also have voice enabled, initiate the call
+              if (shared.app.isVoiceEnabled && shared.app.audioStream) {
+                that.startAudioCall();
+              }
               break;
             case "voice-disabled":
               msg.i("Remote peer disabled voice call");
+              that.remoteVoiceEnabled = false;
               break;
             default: {
               msg.e(`Invalid message: ${data}`);
@@ -558,11 +644,14 @@ export default {
         conn.on("close", () => {
           msg.w("Connection closed");
           shared.peers.remote.data = null;
-          this.isReady = false;
+          that.isReady = false;
+          that.remoteVoiceEnabled = false;
           const video = document.getElementById("video-player-stream");
           video.pause();
           if (that.rttTimer) clearInterval(that.rttTimer);
           that.rtt = null;
+          // Clean up voice call on disconnect
+          that.stopAudioCall();
         });
       });
 
@@ -581,6 +670,10 @@ export default {
 
     // Clean up voice call resources
     this.stopAudioCall();
+
+    // Reset audio call listener state
+    this.audioCallListenerRegistered = false;
+    this.remoteVoiceEnabled = false;
   },
   components: {
     "reelsync-loading-ring": LoadingRing,
