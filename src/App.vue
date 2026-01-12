@@ -141,7 +141,9 @@ export default {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   z-index: 1000;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(var(--mdui-color-outline), 0.1);
+  background-color: rgba(var(--mdui-color-surface), 0.8);
+  color: rgb(var(--mdui-color-on-surface));
 }
 
 .topbar-left {
@@ -170,12 +172,12 @@ footer {
   justify-content: space-between;
   align-items: center;
   font-size: 0.85em;
-  color: #666;
+  color: rgb(var(--mdui-color-on-surface-variant));
   z-index: 100;
-  background-color: rgba(255, 255, 255, 0.85);
+  background-color: rgba(var(--mdui-color-surface), 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  border-top: 1px solid rgba(var(--mdui-color-outline), 0.1);
 }
 
 .footer-left {
@@ -218,7 +220,7 @@ footer {
     align-items: flex-start;
     gap: 1.25rem;
     padding: 2rem 1.5rem;
-    background-color: white; /* 窄屏不再需要半透明 */
+    background-color: rgb(var(--mdui-color-surface));
   }
 
   .footer-left {

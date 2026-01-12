@@ -30,7 +30,7 @@ app.use(i18n);
 app.use(router);
 app.mount("#app");
 
-setColorScheme("#666666");
+setColorScheme("#0061a4");
 
 export const shared = {
   app: {

@@ -494,8 +494,8 @@ export default {
   align-items: center;
   justify-content: center;
   flex: 1;
-  background-color: #f0f4f9; /* Google login background color */
-  padding: 2rem 1rem 80px 1rem; /* 增加底部内边距，为固定底栏留出空间并保持背景色 */
+  background-color: rgb(var(--mdui-color-surface-container-low));
+  padding: 2rem 1rem 80px 1rem;
   box-sizing: border-box;
 }
 
@@ -503,9 +503,11 @@ export default {
   width: 100%;
   max-width: 1000px;
   min-height: 480px;
-  border-radius: 28px; /* Material 3 large corner */
+  border-radius: 28px;
   overflow: hidden;
-  background-color: white;
+  background-color: rgb(var(--mdui-color-surface));
+  color: rgb(var(--mdui-color-on-surface));
+  border: 1px solid rgb(var(--mdui-color-outline-variant));
 }
 
 .card-content {
@@ -522,6 +524,7 @@ export default {
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
+  background-color: rgba(var(--mdui-color-secondary-container), 0.3);
 }
 
 .logo {
@@ -532,12 +535,13 @@ export default {
   font-size: 2.5rem;
   font-weight: 400;
   margin: 0 0 1rem 0;
-  color: #1f1f1f;
+  color: rgb(var(--mdui-color-on-secondary-container));
 }
 
 .description {
   font-size: 1.125rem;
-  color: #444746;
+  color: rgb(var(--mdui-color-on-secondary-container));
+  opacity: 0.8;
   line-height: 1.5;
   margin: 0;
 }
@@ -554,7 +558,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #747775;
+  color: rgb(var(--mdui-color-on-surface-variant));
   font-size: 0.875rem;
 }
 
@@ -568,6 +572,7 @@ export default {
   padding: 40px;
   display: flex;
   flex-direction: column;
+  background-color: rgb(var(--mdui-color-surface));
 }
 
 #options {
@@ -585,13 +590,13 @@ export default {
 
 .option-item label {
   font-size: 0.875rem;
-  color: #444746;
+  color: rgb(var(--mdui-color-on-surface));
   font-weight: 500;
 }
 
 .section-divider {
   margin-bottom: 2rem;
-  opacity: 0.6;
+  opacity: 0.1;
 }
 
 .input-group {
@@ -605,14 +610,14 @@ export default {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #747775;
+  color: rgb(var(--mdui-color-primary));
   font-weight: 600;
   margin-bottom: 0.5rem;
   display: block;
 }
 
 .source-list {
-  background-color: #f8fafb;
+  background-color: rgb(var(--mdui-color-surface-container));
   border-radius: 16px;
   padding: 4px;
 }
@@ -635,6 +640,8 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  background-color: rgb(var(--mdui-color-surface));
+  color: rgb(var(--mdui-color-on-surface));
 }
 
 /* Responsive adjustments */
@@ -644,11 +651,12 @@ export default {
   }
 
   .brand-section {
-    padding-bottom: 20px;
+    padding-bottom: 24px;
   }
 
   .form-section {
-    padding-top: 0;
+    padding-top: 24px;
+    padding-bottom: 40px;
   }
 
   .login-card {

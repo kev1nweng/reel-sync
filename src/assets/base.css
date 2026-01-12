@@ -6,6 +6,8 @@
 }
 
 body {
+  background-color: rgb(var(--mdui-color-background));
+  color: rgb(var(--mdui-color-on-background));
   overflow-y: auto;
   user-select: none;
   min-height: 100vh;

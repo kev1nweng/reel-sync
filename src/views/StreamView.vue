@@ -589,7 +589,7 @@ export default {
   align-items: center;
   gap: 0.5rem;
   font-size: 0.9rem;
-  color: #666;
+  color: rgb(var(--mdui-color-on-surface-variant));
   margin-top: 0.25rem;
 }
 
@@ -602,7 +602,7 @@ export default {
   align-items: center;
   gap: 0.75rem;
   padding: 0.5rem 1rem;
-  background: rgba(0, 0, 0, 0.03);
+  background: rgb(var(--mdui-color-surface-container-low));
   border-radius: 12px;
 }
 
@@ -642,8 +642,8 @@ export default {
   flex-direction: column;
   gap: 0.5rem;
   padding: 1.25rem;
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgb(var(--mdui-color-surface-container-low));
+  border: 1px solid rgb(var(--mdui-color-outline-variant));
   border-radius: 16px;
 }
 
@@ -651,30 +651,30 @@ export default {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #888;
+  color: rgb(var(--mdui-color-on-surface-variant));
   font-weight: 600;
 }
 
 .value {
   font-size: 1rem;
-  color: #1f1f1f;
+  color: rgb(var(--mdui-color-on-surface));
   word-break: break-all;
 }
 
 .latency {
   display: block;
-  color: #666;
+  color: rgb(var(--mdui-color-on-surface-variant));
   font-size: 0.85rem;
   margin-top: 0.25rem;
 }
 
 .error-text {
-  color: #ff5252;
+  color: rgb(var(--mdui-color-error));
   margin: 0;
 }
 
 .hint-text {
-  color: #aaa;
+  color: rgb(var(--mdui-color-on-surface-variant));
   font-size: 0.9rem;
   margin: 0;
 }
