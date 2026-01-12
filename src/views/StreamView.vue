@@ -54,12 +54,12 @@ import VideoPlayer from "@/components/VideoPlayer.vue";
       </div>
 
       <div v-if="!isClient" class="info-group">
-        <span class="label">Share Link</span>
+        <span class="label">{{ $t("StreamView.messages.shareLink") }}</span>
         <span class="value monospace">{{ locationOrigin }}/?join={{ roomID }}</span>
       </div>
 
       <div v-if="isReady" class="info-group">
-        <span class="label">Network Info</span>
+        <span class="label">{{ $t("StreamView.messages.networkInfo") }}</span>
         <span class="value">
           {{
             !isClient

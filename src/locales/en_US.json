@@ -114,6 +114,7 @@
       "delta": "Sync offset",
       "latency": "Latency",
       "shareLink": "Share Link",
+      "networkInfo": "Network Info",
       "connectionRestricted": "Connection limited: Relay node unavailable",
       "voiceCallEnabled": "Voice call enabled",
       "voiceCallDisabled": "Voice call disabled"

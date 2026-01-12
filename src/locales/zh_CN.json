@@ -112,6 +112,7 @@
       "delta": "视频进度差异",
       "latency": "网络延迟",
       "shareLink": "分享链接",
+      "networkInfo": "网络信息",
       "connectionRestricted": "连接受限：信使节点不可用",
       "voiceCallEnabled": "语音通话已启用",
       "voiceCallDisabled": "语音通话已禁用"

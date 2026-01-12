@@ -52,7 +52,16 @@ import { msg } from "./utils/msg";
   <footer>
     <div class="footer-left">
       <div class="version-info">
-        <b style="font-weight: bold">{{ $t("App.versionLiteral") }} {{ REELSYNC_PACKAGE_VERSION }}</b>
+        <b style="font-weight: bold">
+          {{ $t("App.versionLiteral") }}
+          <a
+            v-if="REELSYNC_COMMIT_URL && REELSYNC_PACKAGE_VERSION !== 'devel'"
+            :href="REELSYNC_COMMIT_URL"
+            target="_blank"
+            style="color: inherit; text-decoration: underline"
+          >{{ REELSYNC_PACKAGE_VERSION }}</a>
+          <template v-else>{{ REELSYNC_PACKAGE_VERSION }}</template>
+        </b>
       </div>
       <div class="author-info">
         {{ $t("App.footer.author") }}
@@ -155,6 +164,8 @@ export default {
     return {
       // eslint-disable-next-line no-undef
       REELSYNC_PACKAGE_VERSION: __APP_VERSION__,
+      // eslint-disable-next-line no-undef
+      REELSYNC_COMMIT_URL: __COMMIT_URL__,
     };
   },
 };

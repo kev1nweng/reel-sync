@@ -1,6 +1,6 @@
 {
   "name": "reel-sync",
-  "version": "26w03f",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
