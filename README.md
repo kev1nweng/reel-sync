@@ -56,7 +56,7 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
   - [x] 端到端播放进度同步
   - [x] 延迟测量
   - [x] 考虑网络延迟的播放进度同步
-  - [ ] ~~从节点视频操作请求~~
+  - [ ] ~~接收端视频操作请求~~
 
 - [ ] 实时聊天
   - [ ] WebRTC 文字消息传输

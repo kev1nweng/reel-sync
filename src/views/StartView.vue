@@ -62,19 +62,19 @@ import Bowser from "bowser";
               <mdui-switch
                 id="method-switch"
                 @change="changeMethod"
-                :disabled="!isMaster"
+                :disabled="!isHost"
                 checked-icon="east--rounded"
                 unchecked-icon="commit--rounded"
                 checked
               ></mdui-switch>
-              <label>{{ isMaster ? methodName : $t("StartView.messages.toggleUnavailable") }}</label>
+              <label>{{ isHost ? methodName : $t("StartView.messages.toggleUnavailable") }}</label>
             </div>
           </div>
 
           <mdui-divider class="section-divider"></mdui-divider>
 
-          <!-- Master Mode Inputs -->
-          <div v-if="isMaster" class="input-group">
+          <!-- Host Mode Inputs -->
+          <div v-if="isHost" class="input-group">
             <reelsync-video-input id="video-input" @change="onVideoUpload"></reelsync-video-input>
 
             <div v-if="isP2P" class="source-selector">
@@ -123,7 +123,7 @@ import Bowser from "bowser";
             </div>
           </div>
 
-          <!-- Slave Mode Inputs -->
+          <!-- Client Mode Inputs -->
           <div v-else class="input-group">
             <mdui-text-field
               id="room-id-input"
@@ -177,15 +177,15 @@ export default {
       },
       get modeName() {
         return this.mode === 0
-          ? shared.app.i18n.t("StartView.modes.name.master")
-          : shared.app.i18n.t("StartView.modes.name.slave");
+          ? shared.app.i18n.t("StartView.modes.name.host")
+          : shared.app.i18n.t("StartView.modes.name.client");
       },
       get modeDescription() {
         return this.mode === 0
-          ? shared.app.i18n.t("StartView.modes.description.master")
-          : shared.app.i18n.t("StartView.modes.description.slave");
+          ? shared.app.i18n.t("StartView.modes.description.host")
+          : shared.app.i18n.t("StartView.modes.description.client");
       },
-      get isMaster() {
+      get isHost() {
         return this.mode === 0;
       },
       get isP2P() {
@@ -212,10 +212,10 @@ export default {
     };
   },
   methods: {
-    // 切换主从控制模式
+    // 切换发送接收控制模式
     changeMode() {
       this.mode = document.getElementById("mode-switch").checked ? 0 : 1;
-      // 0: master, 1: slave
+      // 0: host, 1: client
     },
 
     // 切换传输方式
@@ -303,7 +303,7 @@ export default {
       }
     },
 
-    // 创建新房间(主控端)
+    // 创建新房间(发送者端)
     async createRoom() {
       const cfg = (await this.getTurnNode()) ?? null;
       const id = new PeerID().id;
@@ -323,7 +323,7 @@ export default {
       this.$router.push("/stream");
     },
 
-    // 加入已有房间(从属端)
+    // 加入已有房间(接收者端)
     async joinRoom() {
       const cfg = (await this.getTurnNode()) ?? null;
       const id = new PeerID().id;
@@ -390,7 +390,7 @@ export default {
     // 处理回车键快捷操作
     handleKeyPress(event) {
       if (event.key === "Enter") {
-        if (this.isMaster) {
+        if (this.isHost) {
           if (!document.getElementById("create-room-button").disabled) {
             this.onCreateRequest();
             event.preventDefault();
@@ -443,7 +443,7 @@ export default {
   watch: {
     mode(value) {
       shared.app.mode = value;
-      msg.i(`Role changed: ${shared.app.mode === 0 ? "master" : "slave"}`);
+      msg.i(`Role changed: ${shared.app.mode === 0 ? "host" : "client"}`);
     },
     method(value) {
       shared.app.method = value;

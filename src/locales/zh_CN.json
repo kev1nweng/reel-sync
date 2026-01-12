@@ -56,12 +56,12 @@
     },
     "modes": {
       "name": {
-        "master": "主节点模式",
-        "slave": "从节点模式"
+        "host": "发送者模式",
+        "client": "接收者模式"
       },
       "description": {
-        "master": "您可以创建房间并将您本地的视频文件分享给他人。",
-        "slave": "您可以加入其他人创建的房间并观看他们的视频流。"
+        "host": "您可以创建房间并将您本地的视频文件分享给他人。",
+        "client": "您可以加入其他人创建的房间并观看他们的视频流。"
       }
     },
     "methods": {
@@ -80,12 +80,12 @@
   "StreamView": {
     "title": "流式传输",
     "hint": {
-      "master": "号码已复制。请您将号码或链接发送给您的伙伴。",
-      "slave": "请耐心等待。正在全球互联网寻找您的伙伴..."
+      "host": "号码已复制。请您将号码或链接发送给您的伙伴。",
+      "client": "请耐心等待。正在全球互联网寻找您的伙伴..."
     },
     "roleDescription": {
-      "master": "房间",
-      "slave": "成员"
+      "host": "房间",
+      "client": "成员"
     },
     "messages": {
       "roomID": "您的{roleDescription}号：{roomID}",

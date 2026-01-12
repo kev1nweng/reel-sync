@@ -56,7 +56,7 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
   - [x] End-to-end playback progress synchronization
   - [x] Delay measurement
   - [x] Playback progress synchronization considering network delay
-  - [ ] ~~Slave node video operation requests~~
+  - [ ] ~~Client node video operation requests~~
 
 - [ ] Real-time chat
   - [ ] WebRTC text message transmission

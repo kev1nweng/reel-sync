@@ -14,7 +14,7 @@ export class Comm {
         : null,
     };
   }
-  master = {
+  host = {
     timestamp() {
       return `timestamp|atu=${Date.now()}`;
     },
@@ -46,7 +46,7 @@ export class Comm {
       return "voice-disabled";
     },
   };
-  slave = {
+  client = {
     greet(guestID) {
       return `connected|gid=${guestID}`;
     },

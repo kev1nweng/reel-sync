@@ -53,7 +53,7 @@ import VideoPlayer from "@/components/VideoPlayer.vue";
         <span class="value monospace">{{ roomID }}</span>
       </div>
 
-      <div v-if="!isSlave" class="info-group">
+      <div v-if="!isClient" class="info-group">
         <span class="label">Share Link</span>
         <span class="value monospace">{{ locationOrigin }}/?join={{ roomID }}</span>
       </div>
@@ -62,7 +62,7 @@ import VideoPlayer from "@/components/VideoPlayer.vue";
         <span class="label">Network Info</span>
         <span class="value">
           {{
-            !isSlave
+            !isClient
               ? $t("StreamView.messages.pushing", {
                   m: method == 1 ? $t("StreamView.messages.sameOriginLiteral") : $t("StreamView.messages.p2pLiteral"),
                 })
@@ -100,14 +100,14 @@ export default {
         return shared.app.method;
       },
       get roleDescription() {
-        return this.isSlave
-          ? shared.app.i18n.t("StreamView.roleDescription.slave")
-          : shared.app.i18n.t("StreamView.roleDescription.master");
+        return this.isClient
+          ? shared.app.i18n.t("StreamView.roleDescription.client")
+          : shared.app.i18n.t("StreamView.roleDescription.host");
       },
       get hint() {
-        return this.isSlave
-          ? shared.app.i18n.t("StreamView.hint.slave")
-          : shared.app.i18n.t("StreamView.hint.master");
+        return this.isClient
+          ? shared.app.i18n.t("StreamView.hint.client")
+          : shared.app.i18n.t("StreamView.hint.host");
       },
       get loadingDescription() {
         return shared.app.mode == 1
@@ -115,9 +115,9 @@ export default {
           : shared.app.i18n.t("StreamView.messages.waiting");
       },
       get roomID() {
-        return this.isSlave && shared.app.guestID ? shared.app.guestID : shared.app.roomID;
+        return this.isClient && shared.app.guestID ? shared.app.guestID : shared.app.roomID;
       },
-      get isSlave() {
+      get isClient() {
         return shared.app.mode == 1;
       },
       get isConnectionRestricted() {
@@ -145,10 +145,10 @@ export default {
 
           // Notify the remote peer about voice enablement
           if (shared.peers.remote.data) {
-            if (this.isSlave) {
-              shared.peers.remote.data.send(comm.slave.voiceEnabled());
+            if (this.isClient) {
+              shared.peers.remote.data.send(comm.client.voiceEnabled());
             } else {
-              shared.peers.remote.data.send(comm.master.voiceEnabled());
+              shared.peers.remote.data.send(comm.host.voiceEnabled());
             }
           }
 
@@ -165,10 +165,10 @@ export default {
 
         // Notify the remote peer about voice disablement
         if (shared.peers.remote.data) {
-          if (this.isSlave) {
-            shared.peers.remote.data.send(comm.slave.voiceDisabled());
+          if (this.isClient) {
+            shared.peers.remote.data.send(comm.client.voiceDisabled());
           } else {
-            shared.peers.remote.data.send(comm.master.voiceDisabled());
+            shared.peers.remote.data.send(comm.host.voiceDisabled());
           }
         }
 
@@ -179,7 +179,7 @@ export default {
     startAudioCall() {
       if (!shared.app.audioStream || !shared.peers.remote.data) return;
 
-      const peerID = this.isSlave ? shared.app.roomID : shared.app.guestID;
+      const peerID = this.isClient ? shared.app.roomID : shared.app.guestID;
 
       if (shared.peers.local.audio && shared.app.audioStream) {
         // Make an audio call to the remote peer
@@ -242,7 +242,7 @@ export default {
 
       // 连接成功回调
       conn.on("open", () => {
-        conn.send(comm.slave.greet(shared.app.guestID));
+        conn.send(comm.client.greet(shared.app.guestID));
         msg.i(`Connection established with ${shared.app.roomID}.`);
         shared.peers.local.video.on("call", (call) => {
           call.answer();
@@ -285,7 +285,7 @@ export default {
               ? parseFloat(import.meta.env.VITE_LATENCY_MEASUREMENT_INTERVAL_SECONDS)
               : 2) * 1e3;
           this.rttTimer = setInterval(() => {
-            conn.send(comm.slave.rttPing(Date.now()));
+            conn.send(comm.client.rttPing(Date.now()));
             this._rttPingSent = Date.now();
           }, rttInterval);
         }
@@ -302,7 +302,7 @@ export default {
             shared.app.syncThread = setInterval(
               () => {
                 msg.i(`Sending playback progress: ${video.currentTime}`);
-                conn.send(comm.slave.progress(video.currentTime, Date.now()));
+                conn.send(comm.client.progress(video.currentTime, Date.now()));
               },
               import.meta.env.VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS * 1e3,
             );
@@ -323,12 +323,12 @@ export default {
             const timestamp = parseFloat(commMsg.data.atu);
             const latency = (Date.now() - timestamp) / 1000;
             this.playbackDelta = latency;
-            conn.send(comm.slave.latency(latency));
+            conn.send(comm.client.latency(latency));
             break;
           }
           case "rtt-ping":
-            // 对方发起RTT测量，立即回复pong
-            conn.send(comm.slave.rttPong(commMsg.data.ts));
+            // 对方发起RTT measurement，立即回复pong
+            conn.send(comm.client.rttPong(commMsg.data.ts));
             break;
           case "rtt-pong":
             // 收到pong，计算RTT
@@ -380,8 +380,8 @@ export default {
 
     const that = this;
 
-    if (this.isSlave) {
-      // 从属端逻辑
+    if (this.isClient) {
+      // 接收者端逻辑
       const dataPeer = shared.peers.local.data;
 
       // 确保peer已经就绪后再连接
@@ -409,7 +409,7 @@ export default {
                 ? parseFloat(import.meta.env.VITE_LATENCY_MEASUREMENT_INTERVAL_SECONDS)
                 : 2) * 1e3;
             that.rttTimer = setInterval(() => {
-              conn.send(comm.master.rttPing(Date.now()));
+              conn.send(comm.host.rttPing(Date.now()));
               that._rttPingSent = Date.now();
             }, rttInterval);
           }
@@ -458,21 +458,21 @@ export default {
                 const call = shared.peers.local.video.call(`${peerID}-video`, stream);
                 shared.app.pingThread = setInterval(
                   () => {
-                    conn.send(comm.master.timestamp());
+                    conn.send(comm.host.timestamp());
                   },
                   import.meta.env.VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS * 1e3,
                 );
               } else {
                 const video = document.getElementById("video-player-stream");
-                conn.send(comm.master.origin(shared.app.videoURL));
+                conn.send(comm.host.origin(shared.app.videoURL));
                 video.addEventListener("play", () => {
-                  conn.send(comm.master.play());
+                  conn.send(comm.host.play());
                 });
                 video.addEventListener("pause", () => {
-                  conn.send(comm.master.pause());
+                  conn.send(comm.host.pause());
                 });
                 video.addEventListener("seeking", () => {
-                  conn.send(comm.master.seek(video.currentTime));
+                  conn.send(comm.host.seek(video.currentTime));
                 });
               }
               break;
@@ -486,12 +486,12 @@ export default {
               if (Math.abs(delta) > (import.meta.env.VITE_MAX_ACCEPTABLE_DELAY_SECONDS ?? 3)) {
                 msg.w(`Attempting to force sync due to too much latency: ${delta}`);
                 that.playbackDelta = delta;
-                conn.send(comm.master.seek(video.currentTime + offset));
+                conn.send(comm.host.seek(video.currentTime + offset));
               } else {
                 msg.i(`Received status report from the peer. Delta: ${delta}`);
                 that.playbackDelta = delta;
               }
-              conn.send(comm.master.latency(delta));
+              conn.send(comm.host.latency(delta));
               break;
             }
             case "latency": {
@@ -500,7 +500,7 @@ export default {
             }
             case "rtt-ping":
               // 对方发起RTT测量，立即回复pong
-              conn.send(comm.master.rttPong(commMsg.data.ts));
+              conn.send(comm.host.rttPong(commMsg.data.ts));
               break;
             case "rtt-pong":
               // 收到pong，计算RTT

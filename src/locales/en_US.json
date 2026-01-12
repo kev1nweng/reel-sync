@@ -56,12 +56,12 @@
     },
     "modes": {
       "name": {
-        "master": "Master Mode",
-        "slave": "Slave Mode"
+        "host": "Host Mode",
+        "client": "Client Mode"
       },
       "description": {
-        "master": "You may create a room and share your local video stream with others.",
-        "slave": "You may join others' rooms and watch their video streams."
+        "host": "You may create a room and share your local video stream with others.",
+        "client": "You may join others' rooms and watch their video streams."
       }
     },
     "methods": {
@@ -80,12 +80,12 @@
   "StreamView": {
     "title": "Stream",
     "hint": {
-      "master": "Your Room ID is copied. Send the ID or the URL to your partner.",
-      "slave": "Please wait patiently as we are looking for your partner on the Internet."
+      "host": "Your Room ID is copied. Send the ID or the URL to your partner.",
+      "client": "Please wait patiently as we are looking for your partner on the Internet."
     },
     "roleDescription": {
-      "master": "Room",
-      "slave": "User"
+      "host": "Room",
+      "client": "User"
     },
     "messages": {
       "roomID": "Your {roleDescription} ID: {roomID}",
