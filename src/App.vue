@@ -3,32 +3,52 @@ import { RouterView } from "vue-router";
 import { confirm as mduiConfirm } from "mdui/functions/confirm";
 import { prompt as mduiPrompt } from "mdui/functions/prompt";
 import { alert as mduiAlert } from "mdui/functions/alert";
-import { shared } from "./main";
+import { shared, resetSharedState } from "./main";
 import { msg } from "./utils/msg";
 </script>
 
 <template>
   <div class="topbar">
-    <div class="topbar-left">
+    <div class="topbar-left" @click="confirmBackToHome">
       <img src="./assets/logo.png" alt="ReelSync Logo" id="logo" />
       <div id="title">ReelSync</div>
     </div>
     <div class="topbar-right">
       <mdui-chip
+        class="topbar-chip"
         end-icon="language--rounded"
         elevated
         @click="showLanguageSwitchConfirmation"
         >{{ $t("App.languageSwitch.indicatorButton") }}</mdui-chip
       >
       <mdui-chip
+        class="topbar-chip"
         end-icon="settings--rounded"
         elevated
         @click="showSettingsDialog"
         >{{ $t("App.settingsButton") }}</mdui-chip
       >
+      <mdui-button-icon
+        class="topbar-icon"
+        icon="language--rounded"
+        variant="tonal"
+        @click="showLanguageSwitchConfirmation"
+      ></mdui-button-icon>
+      <mdui-button-icon
+        class="topbar-icon"
+        icon="settings--rounded"
+        variant="filled"
+        @click="showSettingsDialog"
+      ></mdui-button-icon>
     </div>
   </div>
-  <RouterView />
+  <div class="router-wrapper">
+    <router-view v-slot="{ Component }">
+      <transition name="page-fade-blur" mode="out-in">
+        <component :is="Component" />
+      </transition>
+    </router-view>
+  </div>
   <footer>
     <div class="footer-left">
       <div class="version-info">
@@ -93,6 +113,20 @@ export default {
         onCancel: () => null,
       });
     },
+    confirmBackToHome() {
+      if (this.$route.name === "start") return;
+      mduiConfirm({
+        headline: this.$t("App.backToHome.headline"),
+        description: this.$t("App.backToHome.description"),
+        confirmText: this.$t("App.backToHome.confirmText"),
+        cancelText: this.$t("App.backToHome.cancelText"),
+        onConfirm: () => {
+          resetSharedState();
+          this.$router.push({ name: "start" });
+        },
+        onCancel: () => null,
+      });
+    },
     showSettingsDialog() {
       mduiPrompt({
         headline: this.$t("App.settingsDialog.title"),
@@ -127,6 +161,32 @@ export default {
 </script>
 
 <style scoped>
+.router-wrapper {
+  overflow: clip;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-fade-blur-enter-active,
+.page-fade-blur-leave-active {
+  transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+              filter 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.page-fade-blur-enter-from {
+  opacity: 0;
+  transform: translateY(24px);
+  filter: blur(10px);
+}
+
+.page-fade-blur-leave-to {
+  opacity: 0;
+  transform: translateY(-16px);
+  filter: blur(6px);
+}
+
 .topbar {
   font-size: 1.2em;
   display: flex;
@@ -150,12 +210,22 @@ export default {
   display: flex;
   align-items: center;
   gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.topbar-left:active {
+  opacity: 0.7;
 }
 
 .topbar-right {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.topbar-icon {
+  display: none;
 }
 
 #title {
@@ -178,6 +248,8 @@ footer {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-top: 1px solid rgba(var(--mdui-color-outline), 0.1);
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 .footer-left {
@@ -214,6 +286,14 @@ footer {
 
 /* 响应式布局：针对手机和窄屏设备 */
 @media (max-width: 768px) {
+  .topbar-chip {
+    display: none;
+  }
+
+  .topbar-icon {
+    display: block;
+  }
+
   footer {
     position: relative; /* 窄屏下不再固定遮挡内容 */
     flex-direction: column;

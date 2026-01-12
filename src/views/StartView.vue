@@ -22,7 +22,7 @@ import Bowser from "bowser";
           <div class="logo">
             <mdui-icon name="rocket_launch--rounded" style="font-size: 48px; color: var(--mdui-color-primary)"></mdui-icon>
           </div>
-          <h1>{{ $t("StartView.title") }}</h1>
+          <h1 style="font-weight: bold;">{{ $t("StartView.title") }}</h1>
           <p class="description">
             {{ $t("StartView.description") }}<br />
             {{ modeDescription }}
@@ -33,13 +33,24 @@ import Bowser from "bowser";
               <mdui-icon name="devices--rounded"></mdui-icon>
               <span>{{ deviceInfo }}</span>
             </div>
-            <div class="env-item">
+            <div
+              class="env-item"
+              :style="{ cursor: webrtcSupportStatus === 1 ? 'pointer' : 'default' }"
+              @click="webrtcSupportStatus === 1 && showSafariWarning()"
+            >
               <mdui-icon name="public--rounded"></mdui-icon>
               <span>{{ browserInfo }}</span>
-              <mdui-icon
-                :name="isWebRTCSupported ? 'check--rounded' : 'close--rounded'"
-                :style="{ color: isWebRTCSupported ? '#4caf50' : '#f44336', fontSize: '1.1rem', marginLeft: '4px', fontWeight: 'bold' }"
-              ></mdui-icon>
+              <mdui-tooltip :content="getSupportTooltip(webrtcSupportStatus)">
+                <mdui-icon
+                  :name="getSupportIcon(webrtcSupportStatus)"
+                  :style="{
+                    color: getSupportColor(webrtcSupportStatus),
+                    fontSize: '1.1rem',
+                    marginLeft: '4px',
+                    fontWeight: 'bold',
+                  }"
+                ></mdui-icon>
+              </mdui-tooltip>
             </div>
           </div>
         </div>
@@ -114,6 +125,7 @@ import Bowser from "bowser";
             <reelsync-video-player style="display: none" id="video-player"></reelsync-video-player>
 
             <div class="action-bar">
+              <span class="no-registration-hint">{{ $t("StartView.messages.noRegistration") }}</span>
               <mdui-button
                 @click="onCreateRequest"
                 id="create-room-button"
@@ -137,6 +149,7 @@ import Bowser from "bowser";
             ></mdui-text-field>
 
             <div class="action-bar">
+              <span class="no-registration-hint">{{ $t("StartView.messages.noRegistration") }}</span>
               <mdui-button
                 @click="onJoinRequest"
                 id="join-room-button"
@@ -202,12 +215,16 @@ export default {
         const browser = Bowser.getParser(window.navigator.userAgent);
         return `${browser.getBrowserName()} ${browser.getBrowserVersion()}`;
       },
-      get isWebRTCSupported() {
-        return !!(
+      get webrtcSupportStatus() {
+        const browser = Bowser.getParser(window.navigator.userAgent);
+        const isSupported = !!(
           window.RTCPeerConnection ||
           window.mozRTCPeerConnection ||
           window.webkitRTCPeerConnection
         );
+        if (!isSupported) return 0;
+        if (browser.getBrowserName() === "Safari") return 1;
+        return 2;
       },
     };
   },
@@ -223,6 +240,33 @@ export default {
       this.method = document.getElementById("method-switch").checked ? 0 : 1;
       // 0: p2p, 1: same-origin
       document.getElementById("create-room-button").disabled = true;
+    },
+
+    showSafariWarning() {
+      mduiAlert({
+        description: this.$t("StartView.messages.safariWarning"),
+        onClose: () => {
+          msg.w("Safari detected, some features may not work as expected.");
+        },
+      });
+    },
+
+    getSupportIcon(status) {
+      if (status === 0) return "close--rounded";
+      if (status === 1) return "priority_high--rounded";
+      return "check--rounded";
+    },
+
+    getSupportColor(status) {
+      if (status === 0) return "#f44336";
+      if (status === 1) return "#ff9800";
+      return "#4caf50";
+    },
+
+    getSupportTooltip(status) {
+      if (status === 0) return this.$t("StartView.supportStatus.none");
+      if (status === 1) return this.$t("StartView.supportStatus.partial");
+      return this.$t("StartView.supportStatus.full");
     },
 
     // 触发文件选择对话框
@@ -429,12 +473,7 @@ export default {
     }
     const browser = Bowser.getParser(window.navigator.userAgent);
     if (browser.getBrowserName() === "Safari") {
-      mduiAlert({
-        description: this.$t("StartView.messages.safariWarning"),
-        onClose: () => {
-          msg.w("Safari detected, some features may not work as expected.");
-        },
-      });
+      this.showSafariWarning();
     }
   },
   unmounted() {
@@ -596,7 +635,7 @@ export default {
 
 .section-divider {
   margin-bottom: 2rem;
-  opacity: 0.1;
+  background-color: rgb(var(--mdui-color-outline-variant));
 }
 
 .input-group {
@@ -628,9 +667,17 @@ export default {
 
 .action-bar {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   margin-top: auto;
   padding-top: 2rem;
+}
+
+.no-registration-hint {
+  font-size: 0.875rem;
+  color: rgb(var(--mdui-color-on-surface-variant));
+  opacity: 0.7;
 }
 
 .loading-card {

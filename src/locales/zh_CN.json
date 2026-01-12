@@ -13,6 +13,12 @@
       "cancelText": "No",
       "indicatorButton": "Language"
     },
+    "backToHome": {
+      "headline": "回到首页",
+      "description": "您确定要回到首页吗？当前的会话将会中断。",
+      "confirmText": "确定",
+      "cancelText": "取消"
+    },
     "settingsButton": "设置",
     "settingsDialog": {
       "title": "设置",
@@ -30,6 +36,7 @@
     "title": "开始",
     "description": "调整选项并开始分享您的视频流。",
     "messages": {
+      "noRegistration": "无需注册，将创建临时会话。",
       "or": "或者",
       "toggleUnavailable": "选项不可用",
       "invalidRoomIDParam": {
@@ -41,8 +48,11 @@
       "screenShareError": "请求桌面视频流失败。请检查您的浏览器是否自动拒绝了请求？",
       "screenShareNotSupported": "请求桌面视频流失败。您的浏览器似乎不支持屏幕共享。",
       "safariWarning": "检测到您正在使用 Safari。由于浏览器 API 限制，即使使用最新的 Safari，您也无法正常地与他人进行点对点推流（包括加载本地视频和屏幕共享）。若要获得完整的功能，请切换到基于 Chromium 或 Firefox 的浏览器。"
-    },
-    "buttons": {
+    },    "supportStatus": {
+      "full": "完全支持",
+      "partial": "功能不完整",
+      "none": "不支持"
+    },    "buttons": {
       "uploadVideo": "加载视频文件",
       "uploadVideoDescription": "从您的设备选择一个本地视频文件进行播放和分享。",
       "createRoom": "创建房间",

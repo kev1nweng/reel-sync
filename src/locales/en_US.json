@@ -13,6 +13,12 @@
       "headline": "切换语言",
       "indicatorButton": "语言"
     },
+    "backToHome": {
+      "headline": "Back to Home",
+      "description": "Are you sure you want to go back to the home page? The current session will be terminated.",
+      "confirmText": "Confirm",
+      "cancelText": "Cancel"
+    },
     "settingsButton": "Settings",
     "settingsDialog": {
       "title": "Settings",
@@ -30,6 +36,7 @@
     "title": "Start",
     "description": "Adjust the options to suit your needs and start sharing your media stream.",
     "messages": {
+      "noRegistration": "No registration required. A temporary session will be created.",
       "or": "or",
       "toggleUnavailable": "Unavailable",
       "invalidRoomIDParam": {
@@ -41,6 +48,11 @@
       "screenShareError": "Failed to access the video stream. Please check your browser's privacy or permission settings.",
       "screenShareNotSupported": "Failed to request the video stream. Screen sharing is not supported by your browser.",
       "safariWarning": "Safari detected. \nDue to browser API limitations, some peer-to-peer features (like local video sharing and screen capture) may not work correctly, even in the latest Safari version. \nTo get the full functionality, please use a Chromium or Firefox-based browser."
+    },
+    "supportStatus": {
+      "full": "Full support",
+      "partial": "Partial support",
+      "none": "Not supported"
     },
     "buttons": {
       "uploadVideo": "Open Local Video",

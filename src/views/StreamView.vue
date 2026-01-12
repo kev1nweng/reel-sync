@@ -468,6 +468,10 @@ export default {
       });
     },
   },
+  unmounted() {
+    if (this.rttTimer) clearInterval(this.rttTimer);
+    // Consider adding resetSharedState() here as well if we want auto-cleanup
+  },
   mounted() {
     // 初始化检查
     if (this.roomID === "" || !this.roomID) {
@@ -718,7 +722,10 @@ export default {
 }
 
 .status-dot {
-  font-size: 0.65rem;
+  font-size: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
 }
 
 .voice-controls {
