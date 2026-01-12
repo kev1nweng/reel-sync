@@ -3,7 +3,7 @@
     "versionLiteral": "Version",
     "footer": {
       "techs": "Powerd by WebRTC and other awesome Web technologies. NO data gets stored as a file on ANY server.",
-      "author": "Crafted by kW with ❤."
+      "author": "Crafted by 小翁同学 with love."
     },
     "languageSwitch": {
       "cancelText": "否",
@@ -43,13 +43,16 @@
     },
     "buttons": {
       "uploadVideo": "Load Your Video",
+      "uploadVideoDescription": "Choose a local video file from your device to play and share.",
       "createRoom": "Create a Room",
       "joinRoom": "Join the Room",
-      "requestScreenShare": "Start Screen Sharing"
+      "requestScreenShare": "Start Screen Sharing",
+      "requestScreenShareDescription": "Instantly capture and sync your screen, a specific window, or a browser tab."
     },
     "labels": {
       "roomID": "Room ID",
-      "sourceURL": "Source URL"
+      "sourceURL": "Source URL",
+      "selectSource": "Select Media Source"
     },
     "modes": {
       "name": {

@@ -9,28 +9,52 @@ import { msg } from "./utils/msg";
 
 <template>
   <div class="topbar">
-    <mdui-chip
-      icon="language--rounded"
-      class="topbar-lbtn"
-      elevated
-      @click="showLanguageSwitchConfirmation"
-      >{{ $t("App.languageSwitch.indicatorButton") }}</mdui-chip
-    >
-    <img src="./assets/logo.png" alt="ReelSync Logo" id="logo" />
-    <mdui-chip
-      end-icon="settings--rounded"
-      class="topbar-rbtn"
-      elevated
-      @click="showSettingsDialog"
-      >{{ $t("App.settingsButton") }}</mdui-chip
-    >
-    <div id="title">ReelSync</div>
+    <div class="topbar-left">
+      <img src="./assets/logo.png" alt="ReelSync Logo" id="logo" />
+      <div id="title">ReelSync</div>
+    </div>
+    <div class="topbar-right">
+      <mdui-chip
+        end-icon="language--rounded"
+        elevated
+        @click="showLanguageSwitchConfirmation"
+        >{{ $t("App.languageSwitch.indicatorButton") }}</mdui-chip
+      >
+      <mdui-chip
+        end-icon="settings--rounded"
+        elevated
+        @click="showSettingsDialog"
+        >{{ $t("App.settingsButton") }}</mdui-chip
+      >
+    </div>
   </div>
   <RouterView />
   <footer>
-    <b style="font-weight: bold">{{ $t("App.versionLiteral") }} {{ REELSYNC_PACKAGE_VERSION }}</b>
-    {{ $t("App.footer.techs") }}<br />
-    {{ $t("App.footer.author") }}
+    <div class="footer-left">
+      <div class="version-info">
+        <b style="font-weight: bold">{{ $t("App.versionLiteral") }} {{ REELSYNC_PACKAGE_VERSION }}</b>
+      </div>
+      <div class="author-info">
+        {{ $t("App.footer.author") }}
+      </div>
+      <div class="github-links">
+        <mdui-chip
+          href="https://github.com/kev1nweng"
+          target="_blank"
+          variant="filled"
+          icon="person--rounded"
+        >GitHub</mdui-chip>
+        <mdui-chip
+          href="https://github.com/kev1nweng/reel-sync"
+          target="_blank"
+          variant="filled"
+          icon="code--rounded"
+        >Source Code</mdui-chip>
+      </div>
+    </div>
+    <div class="footer-right">
+      <span>{{ $t("App.footer.techs") }}</span>
+    </div>
   </footer>
 </template>
 
@@ -104,67 +128,119 @@ export default {
 
 <style scoped>
 .topbar {
-  font-size: 1.5em;
+  font-size: 1.2em;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: var(--topbar-height);
+  padding: 0 1.5rem;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  mask-image: linear-gradient(180deg, white 85%, transparent 100%);
+  z-index: 1000;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.topbar-lbtn {
-  position: absolute;
-  left: 0;
-  top: 0;
-  margin-left: calc(var(--topbar-height) / 2 - 16px);
-  margin-top: calc(var(--topbar-height) / 2 - 16px);
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.topbar-rbtn {
-  position: absolute;
-  right: 0;
-  top: 0;
-  margin-right: calc(var(--topbar-height) / 2 - 16px);
-  margin-top: calc(var(--topbar-height) / 2 - 16px);
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 #title {
   font-weight: bold;
-  /* text-shadow: 0 0 36px; */
 }
 
 footer {
-  padding: 12px;
+  padding: 0.75rem 1.5rem; /* 减小上下内边距 */
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  font-size: 0.8em;
-  color: #888;
+  font-size: 0.85em;
+  color: #666;
+  z-index: 100;
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  column-gap: 1.5rem;
+  row-gap: 0.5rem; /* 减小换行后的行间距 */
+  flex-wrap: wrap;
+  pointer-events: auto;
+}
+
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-align: right;
   pointer-events: none;
 }
 
-.topbar > img {
-  padding: 6px;
+.author-info,
+.version-info {
+  white-space: nowrap;
 }
 
-.topbar > div {
-  padding: 6px;
+.github-links {
+  display: flex;
+  gap: 8px;
+}
+
+.github-links mdui-chip {
+  height: 28px;
+  font-size: 0.85em;
+}
+
+/* 响应式布局：针对手机和窄屏设备 */
+@media (max-width: 768px) {
+  footer {
+    position: relative; /* 窄屏下不再固定遮挡内容 */
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+    padding: 2rem 1.5rem;
+    background-color: white; /* 窄屏不再需要半透明 */
+  }
+
+  .footer-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .footer-right {
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  .github-links {
+    margin-top: 0.25rem;
+  }
 }
 
 #logo {
-  width: auto;
-  height: 70%;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
 }
 
 @media (prefers-color-scheme: dark) {

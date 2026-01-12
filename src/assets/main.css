@@ -5,22 +5,18 @@
 }
 
 #app {
-  margin: 0 auto;
-  padding: calc(var(--topbar-height) + 2rem) 2rem 2rem 2rem;
+  margin: 0;
+  padding-top: var(--topbar-height);
   font-weight: normal;
-  text-align: center;
-  justify-content: center;
   min-height: 100vh;
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .container-c {
   display: flex;
   flex-direction: column;
-  text-align: center;
-  margin: 0 auto;
-  /* wtf? */
-  height: calc(100vh - var(--topbar-height) - 4rem - 61.406px);
+  flex: 1;
   justify-content: center;
 }
 

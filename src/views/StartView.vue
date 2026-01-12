@@ -6,7 +6,6 @@ import { msg } from "@/utils/msg";
 import Peer from "peerjs";
 import VideoInput from "@/components/VideoInput.vue";
 import VideoPlayer from "@/components/VideoPlayer.vue";
-import BlankPadding from "@/components/BlankPadding.vue";
 import LoadingRing from "@/components/LoadingRing.vue";
 
 import { alert as mduiAlert } from "mdui/functions/alert";
@@ -15,110 +14,146 @@ import Bowser from "bowser";
 </script>
 
 <template>
-  <div class="container-c" v-if="!isShareIncoming">
-    <h1>{{ $t("StartView.title") }}</h1>
-    <span>{{ $t("StartView.description") }}<br />{{ modeDescription }}</span>
-    <reelsync-padding></reelsync-padding>
-    <div id="options">
-      <div>
-        <mdui-switch
-          id="mode-switch"
-          style="margin: 0 auto"
-          @change="changeMode"
-          checked-icon="share--rounded"
-          unchecked-icon="link--rounded"
-          checked
-        ></mdui-switch>
-        <label id="mode-indicator">{{ modeName }}</label>
+  <div class="page-container" v-if="!isShareIncoming">
+    <mdui-card variant="elevated" class="login-card">
+      <div class="card-content">
+        <!-- Left Section: Branding and Title -->
+        <div class="brand-section">
+          <div class="logo">
+            <mdui-icon name="rocket_launch--rounded" style="font-size: 48px; color: var(--mdui-color-primary)"></mdui-icon>
+          </div>
+          <h1>{{ $t("StartView.title") }}</h1>
+          <p class="description">
+            {{ $t("StartView.description") }}<br />
+            {{ modeDescription }}
+          </p>
+
+          <div class="env-info">
+            <div class="env-item">
+              <mdui-icon name="devices--rounded"></mdui-icon>
+              <span>{{ deviceInfo }}</span>
+            </div>
+            <div class="env-item">
+              <mdui-icon name="public--rounded"></mdui-icon>
+              <span>{{ browserInfo }}</span>
+              <mdui-icon
+                :name="isWebRTCSupported ? 'check--rounded' : 'close--rounded'"
+                :style="{ color: isWebRTCSupported ? '#4caf50' : '#f44336', fontSize: '1.1rem', marginLeft: '4px', fontWeight: 'bold' }"
+              ></mdui-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Section: Forms and Actions -->
+        <div class="form-section">
+          <!-- Options Section -->
+          <div id="options">
+            <div class="option-item">
+              <mdui-switch
+                id="mode-switch"
+                @change="changeMode"
+                checked-icon="share--rounded"
+                unchecked-icon="link--rounded"
+                checked
+              ></mdui-switch>
+              <label>{{ modeName }}</label>
+            </div>
+            <div class="option-item">
+              <mdui-switch
+                id="method-switch"
+                @change="changeMethod"
+                :disabled="!isMaster"
+                checked-icon="east--rounded"
+                unchecked-icon="commit--rounded"
+                checked
+              ></mdui-switch>
+              <label>{{ isMaster ? methodName : $t("StartView.messages.toggleUnavailable") }}</label>
+            </div>
+          </div>
+
+          <mdui-divider class="section-divider"></mdui-divider>
+
+          <!-- Master Mode Inputs -->
+          <div v-if="isMaster" class="input-group">
+            <reelsync-video-input id="video-input" @change="onVideoUpload"></reelsync-video-input>
+
+            <div v-if="isP2P" class="source-selector">
+              <label class="section-subtitle">{{ $t("StartView.labels.selectSource") }}</label>
+              <mdui-list class="source-list">
+                <mdui-list-item
+                  icon="upload_file--rounded"
+                  @click="uploadVideo"
+                  v-if="!isScreenStreamReady"
+                  :description="$t('StartView.buttons.uploadVideoDescription')"
+                >
+                  {{ $t("StartView.buttons.uploadVideo") }}
+                </mdui-list-item>
+
+                <mdui-list-item
+                  icon="screenshot_monitor--rounded"
+                  @click="requestScreenShare"
+                  :active="isScreenStreamReady"
+                  :description="$t('StartView.buttons.requestScreenShareDescription')"
+                >
+                  {{ $t("StartView.buttons.requestScreenShare") }}
+                </mdui-list-item>
+              </mdui-list>
+            </div>
+            <div v-else class="input-group">
+              <mdui-text-field
+                id="origin-url-input"
+                class="monospace"
+                v-model="originURL"
+                :label="$t('StartView.labels.sourceURL')"
+                variant="outlined"
+                clearable
+                style="width: 100%"
+              ></mdui-text-field>
+            </div>
+
+            <reelsync-video-player style="display: none" id="video-player"></reelsync-video-player>
+
+            <div class="action-bar">
+              <mdui-button
+                @click="onCreateRequest"
+                id="create-room-button"
+                :disabled="(!isVideoReady && !isOriginReady) || isLoading"
+                :loading="isLoading"
+              >{{ $t("StartView.buttons.createRoom") }}</mdui-button>
+            </div>
+          </div>
+
+          <!-- Slave Mode Inputs -->
+          <div v-else class="input-group">
+            <mdui-text-field
+              id="room-id-input"
+              class="monospace"
+              v-model="roomID"
+              :label="$t('StartView.labels.roomID')"
+              variant="outlined"
+              maxlength="16"
+              clearable
+              style="width: 100%"
+            ></mdui-text-field>
+
+            <div class="action-bar">
+              <mdui-button
+                @click="onJoinRequest"
+                id="join-room-button"
+                :disabled="!isRoomReady"
+                :loading="isLoading"
+              >{{ $t("StartView.buttons.joinRoom") }}</mdui-button>
+            </div>
+          </div>
+        </div>
       </div>
-      <div v-if="true">
-        <mdui-switch
-          id="method-switch"
-          style="margin: 0 auto"
-          @change="changeMethod"
-          :disabled="!isMaster"
-          checked-icon="east--rounded"
-          unchecked-icon="commit--rounded"
-          checked
-        ></mdui-switch>
-        <label id="method-indicator">{{
-          isMaster ? methodName : $t("StartView.messages.toggleUnavailable")
-        }}</label>
-      </div>
-    </div>
-    <reelsync-padding></reelsync-padding>
-    <div v-if="isMaster">
-      <reelsync-video-input id="video-input" @change="onVideoUpload"></reelsync-video-input>
-      <div id="fab-container">
-        <mdui-fab
-          extended
-          id="video-upload-button"
-          v-if="isP2P && !isScreenStreamReady"
-          size="normal"
-          variant="surface"
-          icon="upload--rounded"
-          @click="uploadVideo"
-        >
-          {{ $t("StartView.buttons.uploadVideo") }}
-        </mdui-fab>
-        <h4 v-if="isP2P && !isScreenStreamReady">{{ $t("StartView.messages.or") }}</h4>
-        <mdui-fab
-          extended
-          id="screen-sharing-button"
-          v-if="isP2P"
-          size="normal"
-          variant="surface"
-          icon="laptop--rounded"
-          @click="requestScreenShare"
-        >
-          {{ $t("StartView.buttons.requestScreenShare") }}
-        </mdui-fab>
-        <mdui-text-field
-          v-else
-          id="origin-url-input"
-          class="monospace"
-          v-model="originURL"
-          :label="$t('StartView.labels.sourceURL')"
-          variant="outlined"
-          clearable
-          counter
-        ></mdui-text-field>
-      </div>
-      <reelsync-video-player style="display: none" id="video-player"></reelsync-video-player>
-      <reelsync-padding></reelsync-padding>
-      <mdui-button
-        @click="onCreateRequest"
-        id="create-room-button"
-        :disabled="(!isVideoReady && !isOriginReady) || isLoading"
-        :loading="isLoading"
-        >{{ $t("StartView.buttons.createRoom") }}</mdui-button
-      >
-    </div>
-    <div v-else>
-      <mdui-text-field
-        id="room-id-input"
-        class="monospace"
-        v-model="roomID"
-        :label="$t('StartView.labels.roomID')"
-        variant="outlined"
-        maxlength="16"
-        clearable
-        counter
-      ></mdui-text-field
-      ><br />
-      <mdui-button
-        @click="onJoinRequest"
-        id="join-room-button"
-        :disabled="!isRoomReady"
-        :loading="isLoading"
-        >{{ $t("StartView.buttons.joinRoom") }}</mdui-button
-      >
-    </div>
+    </mdui-card>
   </div>
-  <div class="container-c" v-else>
-    <reelsync-loading-ring style="margin: 0 auto"></reelsync-loading-ring>
-    <reelsync-padding></reelsync-padding>
-    <h3>{{ $t("StartView.messages.connectingToTURN") }}</h3>
+  <div class="page-container" v-else>
+    <mdui-card variant="elevated" class="loading-card">
+      <reelsync-loading-ring style="margin: 0 auto"></reelsync-loading-ring>
+      <h3 style="text-align: center; margin-top: 1.5rem">{{ $t("StartView.messages.connectingToTURN") }}</h3>
+    </mdui-card>
   </div>
 </template>
 
@@ -158,6 +193,21 @@ export default {
       },
       get isScreenStreamReady() {
         return shared.app.screenStream;
+      },
+      get deviceInfo() {
+        const browser = Bowser.getParser(window.navigator.userAgent);
+        return `${browser.getOSName()} ${browser.getOSVersion() || ""}`;
+      },
+      get browserInfo() {
+        const browser = Bowser.getParser(window.navigator.userAgent);
+        return `${browser.getBrowserName()} ${browser.getBrowserVersion()}`;
+      },
+      get isWebRTCSupported() {
+        return !!(
+          window.RTCPeerConnection ||
+          window.mozRTCPeerConnection ||
+          window.webkitRTCPeerConnection
+        );
       },
     };
   },
@@ -433,40 +483,177 @@ export default {
   components: {
     "reelsync-video-input": VideoInput,
     "reelsync-video-player": VideoPlayer,
-    "reelsync-padding": BlankPadding,
     "reelsync-loading-ring": LoadingRing,
   },
 };
 </script>
 
 <style scoped>
-mdui-text-field {
-  width: calc(80vw);
-  max-width: 360px;
+.page-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  background-color: #f0f4f9; /* Google login background color */
+  padding: 2rem 1rem 80px 1rem; /* 增加底部内边距，为固定底栏留出空间并保持背景色 */
+  box-sizing: border-box;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 1000px;
+  min-height: 480px;
+  border-radius: 28px; /* Material 3 large corner */
+  overflow: hidden;
+  background-color: white;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  min-height: 480px;
+}
+
+.brand-section {
+  flex: 1;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.logo {
+  margin-bottom: 1.5rem;
+}
+
+.brand-section h1 {
+  font-size: 2.5rem;
+  font-weight: 400;
+  margin: 0 0 1rem 0;
+  color: #1f1f1f;
+}
+
+.description {
+  font-size: 1.125rem;
+  color: #444746;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.env-info {
+  margin-top: auto;
+  padding-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.env-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #747775;
+  font-size: 0.875rem;
+}
+
+.env-item mdui-icon {
+  font-size: 1.25rem;
+  opacity: 0.8;
+}
+
+.form-section {
+  flex: 1;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
 }
 
 #options {
-  width: auto;
   display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 2rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
 
-#options > div {
+.option-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.option-item label {
+  font-size: 0.875rem;
+  color: #444746;
+  font-weight: 500;
+}
+
+.section-divider {
+  margin-bottom: 2rem;
+  opacity: 0.6;
+}
+
+.input-group {
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
+  gap: 1.5rem;
 }
 
-#fab-container {
+.section-subtitle {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #747775;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.source-list {
+  background-color: #f8fafb;
+  border-radius: 16px;
+  padding: 4px;
+}
+
+.source-list mdui-list-item {
+  margin: 4px 0;
+}
+
+.action-bar {
   display: flex;
-  flex-direction: row;
+  justify-content: flex-end;
+  margin-top: auto;
+  padding-top: 2rem;
+}
+
+.loading-card {
+  padding: 3rem;
+  border-radius: 28px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 840px) {
+  .card-content {
+    flex-direction: column;
+  }
+
+  .brand-section {
+    padding-bottom: 20px;
+  }
+
+  .form-section {
+    padding-top: 0;
+  }
+
+  .login-card {
+    max-width: 450px;
+    margin: 2rem 0;
+  }
 }
 </style>

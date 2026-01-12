@@ -5,78 +5,84 @@ import { Comm } from "@/utils/comm";
 
 import LoadingRing from "@/components/LoadingRing.vue";
 import VideoPlayer from "@/components/VideoPlayer.vue";
-import BlankPadding from "@/components/BlankPadding.vue";
 </script>
 
 <template>
-  <div class="container-c">
-    <h1>{{ $t("StreamView.title") }}</h1>
-
-    <!-- Voice Toggle replaces Room ID when ready -->
-    <div v-if="isReady" class="monospace" id="voice-control-main">
-      <mdui-switch
-        id="voice-switch"
-        @change="toggleVoice"
-        :checked="isVoiceEnabled"
-        checked-icon="mic--rounded"
-        unchecked-icon="mic_off--rounded"
-      ></mdui-switch>
-      <label id="voice-indicator">{{ $t("StreamView.labels.voiceToggle") }}</label>
-    </div>
-
-    <span v-else class="monospace" id="room-id-indicator">{{
-      $t("StreamView.messages.roomID", { roleDescription, roomID })
-    }}</span>
-
-    <span class="monospace" v-if="!isSlave" id="share-link-indicator"
-      >{{ locationOrigin }}/?join={{ roomID }}</span
-    >
-    <span v-if="!isReady">{{ hint }}</span
-    ><reelsync-padding></reelsync-padding>
-
-    <div v-if="!isReady">
-      <reelsync-padding></reelsync-padding>
-      <reelsync-loading-ring id="loading"></reelsync-loading-ring><br />
-      <h3>{{ loadingDescription }}</h3>
-      <h4 style="color: crimson" v-if="isConnectionRestricted">
-        {{ $t("StreamView.messages.connectionRestricted") }}
-      </h4>
-    </div>
-    <br />
-    <reelsync-video-player
-      id="video-player-stream"
-      :style="{ display: isReady ? 'block' : 'none' }"
-    ></reelsync-video-player
-    ><reelsync-padding></reelsync-padding>
-    <span id="status"
-      ><s :style="{ color: isReady ? 'green' : 'red' }">⬤</s>
-      {{
-        isReady ? $t("StreamView.messages.connected") : $t("StreamView.messages.disconnected")
-      }}：{{
-        !isSlave
-          ? $t("StreamView.messages.pushing", {
-              m:
-                method == 1
-                  ? $t("StreamView.messages.sameOriginLiteral")
-                  : $t("StreamView.messages.p2pLiteral"),
-            })
-          : $t("StreamView.messages.watching")
-      }}
-      <div v-if="((!isSlave && method == 1) || isSlave || (!isSlave && method == 0)) && isReady">
-        &nbsp;({{
-          method == 1 ? $t("StreamView.messages.delta") : $t("StreamView.messages.latency")
-        }}:
-        {{
-          method == 1
-            ? playbackDelta !== null
-              ? Math.round(playbackDelta * 1e3) + "ms"
-              : $t("StreamView.messages.measuringLiteral")
-            : rtt !== null
-              ? Math.round(rtt * 1e3) + "ms"
-              : $t("StreamView.messages.measuringLiteral")
-        }})
+  <div class="stream-container">
+    <div class="header-section">
+      <div class="title-group">
+        <h1>{{ $t("StreamView.title") }}</h1>
+        <div id="status">
+          <span :style="{ color: isReady ? '#4caf50' : '#f44336' }">⬤</span>
+          {{ isReady ? $t("StreamView.messages.connected") : $t("StreamView.messages.disconnected") }}
+        </div>
       </div>
-    </span>
+
+      <!-- Voice Toggle -->
+      <div v-if="isReady" class="voice-controls">
+        <mdui-switch
+          id="voice-switch"
+          @change="toggleVoice"
+          :checked="isVoiceEnabled"
+          checked-icon="mic--rounded"
+          unchecked-icon="mic_off--rounded"
+        ></mdui-switch>
+        <label>{{ $t("StreamView.labels.voiceToggle") }}</label>
+      </div>
+    </div>
+
+    <mdui-card variant="outlined" class="video-card">
+      <reelsync-video-player
+        id="video-player-stream"
+        v-show="isReady"
+      ></reelsync-video-player>
+
+      <div v-if="!isReady" class="loading-overlay">
+        <reelsync-loading-ring id="loading"></reelsync-loading-ring>
+        <h3>{{ loadingDescription }}</h3>
+        <p v-if="isConnectionRestricted" class="error-text">
+          {{ $t("StreamView.messages.connectionRestricted") }}
+        </p>
+        <p class="hint-text">{{ hint }}</p>
+      </div>
+    </mdui-card>
+
+    <div class="info-section">
+      <div class="info-group">
+        <span class="label">{{ $t("StreamView.messages.roomID", { roleDescription, roomID: "" }) }}</span>
+        <span class="value monospace">{{ roomID }}</span>
+      </div>
+
+      <div v-if="!isSlave" class="info-group">
+        <span class="label">Share Link</span>
+        <span class="value monospace">{{ locationOrigin }}/?join={{ roomID }}</span>
+      </div>
+
+      <div v-if="isReady" class="info-group">
+        <span class="label">Network Info</span>
+        <span class="value">
+          {{
+            !isSlave
+              ? $t("StreamView.messages.pushing", {
+                  m: method == 1 ? $t("StreamView.messages.sameOriginLiteral") : $t("StreamView.messages.p2pLiteral"),
+                })
+              : $t("StreamView.messages.watching")
+          }}
+          <span v-if="playbackDelta !== null || rtt !== null" class="latency">
+            ({{ method == 1 ? $t("StreamView.messages.delta") : $t("StreamView.messages.latency") }}:
+            {{
+              method == 1
+                ? playbackDelta !== null
+                  ? Math.round(playbackDelta * 1e3) + "ms"
+                  : $t("StreamView.messages.measuringLiteral")
+                : rtt !== null
+                  ? Math.round(rtt * 1e3) + "ms"
+                  : $t("StreamView.messages.measuringLiteral")
+            }})
+          </span>
+        </span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -549,55 +555,129 @@ export default {
   components: {
     "reelsync-loading-ring": LoadingRing,
     "reelsync-video-player": VideoPlayer,
-    "reelsync-padding": BlankPadding,
   },
 };
 </script>
 
 <style scoped>
-#video-player-stream {
+.stream-container {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 2rem 80px 2rem; /* 增加底部内边距 */
+  max-width: 1200px;
   margin: 0 auto;
   width: 100%;
-  max-width: 1000px;
+  gap: 2rem;
+  flex: 1;
 }
 
-#room-id-indicator {
-  color: gray;
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-#share-link-indicator {
-  color: slategray;
-}
-
-#loading {
-  margin: 0 auto;
+.title-group h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 500;
 }
 
 #status {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 6px;
-}
-
-#status > s {
-  font-size: 0.65em;
-}
-
-#voice-control-main {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
   gap: 0.5rem;
-  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.25rem;
 }
 
-#voice-indicator {
-  font-size: 1.35rem;
+.voice-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 12px;
+}
+
+.video-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: #000;
+  border-radius: 24px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#video-player-stream {
+  width: 100%;
+  height: 100%;
+}
+
+.loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+  gap: 1rem;
+}
+
+.info-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.info-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+}
+
+.label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888;
+  font-weight: 600;
+}
+
+.value {
+  font-size: 1rem;
+  color: #1f1f1f;
+  word-break: break-all;
+}
+
+.latency {
   color: #666;
-  white-space: nowrap;
+  font-size: 0.85rem;
+  margin-left: 0.5rem;
+}
+
+.error-text {
+  color: #ff5252;
+  margin: 0;
+}
+
+.hint-text {
+  color: #aaa;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .stream-container {
+    padding: 1rem;
+  }
 }
 </style>

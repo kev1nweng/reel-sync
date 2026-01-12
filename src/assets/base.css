@@ -6,7 +6,7 @@
 }
 
 body {
-  overflow: hidden;
+  overflow-y: auto;
   user-select: none;
   min-height: 100vh;
   transition:

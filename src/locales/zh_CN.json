@@ -3,7 +3,7 @@
     "versionLiteral": "版本",
     "footer": {
       "techs": "由 WebRTC 以及其他出色的 Web 技术驱动。没有任何数据会以文件的形式存储在任何服务器上",
-      "author": "by 小翁同学 with ❤"
+      "author": "by 小翁同学 with love"
     },
     "languageSwitch": {
       "headline": "Change Language",
@@ -27,7 +27,7 @@
   },
   "StartView": {
     "title": "开始",
-    "description": "⠀调整选项并开始分享您的视频流。",
+    "description": "调整选项并开始分享您的视频流。",
     "messages": {
       "or": "或者",
       "toggleUnavailable": "选项不可用",
@@ -43,13 +43,16 @@
     },
     "buttons": {
       "uploadVideo": "加载视频文件",
+      "uploadVideoDescription": "从您的设备选择一个本地视频文件进行播放和分享。",
       "createRoom": "创建房间",
       "joinRoom": "加入房间",
-      "requestScreenShare": "开始共享屏幕"
+      "requestScreenShare": "开始共享屏幕",
+      "requestScreenShareDescription": "即时捕获并同步您的屏幕、窗口或浏览器标签页。"
     },
     "labels": {
       "sourceURL": "源 URL",
-      "roomID": "房间 ID"
+      "roomID": "房间 ID",
+      "selectSource": "选择媒体源"
     },
     "modes": {
       "name": {
@@ -57,8 +60,8 @@
         "slave": "从节点模式"
       },
       "description": {
-        "master": "⠀您可以创建房间并将您本地的视频文件分享给他人。",
-        "slave": "⠀您可以加入其他人创建的房间并观看他们的视频流。"
+        "master": "您可以创建房间并将您本地的视频文件分享给他人。",
+        "slave": "您可以加入其他人创建的房间并观看他们的视频流。"
       }
     },
     "methods": {
@@ -77,8 +80,8 @@
   "StreamView": {
     "title": "流式传输",
     "hint": {
-      "master": "⠀号码已复制。请您将号码或链接发送给您的伙伴。",
-      "slave": "⠀请耐心等待。正在全球互联网寻找您的伙伴..."
+      "master": "号码已复制。请您将号码或链接发送给您的伙伴。",
+      "slave": "请耐心等待。正在全球互联网寻找您的伙伴..."
     },
     "roleDescription": {
       "master": "房间",
