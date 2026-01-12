@@ -98,6 +98,7 @@ export default {
       locationOrigin: location.origin,
       audioCallListenerRegistered: false, // 防止重复注册音频来电监听器
       remoteVoiceEnabled: false, // 追踪对方是否启用了语音
+      reconnectTimer: null,
       get method() {
         return shared.app.method;
       },
@@ -330,6 +331,12 @@ export default {
     connectToPeer() {
       const remotePeerId = `${shared.app.roomID}-data`;
       const dataPeer = shared.peers.local.data;
+
+      if (!dataPeer) {
+        msg.w("Connection aborted: dataPeer is null (possibly returning to home)");
+        return;
+      }
+
       const comm = new Comm();
 
       // 确保peer已经就绪
@@ -450,7 +457,11 @@ export default {
         msg.e(`Failed to establish connection with ${shared.app.roomID}: ${err.message}`);
         this.connectionAttempts++;
         // 延迟重试
-        setTimeout(() => this.connectToPeer(), 1000);
+        if (this.connectionAttempts < this.maxAttempts) {
+          this.reconnectTimer = setTimeout(() => this.connectToPeer(), 1000);
+        } else {
+          msg.e("Max connection attempts reached. Please check the room ID and your connection.");
+        }
       });
 
       // 连接关闭处理
@@ -470,6 +481,7 @@ export default {
   },
   unmounted() {
     if (this.rttTimer) clearInterval(this.rttTimer);
+    if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
     // Consider adding resetSharedState() here as well if we want auto-cleanup
   },
   mounted() {

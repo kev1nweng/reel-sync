@@ -123,15 +123,21 @@ export default {
       });
     },
     confirmBackToHome() {
-      if (this.$route.name === "start") return;
+      if (this.$route.name === "start" && !shared.app.roomID) return;
       mduiConfirm({
         headline: this.$t("App.backToHome.headline"),
         description: this.$t("App.backToHome.description"),
         confirmText: this.$t("App.backToHome.confirmText"),
         cancelText: this.$t("App.backToHome.cancelText"),
         onConfirm: () => {
+          const isAtStart = this.$route.name === "start";
           resetSharedState();
-          this.$router.push({ name: "start" });
+          if (isAtStart) {
+            // 如果就在首页，强制刷新以重置内部状态
+            window.location.href = window.location.origin + window.location.pathname + window.location.hash;
+          } else {
+            this.$router.push({ name: "start" });
+          }
         },
         onCancel: () => null,
       });

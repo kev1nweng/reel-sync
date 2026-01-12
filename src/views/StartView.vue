@@ -512,6 +512,12 @@ export default {
     const urlParams = new URLSearchParams(window.location.search);
     const joinParam = urlParams.get("join");
     if (joinParam) {
+      // 清除 URL 中的 join 参数，确保通过分享链接进入后，点击“返回首页”不会再次触发自动加入
+      window.history.replaceState(
+        {},
+        document.title,
+        window.location.pathname + window.location.hash
+      );
       if (joinParam.length === 16) {
         this.isShareIncoming = true;
         this.isLoading = true;
