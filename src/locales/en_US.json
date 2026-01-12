@@ -47,7 +47,9 @@
       "turnNodeError": "Failed to request relay nodes (TURN/STUN): Connection between NAT-restricted networks may be limited.",
       "screenShareError": "Failed to access the video stream. Please check your browser's privacy or permission settings.",
       "screenShareNotSupported": "Failed to request the video stream. Screen sharing is not supported by your browser.",
-      "safariWarning": "Safari detected. \nDue to browser API limitations, some peer-to-peer features (like local video sharing and screen capture) may not work correctly, even in the latest Safari version. \nTo get the full functionality, please use a Chromium or Firefox-based browser."
+      "safariWarning": "Safari detected. \nDue to browser API limitations, some peer-to-peer features (like local video sharing and screen capture) may not work correctly, even in the latest Safari version. \nTo get the full functionality, please use a Chromium or Firefox-based browser.",
+      "firefoxWarning": "Firefox detected. Due to browser limitations, you cannot share system audio while screen sharing. To share audio, please switch to a Chromium-based browser.",
+      "mobileOSWarning": "Mobile device detected. Due to operating system and mobile browser limitations, screen sharing is not available on mobile platforms. To initiate screen sharing, please use a desktop browser."
     },
     "supportStatus": {
       "full": "Full support",

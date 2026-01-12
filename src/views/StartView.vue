@@ -29,14 +29,30 @@ import Bowser from "bowser";
           </p>
 
           <div class="env-info">
-            <div class="env-item">
+            <div
+              class="env-item"
+              :style="{ cursor: osSupportStatus === 1 ? 'pointer' : 'default' }"
+              @click="osSupportStatus === 1 && showOSSupportWarning()"
+            >
               <mdui-icon name="devices--rounded"></mdui-icon>
               <span>{{ deviceInfo }}</span>
+              <mdui-tooltip :content="getSupportTooltip(osSupportStatus)">
+                <mdui-icon
+                  :name="getSupportIcon(osSupportStatus)"
+                  :style="{
+                    color: getSupportColor(osSupportStatus),
+                    fontSize: '1.1rem',
+                    marginLeft: '4px',
+                    fontWeight: 'bold',
+                  }"
+                  @click.stop="osSupportStatus === 1 && showOSSupportWarning()"
+                ></mdui-icon>
+              </mdui-tooltip>
             </div>
             <div
               class="env-item"
               :style="{ cursor: webrtcSupportStatus === 1 ? 'pointer' : 'default' }"
-              @click="webrtcSupportStatus === 1 && showSafariWarning()"
+              @click="webrtcSupportStatus === 1 && showPartialSupportWarning()"
             >
               <mdui-icon name="public--rounded"></mdui-icon>
               <span>{{ browserInfo }}</span>
@@ -49,6 +65,7 @@ import Bowser from "bowser";
                     marginLeft: '4px',
                     fontWeight: 'bold',
                   }"
+                  @click.stop="webrtcSupportStatus === 1 && showPartialSupportWarning()"
                 ></mdui-icon>
               </mdui-tooltip>
             </div>
@@ -215,15 +232,22 @@ export default {
         const browser = Bowser.getParser(window.navigator.userAgent);
         return `${browser.getBrowserName()} ${browser.getBrowserVersion()}`;
       },
+      get osSupportStatus() {
+        const browser = Bowser.getParser(window.navigator.userAgent);
+        const platformType = browser.getPlatformType();
+        // 如果是移动设备，返回部分支持 (1)，否则返回完全支持 (2)
+        return platformType === "mobile" || platformType === "tablet" ? 1 : 2;
+      },
       get webrtcSupportStatus() {
         const browser = Bowser.getParser(window.navigator.userAgent);
+        const name = browser.getBrowserName();
         const isSupported = !!(
           window.RTCPeerConnection ||
           window.mozRTCPeerConnection ||
           window.webkitRTCPeerConnection
         );
         if (!isSupported) return 0;
-        if (browser.getBrowserName() === "Safari") return 1;
+        if (name === "Safari" || name === "Firefox") return 1;
         return 2;
       },
     };
@@ -247,6 +271,34 @@ export default {
         description: this.$t("StartView.messages.safariWarning"),
         onClose: () => {
           msg.w("Safari detected, some features may not work as expected.");
+        },
+      });
+    },
+
+    showFirefoxWarning() {
+      mduiAlert({
+        description: this.$t("StartView.messages.firefoxWarning"),
+        onClose: () => {
+          msg.w("Firefox detected, some features may not work as expected.");
+        },
+      });
+    },
+
+    showPartialSupportWarning() {
+      const browser = Bowser.getParser(window.navigator.userAgent);
+      const name = browser.getBrowserName();
+      if (name === "Safari") {
+        this.showSafariWarning();
+      } else if (name === "Firefox") {
+        this.showFirefoxWarning();
+      }
+    },
+
+    showOSSupportWarning() {
+      mduiAlert({
+        description: this.$t("StartView.messages.mobileOSWarning"),
+        onClose: () => {
+          msg.w("Mobile platform detected, screen sharing is unavailable.");
         },
       });
     },
@@ -277,6 +329,13 @@ export default {
     async requestScreenShare() {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
         msg.e("Screen sharing is not supported in this browser.");
+        if (this.osSupportStatus === 1) {
+          this.showOSSupportWarning();
+        } else {
+          mduiAlert({
+            description: this.$t("StartView.messages.screenShareNotSupported"),
+          });
+        }
         mduiSnackbar({
           message: this.$t("StartView.messages.screenShareNotSupported"),
           closeOnOutsideClick: true,
@@ -472,8 +531,11 @@ export default {
       }
     }
     const browser = Bowser.getParser(window.navigator.userAgent);
-    if (browser.getBrowserName() === "Safari") {
+    const browserName = browser.getBrowserName();
+    if (browserName === "Safari") {
       this.showSafariWarning();
+    } else if (browserName === "Firefox") {
+      this.showFirefoxWarning();
     }
   },
   unmounted() {
