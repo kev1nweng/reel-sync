@@ -7,11 +7,11 @@
       "author": "Crafted by 小翁同学 with love."
     },
     "languageSwitch": {
-      "cancelText": "No",
-      "confirmText": "Yes",
-      "description": "Are you sure you want to switch the display language to Chinese?",
-      "headline": "Switch Language",
-      "indicatorButton": "Language"
+      "cancelText": "否",
+      "confirmText": "是",
+      "description": "您确定要将显示语言切换到中文吗？",
+      "headline": "切换语言",
+      "indicatorButton": "语言"
     },
     "settingsButton": "Settings",
     "settingsDialog": {
