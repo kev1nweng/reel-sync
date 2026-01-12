@@ -11,7 +11,7 @@ import VideoPlayer from "@/components/VideoPlayer.vue";
   <div class="stream-container">
     <div class="header-section">
       <div class="title-group">
-        <h1>{{ $t("StreamView.title") }}</h1>
+        <h1 style="font-weight: bold;">{{ $t("StreamView.title") }}</h1>
         <div id="status">
           <span class="status-dot" :style="{ color: isReady ? '#4caf50' : '#f44336' }">⬤</span>
           {{ isReady ? $t("StreamView.messages.connected") : $t("StreamView.messages.disconnected") }}

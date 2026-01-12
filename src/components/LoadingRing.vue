@@ -28,11 +28,7 @@ export default {
 .loading {
   display: block;
   font-size: 0;
-  color: #000;
-}
-
-.loading.la-dark {
-  color: #333;
+  color: currentColor;
 }
 
 .loading > div {
@@ -148,12 +144,6 @@ export default {
   100% {
     opacity: 1;
     transform: scale(1);
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .loading {
-    filter: invert(1);
   }
 }
 </style>
