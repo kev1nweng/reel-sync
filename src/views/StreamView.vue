@@ -442,16 +442,25 @@ export default {
           const status = commMsg.command;
           const peerID = commMsg.data ? commMsg.data.gid : undefined;
           switch (status) {
-            case "connected": {
+          case "connected": {
               msg.i(`Connection established with ${conn.peer}`);
               that.isReady = true;
+              const video = document.getElementById("video-player-stream");
+
+              // 无论何种模式，都同步播放/暂停状态，确保 Client 端的 video 元素在收到流更新时处于播放状态
+              video.addEventListener("play", () => {
+                conn.send(comm.host.play());
+              });
+              video.addEventListener("pause", () => {
+                conn.send(comm.host.pause());
+              });
+
               if (shared.app.method == 0) {
-                const videoPlayer = document.querySelector("#video-player-stream");
                 let stream;
                 try {
-                  stream = videoPlayer.captureStream();
+                  stream = video.captureStream();
                 } catch (e) {
-                  stream = videoPlayer.mozCaptureStream();
+                  stream = video.mozCaptureStream();
                   msg.w(`Error: ${e} Attempting mozCaptureStream()...`);
                 }
                 // eslint-disable-next-line no-unused-vars
@@ -463,14 +472,7 @@ export default {
                   import.meta.env.VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS * 1e3,
                 );
               } else {
-                const video = document.getElementById("video-player-stream");
                 conn.send(comm.host.origin(shared.app.videoURL));
-                video.addEventListener("play", () => {
-                  conn.send(comm.host.play());
-                });
-                video.addEventListener("pause", () => {
-                  conn.send(comm.host.pause());
-                });
                 video.addEventListener("seeking", () => {
                   conn.send(comm.host.seek(video.currentTime));
                 });
