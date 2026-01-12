@@ -447,24 +447,46 @@ export default {
               that.isReady = true;
               const video = document.getElementById("video-player-stream");
 
-              // 无论何种模式，都同步播放/暂停状态，确保 Client 端的 video 元素在收到流更新时处于播放状态
-              video.addEventListener("play", () => {
-                conn.send(comm.host.play());
-              });
-              video.addEventListener("pause", () => {
-                conn.send(comm.host.pause());
-              });
-
               if (shared.app.method == 0) {
-                let stream;
-                try {
-                  stream = video.captureStream();
-                } catch (e) {
-                  stream = video.mozCaptureStream();
-                  msg.w(`Error: ${e} Attempting mozCaptureStream()...`);
-                }
-                // eslint-disable-next-line no-unused-vars
-                const call = shared.peers.local.video.call(`${peerID}-video`, stream);
+                // P2P 模式：捕获视频流并发送
+                let videoEnded = false;
+
+                const captureAndCall = () => {
+                  let stream;
+                  try {
+                    stream = video.captureStream();
+                  } catch (e) {
+                    stream = video.mozCaptureStream();
+                    msg.w(`Error: ${e} Attempting mozCaptureStream()...`);
+                  }
+                  const call = shared.peers.local.video.call(`${peerID}-video`, stream);
+                  shared.peers.remote.videoCall = call;
+                  msg.i("Video stream call initiated");
+                };
+
+                // 初始捕获并发送流
+                captureAndCall();
+
+                // 监听视频结束事件
+                video.addEventListener("ended", () => {
+                  videoEnded = true;
+                  msg.i("Host video ended, stream tracks may have ended");
+                });
+
+                // 当视频从结束状态恢复播放时，重新捕获流
+                video.addEventListener("playing", () => {
+                  if (videoEnded) {
+                    msg.i("Host video resumed from ended state, re-capturing stream");
+                    videoEnded = false;
+                    // 关闭旧的 call
+                    if (shared.peers.remote.videoCall) {
+                      shared.peers.remote.videoCall.close();
+                    }
+                    // 重新捕获并发起新的 call
+                    captureAndCall();
+                  }
+                });
+
                 shared.app.pingThread = setInterval(
                   () => {
                     conn.send(comm.host.timestamp());
@@ -472,7 +494,14 @@ export default {
                   import.meta.env.VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS * 1e3,
                 );
               } else {
+                // 同源模式：发送视频 URL 并同步播放控制
                 conn.send(comm.host.origin(shared.app.videoURL));
+                video.addEventListener("play", () => {
+                  conn.send(comm.host.play());
+                });
+                video.addEventListener("pause", () => {
+                  conn.send(comm.host.pause());
+                });
                 video.addEventListener("seeking", () => {
                   conn.send(comm.host.seek(video.currentTime));
                 });
