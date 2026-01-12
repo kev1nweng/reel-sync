@@ -49,7 +49,7 @@ import { msg } from "./utils/msg";
           target="_blank"
           variant="filled"
           icon="code--rounded"
-        >Source Code</mdui-chip>
+        >{{ $t("App.sourceCode") }}</mdui-chip>
       </div>
     </div>
     <div class="footer-right">

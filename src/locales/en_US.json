@@ -1,51 +1,52 @@
 {
   "App": {
     "versionLiteral": "Version",
+    "sourceCode": "Source Code",
     "footer": {
-      "techs": "Powerd by WebRTC and other awesome Web technologies. NO data gets stored as a file on ANY server.",
+      "techs": "Powered by WebRTC and other awesome web technologies. No data is stored on any server.",
       "author": "Crafted by 小翁同学 with love."
     },
     "languageSwitch": {
-      "cancelText": "否",
-      "confirmText": "是",
-      "description": "您确定要将显示语言切换到中文吗？",
-      "headline": "切换语言",
-      "indicatorButton": "语言"
+      "cancelText": "No",
+      "confirmText": "Yes",
+      "description": "Are you sure you want to switch the display language to Chinese?",
+      "headline": "Switch Language",
+      "indicatorButton": "Language"
     },
     "settingsButton": "Settings",
     "settingsDialog": {
       "title": "Settings",
       "confirmText": "Submit",
       "cancelText": "Cancel",
-      "description": "Insert your configuration (WIP)",
-      "helper": "The configuration you type here will be stored but not utilized.",
+      "description": "Enter your configuration (WIP)",
+      "helper": "Your configuration will be saved but is currently not utilized.",
       "error": {
         "headline": "Error saving configuration",
-        "description": "The format of your configuration is incorrect, thus not loaded. Error message: "
+        "description": "The configuration format is incorrect and could not be loaded. Error message: "
       }
     }
   },
   "StartView": {
     "title": "Start",
-    "description": "Toggle the options to your needs and start sharing your media stream.",
+    "description": "Adjust the options to suit your needs and start sharing your media stream.",
     "messages": {
       "or": "or",
       "toggleUnavailable": "Unavailable",
       "invalidRoomIDParam": {
-        "description": "The Room ID given in your URL is invalid. Please check whether the share link is correctly pasted. ",
+        "description": "The Room ID in the URL is invalid. Please check if the share link was copied correctly.",
         "headline": "Invalid URL"
       },
       "connectingToTURN": "Connecting",
-      "turnNodeError": "Failed to request TURN / STUN node: You may not be able to connect between NAT-restricted networks.",
-      "screenShareError": "Failed to request for the video stream. Please check whether the privacy preferences of your browser has led to this. ",
-      "screenShareNotSupported": "Failed to requst for the video stream. It seems that screen sharing is not supported by your browser. ",
-      "safariWarning": "You are detected using Safari. \nDue to browser API limitations, you cannot properly perform peer-to-peer push with others (including loading local videos and screen sharing) even with the latest Safari. \nTo get the full functionality, switch to a Chromium or Firefox-based browser."
+      "turnNodeError": "Failed to request relay nodes (TURN/STUN): Connection between NAT-restricted networks may be limited.",
+      "screenShareError": "Failed to access the video stream. Please check your browser's privacy or permission settings.",
+      "screenShareNotSupported": "Failed to request the video stream. Screen sharing is not supported by your browser.",
+      "safariWarning": "Safari detected. \nDue to browser API limitations, some peer-to-peer features (like local video sharing and screen capture) may not work correctly, even in the latest Safari version. \nTo get the full functionality, please use a Chromium or Firefox-based browser."
     },
     "buttons": {
-      "uploadVideo": "Load Your Video",
+      "uploadVideo": "Open Local Video",
       "uploadVideoDescription": "Choose a local video file from your device to play and share.",
       "createRoom": "Create a Room",
-      "joinRoom": "Join the Room",
+      "joinRoom": "Join a Room",
       "requestScreenShare": "Start Screen Sharing",
       "requestScreenShareDescription": "Instantly capture and sync your screen, a specific window, or a browser tab."
     },
@@ -60,8 +61,8 @@
         "client": "Client Mode"
       },
       "description": {
-        "host": "You may create a room and share your local video stream with others.",
-        "client": "You may join others' rooms and watch their video streams."
+        "host": "Create a room and share your local video stream with others.",
+        "client": "Join a room and watch shared video streams."
       }
     },
     "methods": {
@@ -73,15 +74,15 @@
     "roomIDInput": {
       "helper": {
         "empty": "Please provide a Room ID.",
-        "invalid": "The Room ID is invalid."
+        "invalid": "The Room ID format is invalid."
       }
     }
   },
   "StreamView": {
     "title": "Stream",
     "hint": {
-      "host": "Your Room ID is copied. Send the ID or the URL to your partner.",
-      "client": "Please wait patiently as we are looking for your partner on the Internet."
+      "host": "Room ID copied. Share the ID or URL with your partner.",
+      "client": "Searching for your partner on the internet. Please wait..."
     },
     "roleDescription": {
       "host": "Room",
@@ -91,17 +92,17 @@
       "roomID": "Your {roleDescription} ID: {roomID}",
       "connected": "Connected",
       "disconnected": "Disconnected",
-      "pushing": "Pushing {m} video stream",
+      "pushing": "Streaming {m} video",
       "watching": "Watching video stream",
-      "joining": "Joining your peer",
-      "waiting": "Waiting for your peer",
+      "joining": "Connecting to peer...",
+      "waiting": "Waiting for peer...",
       "measuringLiteral": "Measuring",
       "sameOriginLiteral": "same-origin",
       "p2pLiteral": "peer-to-peer",
-      "delta": "Video progress difference",
-      "latency": "Network latency",
+      "delta": "Sync offset",
+      "latency": "Latency",
       "shareLink": "Share Link",
-      "connectionRestricted": "Limited connection: Relay node unavailable",
+      "connectionRestricted": "Connection limited: Relay node unavailable",
       "voiceCallEnabled": "Voice call enabled",
       "voiceCallDisabled": "Voice call disabled"
     },

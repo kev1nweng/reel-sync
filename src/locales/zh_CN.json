@@ -1,6 +1,7 @@
 {
   "App": {
     "versionLiteral": "版本",
+    "sourceCode": "源代码",
     "footer": {
       "techs": "由 WebRTC 以及其他出色的 Web 技术驱动。没有任何数据会以文件的形式存储在任何服务器上",
       "author": "by 小翁同学 with love"
