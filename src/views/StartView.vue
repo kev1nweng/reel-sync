@@ -667,11 +667,23 @@ export default {
   gap: 0.5rem;
   color: rgb(var(--mdui-color-on-surface-variant));
   font-size: 0.875rem;
+  line-height: normal;
 }
 
 .env-item mdui-icon {
   font-size: 1.25rem;
   opacity: 0.8;
+  display: flex;
+}
+
+.env-item mdui-tooltip {
+  display: inline-flex;
+  align-items: center;
+}
+
+.env-item span {
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .form-section {
