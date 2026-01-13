@@ -345,10 +345,10 @@ footer {
 }
 
 #logo {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.65rem;
+  height: 1.65rem;
   object-fit: contain;
-  margin-right: 0.5rem;
+  margin-right: 0.25rem;
 }
 
 @media (prefers-color-scheme: dark) {
