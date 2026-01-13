@@ -69,6 +69,11 @@
       "sourceURL": "Source URL",
       "selectSource": "Select Media Source"
     },
+    "guide": {
+      "step1": "Choose your role (Host or Client)",
+      "step2": "Prepare your video file or web link",
+      "step3": "Create or join a room to sync up"
+    },
     "modes": {
       "name": {
         "host": "Host Mode",
@@ -77,6 +82,11 @@
       "description": {
         "host": "Create a room and share your local video stream with others.",
         "client": "Join a room and watch shared video streams."
+      },
+      "combinedDescription": {
+        "hostP2P": "Choose a video file from your device or share your screen to watch together with your partner in real-time.",
+        "hostSameOrigin": "Enter a web video link to watch synchronized media loaded directly from the source site.",
+        "client": "Enter the Room ID shared by your partner to join and watch their session in sync."
       }
     },
     "methods": {

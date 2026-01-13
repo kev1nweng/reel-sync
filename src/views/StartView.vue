@@ -28,6 +28,21 @@ import Bowser from "bowser";
             {{ modeDescription }}
           </p>
 
+          <div class="quick-guide">
+            <div class="guide-item">
+              <div class="guide-number">1</div>
+              <div class="guide-text">{{ $t("StartView.guide.step1") }}</div>
+            </div>
+            <div class="guide-item">
+              <div class="guide-number">2</div>
+              <div class="guide-text">{{ $t("StartView.guide.step2") }}</div>
+            </div>
+            <div class="guide-item">
+              <div class="guide-number">3</div>
+              <div class="guide-text">{{ $t("StartView.guide.step3") }}</div>
+            </div>
+          </div>
+
           <div class="env-info">
             <div
               class="env-item"
@@ -99,6 +114,10 @@ import Bowser from "bowser";
             </div>
           </div>
 
+          <p class="mode-combined-description">
+            {{ combinedDescription }}
+          </p>
+
           <mdui-divider class="section-divider"></mdui-divider>
 
           <!-- Host Mode Inputs -->
@@ -112,6 +131,7 @@ import Bowser from "bowser";
                   icon="upload_file--rounded"
                   @click="uploadVideo"
                   v-if="!isScreenStreamReady"
+                  :active="isVideoReady"
                   :description="$t('StartView.buttons.uploadVideoDescription')"
                 >
                   {{ $t("StartView.buttons.uploadVideo") }}
@@ -249,6 +269,14 @@ export default {
         if (!isSupported) return 0;
         if (name === "Safari" || name === "Firefox") return 1;
         return 2;
+      },
+      get combinedDescription() {
+        if (this.mode === 1) {
+          return shared.app.i18n.t("StartView.modes.combinedDescription.client");
+        }
+        return this.method === 0
+          ? shared.app.i18n.t("StartView.modes.combinedDescription.hostP2P")
+          : shared.app.i18n.t("StartView.modes.combinedDescription.hostSameOrigin");
       },
     };
   },
@@ -609,7 +637,7 @@ export default {
 .login-card {
   width: 100%;
   max-width: 1000px;
-  min-height: 480px;
+  min-height: 540px;
   border-radius: 28px;
   overflow: hidden;
   background-color: rgb(var(--mdui-color-surface));
@@ -621,7 +649,7 @@ export default {
   display: flex;
   flex-direction: row;
   height: 100%;
-  min-height: 480px;
+  min-height: 540px;
 }
 
 .brand-section {
@@ -651,6 +679,40 @@ export default {
   opacity: 0.8;
   line-height: 1.5;
   margin: 0;
+}
+
+.quick-guide {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.guide-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.guide-number {
+  width: 18px;
+  height: 18px;
+  background-color: rgb(var(--mdui-color-primary));
+  color: rgb(var(--mdui-color-on-primary));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.guide-text {
+  font-size: 0.8125rem;
+  color: rgb(var(--mdui-color-on-secondary-container));
+  opacity: 0.8;
+  line-height: normal;
 }
 
 .env-info {
@@ -711,6 +773,15 @@ export default {
   font-size: 0.875rem;
   color: rgb(var(--mdui-color-on-surface));
   font-weight: 500;
+}
+
+.mode-combined-description {
+  font-size: 0.875rem;
+  color: rgb(var(--mdui-color-on-surface-variant));
+  line-height: 1.5;
+  margin: -0.5rem 0 1.5rem 0;
+  opacity: 0.9;
+  min-height: 2.75rem;
 }
 
 .section-divider {
