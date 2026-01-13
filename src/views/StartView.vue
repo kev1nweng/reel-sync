@@ -130,8 +130,8 @@ import Bowser from "bowser";
                 <mdui-list-item
                   icon="upload_file--rounded"
                   @click="uploadVideo"
-                  v-if="!isScreenStreamReady"
-                  :active="isVideoReady"
+                  :disabled="!!isScreenStreamReady"
+                  :active="isLocalVideoReady"
                   :description="$t('StartView.buttons.uploadVideoDescription')"
                 >
                   {{ $t("StartView.buttons.uploadVideo") }}
@@ -140,7 +140,8 @@ import Bowser from "bowser";
                 <mdui-list-item
                   icon="screenshot_monitor--rounded"
                   @click="requestScreenShare"
-                  :active="isScreenStreamReady"
+                  :disabled="isLocalVideoReady"
+                  :active="!!isScreenStreamReady"
                   :description="$t('StartView.buttons.requestScreenShareDescription')"
                 >
                   {{ $t("StartView.buttons.requestScreenShare") }}
@@ -215,6 +216,7 @@ export default {
       method: 0,
       roomID: "",
       originURL: "",
+      isLocalVideoReady: false,
       isVideoReady: false,
       isOriginReady: false,
       isLoading: false,
@@ -503,8 +505,12 @@ export default {
       if (this.checkVideoValidity()) {
         this.handleFileChange(event);
         createRoomButton.removeAttribute("disabled");
+        this.isLocalVideoReady = true;
         this.isVideoReady = true;
-      } else this.isVideoReady = false;
+      } else {
+        this.isLocalVideoReady = false;
+        this.isVideoReady = false;
+      }
     },
 
     onScreenShareRequested() {
@@ -807,13 +813,53 @@ export default {
 }
 
 .source-list {
-  background-color: rgb(var(--mdui-color-surface-container));
-  border-radius: 16px;
-  padding: 4px;
+  background-color: transparent;
+  border-radius: 0;
+  padding: 0;
+  margin-top: 1rem;
 }
 
 .source-list mdui-list-item {
-  margin: 4px 0;
+  margin-bottom: 4px;
+  background-color: transparent;
+  overflow: hidden; /* Ensure shadow content like hover/ripple is clipped */
+}
+
+.source-list mdui-list-item::part(container) {
+  background-color: rgb(var(--mdui-color-surface-container-high));
+  transition: all 0.2s ease-in-out;
+}
+
+/* Highlighting for the active (selected) state */
+.source-list mdui-list-item[active]::part(container) {
+  background-color: rgb(var(--mdui-color-secondary-container));
+  color: rgb(var(--mdui-color-on-secondary-container));
+}
+
+/* First item: large top corners, small bottom corners */
+.source-list mdui-list-item:first-child,
+.source-list mdui-list-item:first-child::part(container) {
+  border-radius: 16px 16px 4px 4px !important;
+}
+
+/* Last item: small top corners, large bottom corners */
+.source-list mdui-list-item:last-child {
+  margin-bottom: 0;
+}
+
+.source-list mdui-list-item:last-child,
+.source-list mdui-list-item:last-child::part(container) {
+  border-radius: 4px 4px 16px 16px !important;
+}
+
+/* Single item case: all large corners */
+.source-list mdui-list-item:first-child:last-child,
+.source-list mdui-list-item:first-child:last-child::part(container) {
+  border-radius: 24px !important;
+}
+
+.source-list mdui-list-item::part(container) {
+  transition: background-color 0.2s ease-in-out;
 }
 
 .action-bar {
