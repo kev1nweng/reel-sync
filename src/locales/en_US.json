@@ -105,7 +105,7 @@
   "StreamView": {
     "title": "Stream",
     "hint": {
-      "host": "Room ID copied. Share the ID or URL with your partner.",
+      "host": "Share link copied. Share the ID or URL with your partner.",
       "client": "Searching for your partner on the internet. Please wait..."
     },
     "roleDescription": {
@@ -127,6 +127,7 @@
       "latency": "Latency",
       "shareLink": "Share Link",
       "networkInfo": "Network Info",
+      "copiedToClipboard": "Copied to clipboard",
       "connectionRestricted": "Connection limited: Relay node unavailable",
       "voiceCallEnabled": "Voice call enabled",
       "voiceCallDisabled": "Voice call disabled",

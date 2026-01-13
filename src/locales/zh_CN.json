@@ -104,7 +104,7 @@
   "StreamView": {
     "title": "流式传输",
     "hint": {
-      "host": "号码已复制。请您将号码或链接发送给您的伙伴。",
+      "host": "链接已复制。请您将号码或链接发送给您的伙伴。",
       "client": "请耐心等待。正在全球互联网寻找您的伙伴..."
     },
     "roleDescription": {
@@ -126,6 +126,7 @@
       "latency": "网络延迟",
       "shareLink": "分享链接",
       "networkInfo": "网络信息",
+      "copiedToClipboard": "已复制到剪切板",
       "connectionRestricted": "连接受限：信使节点不可用",
       "voiceCallEnabled": "语音通话已启用",
       "voiceCallDisabled": "语音通话已禁用",

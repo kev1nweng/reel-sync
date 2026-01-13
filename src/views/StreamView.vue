@@ -3,6 +3,7 @@ import { shared } from "@/main";
 import { msg } from "@/utils/msg";
 import { Comm } from "@/utils/comm";
 import { alert as mduiAlert } from "mdui/functions/alert";
+import { snackbar as mduiSnackbar } from "mdui/functions/snackbar";
 
 import LoadingRing from "@/components/LoadingRing.vue";
 import VideoPlayer from "@/components/VideoPlayer.vue";
@@ -49,17 +50,17 @@ import VideoPlayer from "@/components/VideoPlayer.vue";
     </mdui-card>
 
     <div class="info-section">
-      <div class="info-group">
+      <mdui-card variant="outlined" clickable class="info-group" @click="copyRoomID">
         <span class="label">{{ $t("StreamView.messages.roomID", { roleDescription, roomID: "" }) }}</span>
         <span class="value monospace">{{ roomID }}</span>
-      </div>
+      </mdui-card>
 
-      <div v-if="!isClient" class="info-group">
+      <mdui-card v-if="!isClient" variant="outlined" clickable class="info-group" @click="copyShareLink(false)">
         <span class="label">{{ $t("StreamView.messages.shareLink") }}</span>
         <span class="value monospace">{{ locationOrigin }}/?join={{ roomID }}</span>
-      </div>
+      </mdui-card>
 
-      <div v-if="isReady" class="info-group">
+      <mdui-card v-if="isReady" variant="outlined" class="info-group">
         <span class="label">{{ $t("StreamView.messages.networkInfo") }}</span>
         <span class="value">
           {{
@@ -81,7 +82,7 @@ import VideoPlayer from "@/components/VideoPlayer.vue";
             }})
           </span>
         </span>
-      </div>
+      </mdui-card>
     </div>
   </div>
 </template>
@@ -329,6 +330,23 @@ export default {
         audioElement.remove();
       }
     },
+    copyShareLink(silent = false) {
+      const link = `${this.locationOrigin}/?join=${this.roomID}`;
+      navigator.clipboard.writeText(link).then(() => {
+        if (!silent) {
+          mduiSnackbar({
+            message: shared.app.i18n.t("StreamView.messages.copiedToClipboard"),
+          });
+        }
+      });
+    },
+    copyRoomID() {
+      navigator.clipboard.writeText(this.roomID).then(() => {
+        mduiSnackbar({
+          message: shared.app.i18n.t("StreamView.messages.copiedToClipboard"),
+        });
+      });
+    },
     connectToPeer() {
       const remotePeerId = `${shared.app.roomID}-data`;
       const dataPeer = shared.peers.local.data;
@@ -518,7 +536,7 @@ export default {
         });
       }
     } else {
-      navigator.clipboard.writeText(this.roomID);
+      this.copyShareLink(true);
       const comm = new Comm();
 
       // 处理连接请求
@@ -808,9 +826,6 @@ export default {
   flex-direction: column;
   gap: 0.5rem;
   padding: 1.25rem;
-  background: rgb(var(--mdui-color-surface-container-low));
-  border: 1px solid rgb(var(--mdui-color-outline-variant));
-  border-radius: 16px;
 }
 
 .label {
