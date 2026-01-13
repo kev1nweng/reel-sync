@@ -45,6 +45,9 @@ export class Comm {
     voiceDisabled() {
       return "voice-disabled";
     },
+    shutdown() {
+      return "shutdown";
+    },
   };
   client = {
     greet(guestID) {
@@ -67,6 +70,9 @@ export class Comm {
     },
     voiceDisabled() {
       return "voice-disabled";
+    },
+    shutdown() {
+      return "shutdown";
     },
   };
 }

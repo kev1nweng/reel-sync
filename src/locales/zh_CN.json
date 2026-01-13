@@ -118,7 +118,12 @@
       "networkInfo": "网络信息",
       "connectionRestricted": "连接受限：信使节点不可用",
       "voiceCallEnabled": "语音通话已启用",
-      "voiceCallDisabled": "语音通话已禁用"
+      "voiceCallDisabled": "语音通话已禁用",
+      "shutdown": {
+        "headline": "会话结束",
+        "description": "您的伙伴结束了会话。您将被重定向至首页。",
+        "confirmText": "好"
+      }
     },
     "labels": {
       "voiceToggle": "语音通话"

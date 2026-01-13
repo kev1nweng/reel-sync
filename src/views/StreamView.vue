@@ -2,6 +2,7 @@
 import { shared } from "@/main";
 import { msg } from "@/utils/msg";
 import { Comm } from "@/utils/comm";
+import { alert as mduiAlert } from "mdui/functions/alert";
 
 import LoadingRing from "@/components/LoadingRing.vue";
 import VideoPlayer from "@/components/VideoPlayer.vue";
@@ -446,6 +447,17 @@ export default {
             msg.i("Remote peer disabled voice call");
             this.remoteVoiceEnabled = false;
             break;
+          case "shutdown":
+            msg.w("Remote peer shut down the session");
+            mduiAlert({
+              headline: this.$t("StreamView.messages.shutdown.headline"),
+              description: this.$t("StreamView.messages.shutdown.description"),
+              confirmText: this.$t("StreamView.messages.shutdown.confirmText"),
+              onConfirm: () => {
+                this.$router.replace("/");
+              },
+            });
+            break;
           default:
             msg.w(`Invalid message: ${data}`);
             break;
@@ -649,6 +661,17 @@ export default {
             case "voice-disabled":
               msg.i("Remote peer disabled voice call");
               that.remoteVoiceEnabled = false;
+              break;
+            case "shutdown":
+              msg.w("Remote peer shut down the session");
+              mduiAlert({
+                headline: that.$t("StreamView.messages.shutdown.headline"),
+                description: that.$t("StreamView.messages.shutdown.description"),
+                confirmText: that.$t("StreamView.messages.shutdown.confirmText"),
+                onConfirm: () => {
+                  that.$router.replace("/");
+                },
+              });
               break;
             default: {
               msg.e(`Invalid message: ${data}`);

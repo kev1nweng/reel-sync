@@ -119,7 +119,12 @@
       "networkInfo": "Network Info",
       "connectionRestricted": "Connection limited: Relay node unavailable",
       "voiceCallEnabled": "Voice call enabled",
-      "voiceCallDisabled": "Voice call disabled"
+      "voiceCallDisabled": "Voice call disabled",
+      "shutdown": {
+        "headline": "Session Ended",
+        "description": "Your partner has ended the session. You will be redirected to the home page.",
+        "confirmText": "OK"
+      }
     },
     "labels": {
       "voiceToggle": "Voice Call"

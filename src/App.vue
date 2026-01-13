@@ -5,6 +5,7 @@ import { prompt as mduiPrompt } from "mdui/functions/prompt";
 import { alert as mduiAlert } from "mdui/functions/alert";
 import { shared, resetSharedState } from "./main";
 import { msg } from "./utils/msg";
+import { Comm } from "./utils/comm";
 </script>
 
 <template>
@@ -131,6 +132,13 @@ export default {
         cancelText: this.$t("App.backToHome.cancelText"),
         onConfirm: () => {
           const isAtStart = this.$route.name === "start";
+
+          if (shared.peers.remote.data && shared.peers.remote.data.open) {
+            const comm = new Comm();
+            const msgStr = shared.app.mode === 0 ? comm.host.shutdown() : comm.client.shutdown();
+            shared.peers.remote.data.send(msgStr);
+          }
+
           resetSharedState();
           if (isAtStart) {
             // 如果就在首页，强制刷新以重置内部状态
