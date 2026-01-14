@@ -83,8 +83,8 @@
         "client": "Client Mode"
       },
       "description": {
-        "host": "Create a room and share your local video stream with others.",
-        "client": "Join a room and watch shared video streams."
+        "host": "Easily create a room and share your local video stream with others in real-time.",
+        "client": "Join an existing room and watch shared video streams together with your partners."
       },
       "combinedDescription": {
         "hostP2P": "Choose a video file from your device or share your screen to watch together with your partner in real-time.",

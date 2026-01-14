@@ -673,7 +673,7 @@ export default {
 .login-card {
   width: 100%;
   max-width: 1000px;
-  min-height: 540px;
+  min-height: 35rem;
   border-radius: 28px;
   overflow: hidden;
   background-color: rgb(var(--mdui-color-surface));
@@ -685,7 +685,7 @@ export default {
   display: flex;
   flex-direction: row;
   height: 100%;
-  min-height: 540px;
+  min-height: 35rem;
 }
 
 .brand-section {
@@ -699,7 +699,7 @@ export default {
 }
 
 .logo {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .brand-section h1 {
