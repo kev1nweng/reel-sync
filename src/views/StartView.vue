@@ -125,7 +125,18 @@ import Bowser from "bowser";
             <reelsync-video-input id="video-input" @change="onVideoUpload"></reelsync-video-input>
 
             <div v-if="isP2P" class="source-selector">
-              <label class="section-subtitle">{{ $t("StartView.labels.selectSource") }}</label>
+              <div class="section-header">
+                <label class="section-subtitle">{{ $t("StartView.labels.selectSource") }}</label>
+                <mdui-card
+                  clickable
+                  @click="resetSourceSelection"
+                  v-if="isLocalVideoReady || isScreenStreamReady"
+                  class="reset-card"
+                >
+                  <mdui-icon name="replay--rounded"></mdui-icon>
+                  {{ $t("Common.reset") }}
+                </mdui-card>
+              </div>
               <mdui-list class="source-list">
                 <mdui-list-item
                   icon="upload_file--rounded"
@@ -524,6 +535,25 @@ export default {
       }
     },
 
+    resetSourceSelection() {
+      // Reset screen share
+      if (shared.app.screenStream) {
+        shared.app.screenStream.getTracks().forEach((track) => track.stop());
+        shared.app.screenStream = null;
+      }
+
+      // Reset local video
+      shared.app.videoURL = "";
+      const videoInput = document.querySelector("#video-input");
+      if (videoInput) videoInput.value = "";
+
+      // Reset state
+      this.isLocalVideoReady = false;
+      this.isVideoReady = false;
+
+      msg.i("Media source selection reset");
+    },
+
     // 处理回车键快捷操作
     handleKeyPress(event) {
       if (event.key === "Enter") {
@@ -802,14 +832,48 @@ export default {
   gap: 1.5rem;
 }
 
+.section-header {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  height: 1rem; /* Limit height to match text */
+}
+
+.reset-card {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  font-size: 0.75rem;
+  color: rgb(var(--mdui-color-on-surface-variant));
+  font-weight: 600;
+  cursor: pointer;
+  z-index: 1;
+  transition: all 0.2s ease-in-out;
+  border-radius: 8px !important;
+  user-select: none;
+}
+
+.reset-card mdui-icon {
+  font-size: 1rem;
+}
+
 .section-subtitle {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: rgb(var(--mdui-color-primary));
   font-weight: 600;
-  margin-bottom: 0.5rem;
-  display: block;
+  margin-bottom: 0;
 }
 
 .source-list {

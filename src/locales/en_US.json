@@ -1,4 +1,7 @@
 {
+  "Common": {
+    "reset": "Reset"
+  },
   "App": {
     "versionLiteral": "Version",
     "sourceCode": "Source Code",
@@ -128,6 +131,7 @@
       "shareLink": "Share Link",
       "networkInfo": "Network Info",
       "copiedToClipboard": "Copied to clipboard",
+      "selectionReset": "Media source reset",
       "connectionRestricted": "Connection limited: Relay node unavailable",
       "voiceCallEnabled": "Voice call enabled",
       "voiceCallDisabled": "Voice call disabled",

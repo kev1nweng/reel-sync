@@ -1,4 +1,7 @@
 {
+  "Common": {
+    "reset": "重置"
+  },
   "App": {
     "versionLiteral": "版本",
     "sourceCode": "源代码",
@@ -127,6 +130,7 @@
       "shareLink": "分享链接",
       "networkInfo": "网络信息",
       "copiedToClipboard": "已复制到剪切板",
+      "selectionReset": "媒体源已重置",
       "connectionRestricted": "连接受限：信使节点不可用",
       "voiceCallEnabled": "语音通话已启用",
       "voiceCallDisabled": "语音通话已禁用",
