@@ -828,6 +828,8 @@ export default {
 .source-list mdui-list-item::part(container) {
   background-color: rgb(var(--mdui-color-surface-container-high));
   transition: all 0.2s ease-in-out;
+  padding-top: 12px;
+  padding-bottom: 12px;
 }
 
 /* Highlighting for the active (selected) state */
