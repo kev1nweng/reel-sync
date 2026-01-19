@@ -25,10 +25,15 @@
     "settingsButton": "设置",
     "settingsDialog": {
       "title": "设置",
-      "description": "键入配置文件（功能未完成）",
-      "confirmText": "提交",
-      "cancelText": "取消",
-      "helper": "此处键入的配置会被存储，但不会被利用。",
+      "confirmText": "关闭",
+      "backgroundImage": {
+        "title": "自定义背景图",
+        "upload": "上传图片",
+        "clear": "还原默认",
+        "error": {
+          "quotaExceeded": "图片文件太大了，即使经过压缩也无法存入浏览器的本地存储（限制约为 5MB）。请尝试使用更小的图片。"
+        }
+      },
       "error": {
         "headline": "配置保存出现错误",
         "description": "您配置文件的格式不正确，因此不会被采用。错误信息："

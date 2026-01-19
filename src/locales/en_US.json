@@ -25,10 +25,15 @@
     "settingsButton": "Settings",
     "settingsDialog": {
       "title": "Settings",
-      "confirmText": "Submit",
-      "cancelText": "Cancel",
-      "description": "Enter your configuration (WIP)",
-      "helper": "Your configuration will be saved but is currently not utilized.",
+      "confirmText": "Close",
+      "backgroundImage": {
+        "title": "Custom Background",
+        "upload": "Upload Image",
+        "clear": "Reset",
+        "error": {
+          "quotaExceeded": "The image file is too large to be saved in the browser's local storage (limit is about 5MB), even after compression. Please try a smaller image."
+        }
+      },
       "error": {
         "headline": "Error saving configuration",
         "description": "The configuration format is incorrect and could not be loaded. Error message: "

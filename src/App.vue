@@ -1,14 +1,23 @@
 <script setup>
 import { RouterView } from "vue-router";
 import { confirm as mduiConfirm } from "mdui/functions/confirm";
-import { prompt as mduiPrompt } from "mdui/functions/prompt";
 import { alert as mduiAlert } from "mdui/functions/alert";
+import { setColorScheme } from "mdui/functions/setColorScheme";
+import { getColorFromImage } from "mdui/functions/getColorFromImage";
 import { shared, resetSharedState } from "./main";
 import { msg } from "./utils/msg";
 import { Comm } from "./utils/comm";
 </script>
 
 <template>
+  <transition name="background-fade" mode="out-in">
+    <div
+      v-if="backgroundUrl"
+      :key="backgroundUrl"
+      id="app-background"
+      :style="{ backgroundImage: `url(${backgroundUrl})` }"
+    ></div>
+  </transition>
   <div class="topbar">
     <div class="topbar-left" @click="confirmBackToHome">
       <img src="./assets/logo.png" alt="ReelSync Logo" id="logo" />
@@ -43,7 +52,7 @@ import { Comm } from "./utils/comm";
       ></mdui-button-icon>
     </div>
   </div>
-  <div class="router-wrapper">
+  <div class="router-wrapper" :class="{ 'has-background': backgroundUrl }">
     <router-view v-slot="{ Component }">
       <transition name="page-fade-blur" mode="out-in">
         <component :is="Component" />
@@ -86,17 +95,59 @@ import { Comm } from "./utils/comm";
       <span>{{ $t("App.footer.techs") }}</span>
     </div>
   </footer>
+
+  <mdui-dialog
+    ref="settingsDialog"
+    :headline="$t('App.settingsDialog.title')"
+    close-on-esc
+  >
+    <mdui-list>
+      <mdui-list-item nonclickable>
+        {{ $t("App.settingsDialog.backgroundImage.title") }}
+        <div slot="end-icon" style="display: flex; gap: 8px">
+          <mdui-button-icon
+            icon="file_upload--rounded"
+            variant="tonal"
+            @click="triggerBackgroundUpload"
+          ></mdui-button-icon>
+          <mdui-button-icon
+            icon="delete--rounded"
+            variant="text"
+            @click="clearBackground"
+          ></mdui-button-icon>
+        </div>
+      </mdui-list-item>
+    </mdui-list>
+    <mdui-button slot="action" variant="text" @click="closeSettingsDialog">
+      {{ $t("App.settingsDialog.confirmText") }}
+    </mdui-button>
+  </mdui-dialog>
+
+  <input
+    type="file"
+    ref="backgroundInput"
+    style="display: none"
+    accept="image/*"
+    @change="handleFileUpload"
+  />
 </template>
 
 <script>
 export default {
   name: "App",
-  mounted() {
-    document.addEventListener("DOMContentLoaded", () => {
-      // delay a bit so that shared is initialized
-      this.updatePreferences(localStorage.getItem("reelsync-settings") ?? "{}");
-      msg.i("User preferences loaded");
-    });
+  data() {
+    return {
+      // eslint-disable-next-line no-undef
+      REELSYNC_PACKAGE_VERSION: __APP_VERSION__,
+      // eslint-disable-next-line no-undef
+      REELSYNC_COMMIT_URL: __COMMIT_URL__,
+      backgroundUrl: localStorage.getItem("reelsync-background") || "",
+    };
+  },
+  watch: {
+    backgroundUrl(newVal) {
+      this.updateBodyClass(newVal);
+    },
   },
   methods: {
     updatePreferences(value) {
@@ -107,6 +158,15 @@ export default {
           headline: this.$t("App.settingsDialog.error.headline"),
           description: `${this.$t("App.settingsDialog.error.description")}${e.message}`,
         });
+      }
+    },
+    updateBodyClass(url) {
+      if (url) {
+        document.documentElement.classList.add("has-custom-background");
+        document.body.classList.add("has-custom-background");
+      } else {
+        document.documentElement.classList.remove("has-custom-background");
+        document.body.classList.remove("has-custom-background");
       }
     },
     showLanguageSwitchConfirmation() {
@@ -151,39 +211,118 @@ export default {
       });
     },
     showSettingsDialog() {
-      mduiPrompt({
-        headline: this.$t("App.settingsDialog.title"),
-        description: this.$t("App.settingsDialog.description"),
-        confirmText: this.$t("App.settingsDialog.confirmText"),
-        cancelText: this.$t("App.settingsDialog.cancelText"),
-        closeOnEsc: true,
-        onConfirm: (value) => {
-          localStorage.setItem("reelsync-settings", value);
-          this.updatePreferences(value);
-        },
-        onCancel: () => null,
-        textFieldOptions: {
-          label: "JSON",
-          value: localStorage.getItem("reelsync-settings") ?? "",
-          type: "text",
-          variant: "outlined",
-          required: true,
-          helper: this.$t("App.settingsDialog.helper"),
-          clearable: true,
-        },
-      });
+      this.$refs.settingsDialog.open = true;
+    },
+    closeSettingsDialog() {
+      this.$refs.settingsDialog.open = false;
+    },
+    triggerBackgroundUpload() {
+      this.$refs.backgroundInput.click();
+    },
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
+
+          // 限制最大分辨率，防止 Base64 过大
+          const MAX_WIDTH = 1920;
+          const MAX_HEIGHT = 1080;
+
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // 根据图片生成主题色
+          getColorFromImage(img).then((color) => {
+            setColorScheme(color);
+          });
+
+          // 逐渐降低质量直到能够存入 localStorage
+          let quality = 0.9;
+          let dataUrl = canvas.toDataURL("image/jpeg", quality);
+
+          const trySave = (data) => {
+            try {
+              localStorage.setItem("reelsync-background", data);
+              this.backgroundUrl = data;
+              return true;
+            } catch (error) {
+              if (error.name === "QuotaExceededError" || error.name === "NS_ERROR_DOM_QUOTA_REACHED") {
+                return false;
+              }
+              throw error;
+            }
+          };
+
+          while (!trySave(dataUrl) && quality > 0.1) {
+            quality -= 0.1;
+            dataUrl = canvas.toDataURL("image/jpeg", quality);
+          }
+
+          if (quality <= 0.1 && !trySave(dataUrl)) {
+            mduiAlert({
+              headline: this.$t("App.settingsDialog.error.headline"),
+              description: this.$t("App.settingsDialog.backgroundImage.error.quotaExceeded"),
+            });
+          }
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    },
+    clearBackground() {
+      this.backgroundUrl = "";
+      localStorage.removeItem("reelsync-background");
+      setColorScheme("#0061a4");
+      if (this.$refs.backgroundInput) {
+        this.$refs.backgroundInput.value = "";
+      }
     },
   },
-  data() {
-    return {
-      // eslint-disable-next-line no-undef
-      REELSYNC_PACKAGE_VERSION: __APP_VERSION__,
-      // eslint-disable-next-line no-undef
-      REELSYNC_COMMIT_URL: __COMMIT_URL__,
-    };
+  mounted() {
+    this.updateBodyClass(this.backgroundUrl);
+    if (this.backgroundUrl) {
+      const img = new Image();
+      img.onload = () => {
+        getColorFromImage(img).then((color) => {
+          setColorScheme(color);
+        });
+      };
+      img.src = this.backgroundUrl;
+    }
+    document.addEventListener("DOMContentLoaded", () => {
+      // delay a bit so that shared is initialized
+      this.updatePreferences(localStorage.getItem("reelsync-settings") ?? "{}");
+      msg.i("User preferences loaded");
+    });
   },
 };
 </script>
+
+<style>
+html.has-custom-background,
+body.has-custom-background,
+body.has-custom-background #app {
+  background-color: transparent !important;
+}
+</style>
 
 <style scoped>
 .router-wrapper {
@@ -191,6 +330,48 @@ export default {
   flex: 1;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 10;
+}
+
+#app-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+
+#app-background::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(var(--mdui-color-surface), 0.65);
+  /* backdrop-filter: blur(2px); */
+  /* -webkit-backdrop-filter: blur(2px); */
+  pointer-events: none;
+}
+
+.background-fade-enter-active,
+.background-fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.background-fade-enter-from,
+.background-fade-leave-to {
+  opacity: 0;
+}
+
+.has-background :deep(.page-container),
+.has-background :deep(.stream-container) {
+  background-color: transparent !important;
 }
 
 .page-fade-blur-enter-active,

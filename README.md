@@ -78,7 +78,7 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
 
 - [ ] 其他功能
   - [x] 分享直链
-  - [ ] 自定义背景图
+  - [x] 自定义背景图
   - [x] 基于 RTT（往返延迟）的增强同步
 
 ## 许可证
