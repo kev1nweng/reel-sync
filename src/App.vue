@@ -1,22 +1,7 @@
-<script setup>
-import { RouterView } from "vue-router";
-import { confirm as mduiConfirm } from "mdui/functions/confirm";
-import { alert as mduiAlert } from "mdui/functions/alert";
-import { setColorScheme } from "mdui/functions/setColorScheme";
-import { getColorFromImage } from "mdui/functions/getColorFromImage";
-import { shared, resetSharedState } from "./main";
-import { msg } from "./utils/msg";
-import { Comm } from "./utils/comm";
-</script>
-
 <template>
   <transition name="background-fade" mode="out-in">
-    <div
-      v-if="backgroundUrl"
-      :key="backgroundUrl"
-      id="app-background"
-      :style="{ backgroundImage: `url(${backgroundUrl})` }"
-    ></div>
+    <div v-if="backgroundUrl" :key="backgroundUrl" id="app-background"
+      :style="{ backgroundImage: `url(${backgroundUrl})` }"></div>
   </transition>
   <div class="topbar">
     <div class="topbar-left" @click="confirmBackToHome">
@@ -24,32 +9,14 @@ import { Comm } from "./utils/comm";
       <div id="title">ReelSync</div>
     </div>
     <div class="topbar-right">
-      <mdui-chip
-        class="topbar-chip"
-        end-icon="language--rounded"
-        elevated
-        @click="showLanguageSwitchConfirmation"
-        >{{ $t("App.languageSwitch.indicatorButton") }}</mdui-chip
-      >
-      <mdui-chip
-        class="topbar-chip"
-        end-icon="settings--rounded"
-        elevated
-        @click="showSettingsDialog"
-        >{{ $t("App.settingsButton") }}</mdui-chip
-      >
-      <mdui-button-icon
-        class="topbar-icon"
-        icon="language--rounded"
-        variant="tonal"
-        @click="showLanguageSwitchConfirmation"
-      ></mdui-button-icon>
-      <mdui-button-icon
-        class="topbar-icon"
-        icon="settings--rounded"
-        variant="filled"
-        @click="showSettingsDialog"
-      ></mdui-button-icon>
+      <mdui-chip class="topbar-chip" end-icon="language--rounded" elevated @click="showLanguageSwitchConfirmation">{{
+        $t("App.languageSwitch.indicatorButton") }}</mdui-chip>
+      <mdui-chip class="topbar-chip" end-icon="settings--rounded" elevated @click="showSettingsDialog">{{
+        $t("App.settingsButton") }}</mdui-chip>
+      <mdui-button-icon class="topbar-icon" icon="language--rounded" variant="tonal"
+        @click="showLanguageSwitchConfirmation"></mdui-button-icon>
+      <mdui-button-icon class="topbar-icon" icon="settings--rounded" variant="filled"
+        @click="showSettingsDialog"></mdui-button-icon>
     </div>
   </div>
   <div class="router-wrapper" :class="{ 'has-background': backgroundUrl }">
@@ -64,12 +31,8 @@ import { Comm } from "./utils/comm";
       <div class="version-info">
         <b style="font-weight: bold">
           {{ $t("App.versionLiteral") }}
-          <a
-            v-if="REELSYNC_COMMIT_URL && REELSYNC_PACKAGE_VERSION !== 'devel'"
-            :href="REELSYNC_COMMIT_URL"
-            target="_blank"
-            style="color: inherit; text-decoration: underline"
-          >{{ REELSYNC_PACKAGE_VERSION }}</a>
+          <a v-if="REELSYNC_COMMIT_URL && REELSYNC_PACKAGE_VERSION !== 'devel'" :href="REELSYNC_COMMIT_URL"
+            target="_blank" style="color: inherit; text-decoration: underline">{{ REELSYNC_PACKAGE_VERSION }}</a>
           <template v-else>{{ REELSYNC_PACKAGE_VERSION }}</template>
         </b>
       </div>
@@ -77,18 +40,11 @@ import { Comm } from "./utils/comm";
         {{ $t("App.footer.author") }}
       </div>
       <div class="github-links">
-        <mdui-chip
-          href="https://github.com/kev1nweng"
-          target="_blank"
-          variant="filled"
-          icon="person--rounded"
-        >GitHub</mdui-chip>
-        <mdui-chip
-          href="https://github.com/kev1nweng/reel-sync"
-          target="_blank"
-          variant="filled"
-          icon="code--rounded"
-        >{{ $t("App.sourceCode") }}</mdui-chip>
+        <mdui-chip href="https://github.com/kev1nweng" target="_blank" variant="filled"
+          icon="person--rounded">GitHub</mdui-chip>
+        <mdui-chip href="https://github.com/kev1nweng/reel-sync" target="_blank" variant="filled"
+          icon="code--rounded">{{
+            $t("App.sourceCode") }}</mdui-chip>
       </div>
     </div>
     <div class="footer-right">
@@ -96,25 +52,14 @@ import { Comm } from "./utils/comm";
     </div>
   </footer>
 
-  <mdui-dialog
-    ref="settingsDialog"
-    :headline="$t('App.settingsDialog.title')"
-    close-on-esc
-  >
+  <mdui-dialog ref="settingsDialog" :headline="$t('App.settingsDialog.title')" close-on-esc>
     <mdui-list>
       <mdui-list-item nonclickable>
         {{ $t("App.settingsDialog.backgroundImage.title") }}
         <div slot="end-icon" style="display: flex; gap: 8px">
-          <mdui-button-icon
-            icon="file_upload--rounded"
-            variant="tonal"
-            @click="triggerBackgroundUpload"
-          ></mdui-button-icon>
-          <mdui-button-icon
-            icon="delete--rounded"
-            variant="text"
-            @click="clearBackground"
-          ></mdui-button-icon>
+          <mdui-button-icon icon="file_upload--rounded" variant="tonal"
+            @click="triggerBackgroundUpload"></mdui-button-icon>
+          <mdui-button-icon icon="delete--rounded" variant="text" @click="clearBackground"></mdui-button-icon>
         </div>
       </mdui-list-item>
     </mdui-list>
@@ -123,16 +68,18 @@ import { Comm } from "./utils/comm";
     </mdui-button>
   </mdui-dialog>
 
-  <input
-    type="file"
-    ref="backgroundInput"
-    style="display: none"
-    accept="image/*"
-    @change="handleFileUpload"
-  />
+  <input type="file" ref="backgroundInput" style="display: none" accept="image/*" @change="handleFileUpload" />
 </template>
 
 <script>
+import { confirm as mduiConfirm } from "mdui/functions/confirm";
+import { alert as mduiAlert } from "mdui/functions/alert";
+import { setColorScheme } from "mdui/functions/setColorScheme";
+import { getColorFromImage } from "mdui/functions/getColorFromImage";
+import { useSharedStore } from "./stores/shared";
+import { msg } from "./utils/msg";
+import { Comm } from "./utils/comm";
+
 export default {
   name: "App",
   data() {
@@ -142,6 +89,7 @@ export default {
       // eslint-disable-next-line no-undef
       REELSYNC_COMMIT_URL: __COMMIT_URL__,
       backgroundUrl: localStorage.getItem("reelsync-background") || "",
+      shared: useSharedStore(),
     };
   },
   watch: {
@@ -152,7 +100,7 @@ export default {
   methods: {
     updatePreferences(value) {
       try {
-        shared.preferences = JSON.parse(value);
+        this.shared.preferences = JSON.parse(value);
       } catch (e) {
         mduiAlert({
           headline: this.$t("App.settingsDialog.error.headline"),
@@ -184,7 +132,7 @@ export default {
       });
     },
     confirmBackToHome() {
-      if (this.$route.name === "start" && !shared.app.roomID) return;
+      if (this.$route.name === "start" && !this.shared.app.roomID) return;
       mduiConfirm({
         headline: this.$t("App.backToHome.headline"),
         description: this.$t("App.backToHome.description"),
@@ -193,13 +141,13 @@ export default {
         onConfirm: () => {
           const isAtStart = this.$route.name === "start";
 
-          if (shared.peers.remote.data && shared.peers.remote.data.open) {
+          if (this.shared.peers.remote.data && this.shared.peers.remote.data.open) {
             const comm = new Comm();
-            const msgStr = shared.app.mode === 0 ? comm.host.shutdown() : comm.client.shutdown();
-            shared.peers.remote.data.send(msgStr);
+            const msgStr = this.shared.app.mode === 0 ? comm.host.shutdown() : comm.client.shutdown();
+            this.shared.peers.remote.data.send(msgStr);
           }
 
-          resetSharedState();
+          this.shared.resetSharedState();
           if (isAtStart) {
             // 如果就在首页，强制刷新以重置内部状态
             window.location.href = window.location.origin + window.location.pathname + window.location.hash;
@@ -307,11 +255,8 @@ export default {
       };
       img.src = this.backgroundUrl;
     }
-    document.addEventListener("DOMContentLoaded", () => {
-      // delay a bit so that shared is initialized
-      this.updatePreferences(localStorage.getItem("reelsync-settings") ?? "{}");
-      msg.i("User preferences loaded");
-    });
+    this.updatePreferences(localStorage.getItem("reelsync-settings") ?? "{}");
+    msg.i("User preferences loaded");
   },
 };
 </script>
@@ -377,8 +322,8 @@ body.has-custom-background #app {
 .page-fade-blur-enter-active,
 .page-fade-blur-leave-active {
   transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-              filter 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .page-fade-blur-enter-from {
@@ -439,7 +384,8 @@ body.has-custom-background #app {
 }
 
 footer {
-  padding: 0.75rem 1.5rem; /* 减小上下内边距 */
+  padding: 0.75rem 1.5rem;
+  /* 减小上下内边距 */
   position: fixed;
   bottom: 0;
   left: 0;
@@ -462,7 +408,8 @@ footer {
   display: flex;
   align-items: center;
   column-gap: 1.5rem;
-  row-gap: 0.5rem; /* 减小换行后的行间距 */
+  row-gap: 0.5rem;
+  /* 减小换行后的行间距 */
   flex-wrap: wrap;
   pointer-events: auto;
 }
@@ -501,7 +448,8 @@ footer {
   }
 
   footer {
-    position: relative; /* 窄屏下不再固定遮挡内容 */
+    position: relative;
+    /* 窄屏下不再固定遮挡内容 */
     flex-direction: column;
     align-items: flex-start;
     gap: 1.25rem;

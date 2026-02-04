@@ -1,18 +1,3 @@
-<script setup>
-import { PeerID } from "@/utils/peer-id";
-import { shared } from "@/main";
-import { msg } from "@/utils/msg";
-
-import Peer from "peerjs";
-import VideoInput from "@/components/VideoInput.vue";
-import VideoPlayer from "@/components/VideoPlayer.vue";
-import LoadingRing from "@/components/LoadingRing.vue";
-
-import { alert as mduiAlert } from "mdui/functions/alert";
-import { snackbar as mduiSnackbar } from "mdui/functions/snackbar";
-import Bowser from "bowser";
-</script>
-
 <template>
   <div class="page-container" v-if="!isShareIncoming">
     <mdui-card variant="elevated" class="login-card">
@@ -20,7 +5,8 @@ import Bowser from "bowser";
         <!-- Left Section: Branding and Title -->
         <div class="brand-section">
           <div class="logo">
-            <mdui-icon name="rocket_launch--rounded" style="font-size: 48px; color: var(--mdui-color-primary)"></mdui-icon>
+            <mdui-icon name="rocket_launch--rounded"
+              style="font-size: 48px; color: var(--mdui-color-primary)"></mdui-icon>
           </div>
           <h1 style="font-weight: bold;">{{ $t("StartView.title") }}</h1>
           <p class="description">
@@ -44,44 +30,30 @@ import Bowser from "bowser";
           </div>
 
           <div class="env-info">
-            <div
-              class="env-item"
-              :style="{ cursor: osSupportStatus === 1 ? 'pointer' : 'default' }"
-              @click="osSupportStatus === 1 && showOSSupportWarning()"
-            >
+            <div class="env-item" :style="{ cursor: osSupportStatus === 1 ? 'pointer' : 'default' }"
+              @click="osSupportStatus === 1 && showOSSupportWarning()">
               <mdui-icon name="devices--rounded"></mdui-icon>
               <span>{{ deviceInfo }}</span>
               <mdui-tooltip :content="getSupportTooltip(osSupportStatus)">
-                <mdui-icon
-                  :name="getSupportIcon(osSupportStatus)"
-                  :style="{
-                    color: getSupportColor(osSupportStatus),
-                    fontSize: '1.1rem',
-                    marginLeft: '4px',
-                    fontWeight: 'bold',
-                  }"
-                  @click.stop="osSupportStatus === 1 && showOSSupportWarning()"
-                ></mdui-icon>
+                <mdui-icon :name="getSupportIcon(osSupportStatus)" :style="{
+                  color: getSupportColor(osSupportStatus),
+                  fontSize: '1.1rem',
+                  marginLeft: '4px',
+                  fontWeight: 'bold',
+                }" @click.stop="osSupportStatus === 1 && showOSSupportWarning()"></mdui-icon>
               </mdui-tooltip>
             </div>
-            <div
-              class="env-item"
-              :style="{ cursor: webrtcSupportStatus === 1 ? 'pointer' : 'default' }"
-              @click="webrtcSupportStatus === 1 && showPartialSupportWarning()"
-            >
+            <div class="env-item" :style="{ cursor: webrtcSupportStatus === 1 ? 'pointer' : 'default' }"
+              @click="webrtcSupportStatus === 1 && showPartialSupportWarning()">
               <mdui-icon name="public--rounded"></mdui-icon>
               <span>{{ browserInfo }}</span>
               <mdui-tooltip :content="getSupportTooltip(webrtcSupportStatus)">
-                <mdui-icon
-                  :name="getSupportIcon(webrtcSupportStatus)"
-                  :style="{
-                    color: getSupportColor(webrtcSupportStatus),
-                    fontSize: '1.1rem',
-                    marginLeft: '4px',
-                    fontWeight: 'bold',
-                  }"
-                  @click.stop="webrtcSupportStatus === 1 && showPartialSupportWarning()"
-                ></mdui-icon>
+                <mdui-icon :name="getSupportIcon(webrtcSupportStatus)" :style="{
+                  color: getSupportColor(webrtcSupportStatus),
+                  fontSize: '1.1rem',
+                  marginLeft: '4px',
+                  fontWeight: 'bold',
+                }" @click.stop="webrtcSupportStatus === 1 && showPartialSupportWarning()"></mdui-icon>
               </mdui-tooltip>
             </div>
           </div>
@@ -92,24 +64,13 @@ import Bowser from "bowser";
           <!-- Options Section -->
           <div id="options">
             <div class="option-item">
-              <mdui-switch
-                id="mode-switch"
-                @change="changeMode"
-                checked-icon="share--rounded"
-                unchecked-icon="link--rounded"
-                checked
-              ></mdui-switch>
+              <mdui-switch id="mode-switch" ref="modeSwitch" @change="changeMode" checked-icon="share--rounded"
+                unchecked-icon="link--rounded" checked></mdui-switch>
               <label>{{ modeName }}</label>
             </div>
             <div class="option-item">
-              <mdui-switch
-                id="method-switch"
-                @change="changeMethod"
-                :disabled="!isHost"
-                checked-icon="east--rounded"
-                unchecked-icon="commit--rounded"
-                checked
-              ></mdui-switch>
+              <mdui-switch id="method-switch" ref="methodSwitch" @change="changeMethod" :disabled="!isHost"
+                checked-icon="east--rounded" unchecked-icon="commit--rounded" checked></mdui-switch>
               <label>{{ isHost ? methodName : $t("StartView.messages.toggleUnavailable") }}</label>
             </div>
           </div>
@@ -122,89 +83,57 @@ import Bowser from "bowser";
 
           <!-- Host Mode Inputs -->
           <div v-if="isHost" class="input-group">
-            <reelsync-video-input id="video-input" @change="onVideoUpload"></reelsync-video-input>
+            <reelsync-video-input ref="videoInput" id="video-input" @change="onVideoUpload"></reelsync-video-input>
 
             <div v-if="isP2P" class="source-selector">
               <div class="section-header">
                 <label class="section-subtitle">{{ $t("StartView.labels.selectSource") }}</label>
-                <mdui-card
-                  clickable
-                  @click="resetSourceSelection"
-                  v-if="isLocalVideoReady || isScreenStreamReady"
-                  class="reset-card"
-                >
+                <mdui-card clickable @click="resetSourceSelection" v-if="isLocalVideoReady || isScreenStreamReady"
+                  class="reset-card">
                   <mdui-icon name="replay--rounded"></mdui-icon>
                   {{ $t("Common.reset") }}
                 </mdui-card>
               </div>
               <mdui-list class="source-list">
-                <mdui-list-item
-                  icon="upload_file--rounded"
-                  @click="uploadVideo"
-                  :disabled="!!isScreenStreamReady"
-                  :active="isLocalVideoReady"
-                  :description="$t('StartView.buttons.uploadVideoDescription')"
-                >
+                <mdui-list-item icon="upload_file--rounded" @click="uploadVideo" :disabled="!!isScreenStreamReady"
+                  :active="isLocalVideoReady" :description="$t('StartView.buttons.uploadVideoDescription')">
                   {{ $t("StartView.buttons.uploadVideo") }}
                 </mdui-list-item>
 
-                <mdui-list-item
-                  icon="screenshot_monitor--rounded"
-                  @click="requestScreenShare"
-                  :disabled="isLocalVideoReady"
-                  :active="!!isScreenStreamReady"
-                  :description="$t('StartView.buttons.requestScreenShareDescription')"
-                >
+                <mdui-list-item icon="screenshot_monitor--rounded" @click="requestScreenShare"
+                  :disabled="isLocalVideoReady" :active="!!isScreenStreamReady"
+                  :description="$t('StartView.buttons.requestScreenShareDescription')">
                   {{ $t("StartView.buttons.requestScreenShare") }}
                 </mdui-list-item>
               </mdui-list>
             </div>
             <div v-else class="input-group">
-              <mdui-text-field
-                id="origin-url-input"
-                class="monospace"
-                v-model="originURL"
-                :label="$t('StartView.labels.sourceURL')"
-                variant="outlined"
-                clearable
-                style="width: 100%"
-              ></mdui-text-field>
+              <mdui-text-field id="origin-url-input" class="monospace" ref="originUrlInput" v-model="originURL"
+                :label="$t('StartView.labels.sourceURL')" variant="outlined" clearable
+                style="width: 100%"></mdui-text-field>
             </div>
 
             <reelsync-video-player style="display: none" id="video-player"></reelsync-video-player>
 
             <div class="action-bar">
               <span class="no-registration-hint">{{ $t("StartView.messages.noRegistration") }}</span>
-              <mdui-button
-                @click="onCreateRequest"
-                id="create-room-button"
-                :disabled="(!isVideoReady && !isOriginReady) || isLoading"
-                :loading="isLoading"
-              >{{ $t("StartView.buttons.createRoom") }}</mdui-button>
+              <mdui-button @click="onCreateRequest" id="create-room-button" ref="createRoomButton"
+                :disabled="forceCreateDisabled || ((!isVideoReady && !isOriginReady) || isLoading)"
+                :loading="isLoading">{{ isLoading ? $t("Common.loading") : $t("StartView.buttons.createRoom") }}</mdui-button>
             </div>
           </div>
 
           <!-- Client Mode Inputs -->
           <div v-else class="input-group">
-            <mdui-text-field
-              id="room-id-input"
-              class="monospace"
-              v-model="roomID"
-              :label="$t('StartView.labels.roomID')"
-              variant="outlined"
-              maxlength="16"
-              clearable
-              style="width: 100%"
-            ></mdui-text-field>
+            <mdui-text-field id="room-id-input" class="monospace" ref="roomIdInput" v-model="roomID"
+              :label="$t('StartView.labels.roomID')" variant="outlined" maxlength="16" clearable
+              style="width: 100%"></mdui-text-field>
 
             <div class="action-bar">
               <span class="no-registration-hint">{{ $t("StartView.messages.noRegistration") }}</span>
-              <mdui-button
-                @click="onJoinRequest"
-                id="join-room-button"
-                :disabled="!isRoomReady"
-                :loading="isLoading"
-              >{{ $t("StartView.buttons.joinRoom") }}</mdui-button>
+              <mdui-button @click="onJoinRequest" id="join-room-button" ref="joinRoomButton"
+                :disabled="!isRoomReady || isLoading" :loading="isLoading">{{ isLoading ? $t("Common.loading") : $t("StartView.buttons.joinRoom")
+                }}</mdui-button>
             </div>
           </div>
         </div>
@@ -220,6 +149,19 @@ import Bowser from "bowser";
 </template>
 
 <script>
+import { PeerID } from "@/utils/peer-id";
+import { useSharedStore } from "@/stores/shared";
+import { msg } from "@/utils/msg";
+
+import Peer from "peerjs";
+import VideoInput from "@/components/VideoInput.vue";
+import VideoPlayer from "@/components/VideoPlayer.vue";
+import LoadingRing from "@/components/LoadingRing.vue";
+
+import { alert as mduiAlert } from "mdui/functions/alert";
+import { snackbar as mduiSnackbar } from "mdui/functions/snackbar";
+import Bowser from "bowser";
+
 export default {
   data() {
     return {
@@ -233,78 +175,81 @@ export default {
       isLoading: false,
       isRoomReady: false,
       isShareIncoming: false,
-      get methodName() {
-        return this.method === 0
-          ? shared.app.i18n.t("StartView.methods.name.p2p")
-          : shared.app.i18n.t("StartView.methods.name.sameOrigin");
-      },
-      get modeName() {
-        return this.mode === 0
-          ? shared.app.i18n.t("StartView.modes.name.host")
-          : shared.app.i18n.t("StartView.modes.name.client");
-      },
-      get modeDescription() {
-        return this.mode === 0
-          ? shared.app.i18n.t("StartView.modes.description.host")
-          : shared.app.i18n.t("StartView.modes.description.client");
-      },
-      get isHost() {
-        return this.mode === 0;
-      },
-      get isP2P() {
-        return this.method === 0;
-      },
-      get isScreenStreamReady() {
-        return shared.app.screenStream;
-      },
-      get deviceInfo() {
-        const browser = Bowser.getParser(window.navigator.userAgent);
-        return `${browser.getOSName()} ${browser.getOSVersion() || ""}`;
-      },
-      get browserInfo() {
-        const browser = Bowser.getParser(window.navigator.userAgent);
-        return `${browser.getBrowserName()} ${browser.getBrowserVersion()}`;
-      },
-      get osSupportStatus() {
-        const browser = Bowser.getParser(window.navigator.userAgent);
-        const platformType = browser.getPlatformType();
-        // 如果是移动设备，返回部分支持 (1)，否则返回完全支持 (2)
-        return platformType === "mobile" || platformType === "tablet" ? 1 : 2;
-      },
-      get webrtcSupportStatus() {
-        const browser = Bowser.getParser(window.navigator.userAgent);
-        const name = browser.getBrowserName();
-        const isSupported = !!(
-          window.RTCPeerConnection ||
-          window.mozRTCPeerConnection ||
-          window.webkitRTCPeerConnection
-        );
-        if (!isSupported) return 0;
-        if (name === "Safari" || name === "Firefox") return 1;
-        return 2;
-      },
-      get combinedDescription() {
-        if (this.mode === 1) {
-          return shared.app.i18n.t("StartView.modes.combinedDescription.client");
-        }
-        return this.method === 0
-          ? shared.app.i18n.t("StartView.modes.combinedDescription.hostP2P")
-          : shared.app.i18n.t("StartView.modes.combinedDescription.hostSameOrigin");
-      },
+      forceCreateDisabled: false,
+      browserParser: Bowser.getParser(window.navigator.userAgent),
+      shared: useSharedStore(),
     };
+  },
+  computed: {
+    methodName() {
+      return this.method === 0
+        ? this.shared.app.i18n.t("StartView.methods.name.p2p")
+        : this.shared.app.i18n.t("StartView.methods.name.sameOrigin");
+    },
+    modeName() {
+      return this.mode === 0
+        ? this.shared.app.i18n.t("StartView.modes.name.host")
+        : this.shared.app.i18n.t("StartView.modes.name.client");
+    },
+    modeDescription() {
+      return this.mode === 0
+        ? this.shared.app.i18n.t("StartView.modes.description.host")
+        : this.shared.app.i18n.t("StartView.modes.description.client");
+    },
+    isHost() {
+      return this.mode === 0;
+    },
+    isP2P() {
+      return this.method === 0;
+    },
+    isScreenStreamReady() {
+      return !!this.shared.app.screenStream;
+    },
+    deviceInfo() {
+      return `${this.browserParser.getOSName()} ${this.browserParser.getOSVersion() || ""}`;
+    },
+    browserInfo() {
+      return `${this.browserParser.getBrowserName()} ${this.browserParser.getBrowserVersion()}`;
+    },
+    osSupportStatus() {
+      const platformType = this.browserParser.getPlatformType();
+      // 如果是移动设备，返回部分支持 (1)，否则返回完全支持 (2)
+      return platformType === "mobile" || platformType === "tablet" ? 1 : 2;
+    },
+    webrtcSupportStatus() {
+      const name = this.browserParser.getBrowserName();
+      const isSupported = !!(
+        window.RTCPeerConnection ||
+        window.mozRTCPeerConnection ||
+        window.webkitRTCPeerConnection
+      );
+      if (!isSupported) return 0;
+      if (name === "Safari" || name === "Firefox") return 1;
+      return 2;
+    },
+    combinedDescription() {
+      if (this.mode === 1) {
+        return this.shared.app.i18n.t("StartView.modes.combinedDescription.client");
+      }
+      return this.method === 0
+        ? this.shared.app.i18n.t("StartView.modes.combinedDescription.hostP2P")
+        : this.shared.app.i18n.t("StartView.modes.combinedDescription.hostSameOrigin");
+    },
   },
   methods: {
     // 切换发送接收控制模式
-    changeMode() {
-      this.mode = document.getElementById("mode-switch").checked ? 0 : 1;
+    changeMode(event) {
+      const checked = event?.target?.checked ?? this.$refs.modeSwitch?.checked;
+      this.mode = checked ? 0 : 1;
       // 0: host, 1: client
     },
 
     // 切换传输方式
-    changeMethod() {
-      this.method = document.getElementById("method-switch").checked ? 0 : 1;
+    changeMethod(event) {
+      const checked = event?.target?.checked ?? this.$refs.methodSwitch?.checked;
+      this.method = checked ? 0 : 1;
       // 0: p2p, 1: same-origin
-      document.getElementById("create-room-button").disabled = true;
+      this.forceCreateDisabled = true;
     },
 
     showSafariWarning() {
@@ -364,7 +309,7 @@ export default {
 
     // 触发文件选择对话框
     uploadVideo() {
-      document.querySelector("#video-input").click();
+      this.$refs.videoInput?.click();
     },
 
     async requestScreenShare() {
@@ -384,7 +329,7 @@ export default {
         return;
       }
       try {
-        shared.app.screenStream = await navigator.mediaDevices.getDisplayMedia({
+        this.shared.app.screenStream = await navigator.mediaDevices.getDisplayMedia({
           video: true,
           audio: true,
         });
@@ -400,7 +345,8 @@ export default {
 
     // 检查选择的视频文件是否有效
     checkVideoValidity() {
-      const videoInput = document.querySelector("#video-input");
+      const videoInput = this.$refs.videoInput;
+      if (!videoInput) return false;
       msg.i(`Acquired video file: ${videoInput.value}`);
       if (videoInput.value) {
         return true;
@@ -412,6 +358,10 @@ export default {
     // 获取TURN服务器配置
     async getTurnNode() {
       const url = import.meta.env.VITE_NODE_SERVER_URL;
+      if (!url) {
+        msg.e("VITE_NODE_SERVER_URL is not configured");
+        return false;
+      }
       const data = {
         ttl: 86400, // 请求体数据
       };
@@ -457,13 +407,13 @@ export default {
           message: this.$t("StartView.messages.turnNodeError"),
           closeOnOutsideClick: true,
         });
-        shared.app.isConnectionRestricted = true;
+        this.shared.app.isConnectionRestricted = true;
       }
 
-      shared.app.roomID = id.raw;
-      shared.peers.local.data = new Peer(id.data, cfg ? { config: cfg } : null);
-      shared.peers.local.video = new Peer(id.video, cfg ? { config: cfg } : null);
-      shared.peers.local.audio = new Peer(id.audio, cfg ? { config: cfg } : null);
+      this.shared.app.roomID = id.raw;
+      this.shared.peers.local.data = new Peer(id.data, cfg ? { config: cfg } : null);
+      this.shared.peers.local.video = new Peer(id.video, cfg ? { config: cfg } : null);
+      this.shared.peers.local.audio = new Peer(id.audio, cfg ? { config: cfg } : null);
       this.$router.push("/stream");
     },
 
@@ -477,13 +427,13 @@ export default {
           message: this.$t("StartView.messages.turnNodeError"),
           closeOnOutsideClick: true,
         });
-        shared.app.isConnectionRestricted = true;
+        this.shared.app.isConnectionRestricted = true;
       }
 
-      shared.app.guestID = id.raw;
-      shared.peers.local.data = new Peer(id.data, cfg ? { config: cfg } : null);
-      shared.peers.local.video = new Peer(id.video, cfg ? { config: cfg } : null);
-      shared.peers.local.audio = new Peer(id.audio, cfg ? { config: cfg } : null);
+      this.shared.app.guestID = id.raw;
+      this.shared.peers.local.data = new Peer(id.data, cfg ? { config: cfg } : null);
+      this.shared.peers.local.video = new Peer(id.video, cfg ? { config: cfg } : null);
+      this.shared.peers.local.audio = new Peer(id.audio, cfg ? { config: cfg } : null);
       this.$router.push("/stream");
     },
 
@@ -497,59 +447,57 @@ export default {
     // 加入房间的点击处理
     async onJoinRequest() {
       this.isLoading = true;
-      document.getElementById("join-room-button").setAttribute("disabled", true);
       await this.joinRoom();
       this.isLoading = false;
-      document.getElementById("join-room-button").removeAttribute("disabled");
     },
 
     // 处理选择的视频文件
     handleFileChange(event) {
       const file = event.target.files[0];
       const videoURL = URL.createObjectURL(file);
-      shared.app.videoURL = videoURL;
+      this.shared.app.videoURL = videoURL;
     },
 
     // 视频上传完成的回调
     onVideoUpload(event) {
-      const createRoomButton = document.getElementById("create-room-button");
       if (this.checkVideoValidity()) {
         this.handleFileChange(event);
-        createRoomButton.removeAttribute("disabled");
+        this.forceCreateDisabled = false;
         this.isLocalVideoReady = true;
         this.isVideoReady = true;
       } else {
+        this.forceCreateDisabled = true;
         this.isLocalVideoReady = false;
         this.isVideoReady = false;
       }
     },
 
     onScreenShareRequested() {
-      const createRoomButton = document.getElementById("create-room-button");
-      if (shared.app.screenStream) {
+      if (this.shared.app.screenStream) {
         this.isVideoReady = true;
-        createRoomButton.removeAttribute("disabled");
+        this.forceCreateDisabled = false;
       } else {
-        createRoomButton.setAttribute("disabled", true);
+        this.forceCreateDisabled = true;
         this.isVideoReady = false;
       }
     },
 
     resetSourceSelection() {
       // Reset screen share
-      if (shared.app.screenStream) {
-        shared.app.screenStream.getTracks().forEach((track) => track.stop());
-        shared.app.screenStream = null;
+      if (this.shared.app.screenStream) {
+        this.shared.app.screenStream.getTracks().forEach((track) => track.stop());
+        this.shared.app.screenStream = null;
       }
 
       // Reset local video
-      shared.app.videoURL = "";
-      const videoInput = document.querySelector("#video-input");
+      this.shared.app.videoURL = "";
+      const videoInput = this.$refs.videoInput;
       if (videoInput) videoInput.value = "";
 
       // Reset state
       this.isLocalVideoReady = false;
       this.isVideoReady = false;
+      this.forceCreateDisabled = true;
 
       msg.i("Media source selection reset");
     },
@@ -558,12 +506,12 @@ export default {
     handleKeyPress(event) {
       if (event.key === "Enter") {
         if (this.isHost) {
-          if (!document.getElementById("create-room-button").disabled) {
+          if (!this.$refs.createRoomButton?.disabled) {
             this.onCreateRequest();
             event.preventDefault();
           }
         } else {
-          if (!document.getElementById("join-room-button").disabled) {
+          if (!this.$refs.joinRoomButton?.disabled) {
             this.onJoinRequest();
             event.preventDefault();
           }
@@ -585,8 +533,8 @@ export default {
       if (joinParam.length === 16) {
         this.isShareIncoming = true;
         this.isLoading = true;
-        shared.app.roomID = joinParam;
-        shared.app.mode = 1;
+        this.shared.app.roomID = joinParam;
+        this.shared.app.mode = 1;
         this.isRoomReady = true;
         this.joinRoom();
         this.isLoading = false;
@@ -613,29 +561,29 @@ export default {
   },
   watch: {
     mode(value) {
-      shared.app.mode = value;
-      msg.i(`Role changed: ${shared.app.mode === 0 ? "host" : "client"}`);
+      this.shared.app.mode = value;
+      msg.i(`Role changed: ${this.shared.app.mode === 0 ? "host" : "client"}`);
     },
     method(value) {
-      shared.app.method = value;
-      msg.i(`Method changed: ${shared.app.method === 0 ? "p2p" : "same-origin"}`);
+      this.shared.app.method = value;
+      msg.i(`Method changed: ${this.shared.app.method === 0 ? "p2p" : "same-origin"}`);
     },
     roomID(value) {
-      const roomIDInput = document.getElementById("room-id-input");
+      const roomIDInput = this.$refs.roomIdInput;
       if (value.length === 16) {
         this.isRoomReady = true;
-        roomIDInput.removeAttribute("helper");
-        shared.app.roomID = value;
+        roomIDInput?.removeAttribute("helper");
+        this.shared.app.roomID = value;
       } else if (value.length == 0) {
         this.isRoomReady = false;
-        roomIDInput.setAttribute("helper", this.$t("StartView.roomIDInput.helper.empty"));
+        roomIDInput?.setAttribute("helper", this.$t("StartView.roomIDInput.helper.empty"));
       } else {
         this.isRoomReady = false;
-        roomIDInput.setAttribute("helper", this.$t("StartView.roomIDInput.helper.invalid"));
+        roomIDInput?.setAttribute("helper", this.$t("StartView.roomIDInput.helper.invalid"));
       }
     },
     originURL(value) {
-      const originURLInput = document.getElementById("origin-url-input");
+      const originURLInput = this.$refs.originUrlInput;
       if (
         value.length > 0 &&
         new String(value).match(
@@ -644,10 +592,12 @@ export default {
       ) {
         msg.i("Video is ready");
         this.isOriginReady = true;
-        originURLInput.removeAttribute("helper");
-        shared.app.videoURL = value;
+        this.forceCreateDisabled = false;
+        originURLInput?.removeAttribute("helper");
+        this.shared.app.videoURL = value;
       } else {
         this.isOriginReady = false;
+        this.forceCreateDisabled = true;
       }
     },
   },
@@ -838,7 +788,8 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.5rem;
-  height: 1rem; /* Limit height to match text */
+  height: 1rem;
+  /* Limit height to match text */
 }
 
 .reset-card {
@@ -886,7 +837,8 @@ export default {
 .source-list mdui-list-item {
   margin-bottom: 4px;
   background-color: transparent;
-  overflow: hidden; /* Ensure shadow content like hover/ripple is clipped */
+  overflow: hidden;
+  /* Ensure shadow content like hover/ripple is clipped */
 }
 
 .source-list mdui-list-item::part(container) {

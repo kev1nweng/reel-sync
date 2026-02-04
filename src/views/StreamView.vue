@@ -1,16 +1,6 @@
-<script setup>
-import { shared } from "@/main";
-import { msg } from "@/utils/msg";
-import { Comm } from "@/utils/comm";
-import { alert as mduiAlert } from "mdui/functions/alert";
-import { snackbar as mduiSnackbar } from "mdui/functions/snackbar";
-
-import LoadingRing from "@/components/LoadingRing.vue";
-import VideoPlayer from "@/components/VideoPlayer.vue";
-</script>
-
 <template>
-  <div class="stream-container">
+  <div class="stream-root">
+    <div class="stream-container">
     <div class="header-section">
       <div class="title-group">
         <h1 style="font-weight: bold;">{{ $t("StreamView.title") }}</h1>
@@ -22,22 +12,14 @@ import VideoPlayer from "@/components/VideoPlayer.vue";
 
       <!-- Voice Toggle -->
       <div v-if="isReady" class="voice-controls">
-        <mdui-switch
-          id="voice-switch"
-          @change="toggleVoice"
-          :checked="isVoiceEnabled"
-          checked-icon="mic--rounded"
-          unchecked-icon="mic_off--rounded"
-        ></mdui-switch>
+        <mdui-switch id="voice-switch" ref="voiceSwitch" @change="toggleVoice" :checked="isVoiceEnabled"
+          checked-icon="mic--rounded" unchecked-icon="mic_off--rounded"></mdui-switch>
         <label>{{ $t("StreamView.labels.voiceToggle") }}</label>
       </div>
     </div>
 
     <mdui-card variant="outlined" class="video-card">
-      <reelsync-video-player
-        id="video-player-stream"
-        v-show="isReady"
-      ></reelsync-video-player>
+      <reelsync-video-player id="video-player-stream" ref="videoPlayerStream" v-show="isReady"></reelsync-video-player>
 
       <div v-if="!isReady" class="loading-overlay">
         <reelsync-loading-ring id="loading"></reelsync-loading-ring>
@@ -66,8 +48,8 @@ import VideoPlayer from "@/components/VideoPlayer.vue";
           {{
             !isClient
               ? $t("StreamView.messages.pushing", {
-                  m: method == 1 ? $t("StreamView.messages.sameOriginLiteral") : $t("StreamView.messages.p2pLiteral"),
-                })
+                m: method == 1 ? $t("StreamView.messages.sameOriginLiteral") : $t("StreamView.messages.p2pLiteral"),
+              })
               : $t("StreamView.messages.watching")
           }}<span v-if="playbackDelta !== null || rtt !== null" class="latency">
             ({{ method == 1 ? $t("StreamView.messages.delta") : $t("StreamView.messages.latency") }}:
@@ -84,10 +66,21 @@ import VideoPlayer from "@/components/VideoPlayer.vue";
         </span>
       </mdui-card>
     </div>
+    </div>
+    <audio ref="remoteAudio" class="remote-audio" autoplay playsinline></audio>
   </div>
 </template>
 
 <script>
+import { useSharedStore } from "@/stores/shared";
+import { msg } from "@/utils/msg";
+import { Comm } from "@/utils/comm";
+import { alert as mduiAlert } from "mdui/functions/alert";
+import { snackbar as mduiSnackbar } from "mdui/functions/snackbar";
+
+import LoadingRing from "@/components/LoadingRing.vue";
+import VideoPlayer from "@/components/VideoPlayer.vue";
+
 export default {
   name: "StreamView",
   data() {
@@ -101,44 +94,51 @@ export default {
       audioCallListenerRegistered: false, // 防止重复注册音频来电监听器
       remoteVoiceEnabled: false, // 追踪对方是否启用了语音
       reconnectTimer: null,
-      get method() {
-        return shared.app.method;
-      },
-      get roleDescription() {
-        return this.isClient
-          ? shared.app.i18n.t("StreamView.roleDescription.client")
-          : shared.app.i18n.t("StreamView.roleDescription.host");
-      },
-      get hint() {
-        return this.isClient
-          ? shared.app.i18n.t("StreamView.hint.client")
-          : shared.app.i18n.t("StreamView.hint.host");
-      },
-      get loadingDescription() {
-        return shared.app.mode == 1
-          ? shared.app.i18n.t("StreamView.messages.joining")
-          : shared.app.i18n.t("StreamView.messages.waiting");
-      },
-      get roomID() {
-        return this.isClient && shared.app.guestID ? shared.app.guestID : shared.app.roomID;
-      },
-      get isClient() {
-        return shared.app.mode == 1;
-      },
-      get isConnectionRestricted() {
-        return shared.app.isConnectionRestricted;
-      },
-      get isVoiceEnabled() {
-        return shared.app.isVoiceEnabled;
-      },
+      shared: useSharedStore(),
     };
   },
+  computed: {
+    method() {
+      return this.shared.app.method;
+    },
+    roleDescription() {
+      return this.isClient
+        ? this.shared.app.i18n.t("StreamView.roleDescription.client")
+        : this.shared.app.i18n.t("StreamView.roleDescription.host");
+    },
+    hint() {
+      return this.isClient
+        ? this.shared.app.i18n.t("StreamView.hint.client")
+        : this.shared.app.i18n.t("StreamView.hint.host");
+    },
+    loadingDescription() {
+      return this.shared.app.mode == 1
+        ? this.shared.app.i18n.t("StreamView.messages.joining")
+        : this.shared.app.i18n.t("StreamView.messages.waiting");
+    },
+    roomID() {
+      return this.isClient && this.shared.app.guestID ? this.shared.app.guestID : this.shared.app.roomID;
+    },
+    isClient() {
+      return this.shared.app.mode == 1;
+    },
+    isConnectionRestricted() {
+      return this.shared.app.isConnectionRestricted;
+    },
+    isVoiceEnabled() {
+      return this.shared.app.isVoiceEnabled;
+    },
+  },
   methods: {
-    async toggleVoice() {
-      shared.app.isVoiceEnabled = document.getElementById("voice-switch").checked;
+    getVideoElement() {
+      return this.$refs.videoPlayerStream?.$el ?? null;
+    },
+    async toggleVoice(event) {
+      const checked = event?.target?.checked ?? this.$refs.voiceSwitch?.checked;
+      this.shared.app.isVoiceEnabled = !!checked;
       const comm = new Comm();
 
-      if (shared.app.isVoiceEnabled) {
+      if (this.shared.app.isVoiceEnabled) {
         try {
           // Check for getUserMedia support with fallback for older browsers
           const getUserMedia = navigator.mediaDevices?.getUserMedia?.bind(navigator.mediaDevices)
@@ -155,7 +155,7 @@ export default {
             }));
 
           // Request microphone access with compatibility options
-          shared.app.audioStream = await getUserMedia({
+          this.shared.app.audioStream = await getUserMedia({
             audio: {
               echoCancellation: true,
               noiseSuppression: true,
@@ -170,11 +170,11 @@ export default {
           this.setupAudioCallListener();
 
           // Notify the remote peer about voice enablement
-          if (shared.peers.remote.data) {
+          if (this.shared.peers.remote.data) {
             if (this.isClient) {
-              shared.peers.remote.data.send(comm.client.voiceEnabled());
+              this.shared.peers.remote.data.send(comm.client.voiceEnabled());
             } else {
-              shared.peers.remote.data.send(comm.host.voiceEnabled());
+              this.shared.peers.remote.data.send(comm.host.voiceEnabled());
             }
           }
 
@@ -184,19 +184,19 @@ export default {
           }
         } catch (error) {
           msg.e("Failed to access microphone:", error);
-          shared.app.isVoiceEnabled = false;
-          document.getElementById("voice-switch").checked = false;
+          this.shared.app.isVoiceEnabled = false;
+          if (this.$refs.voiceSwitch) this.$refs.voiceSwitch.checked = false;
         }
       } else {
         // Disable voice call
         this.stopAudioCall();
 
         // Notify the remote peer about voice disablement
-        if (shared.peers.remote.data) {
+        if (this.shared.peers.remote.data) {
           if (this.isClient) {
-            shared.peers.remote.data.send(comm.client.voiceDisabled());
+            this.shared.peers.remote.data.send(comm.client.voiceDisabled());
           } else {
-            shared.peers.remote.data.send(comm.host.voiceDisabled());
+            this.shared.peers.remote.data.send(comm.host.voiceDisabled());
           }
         }
 
@@ -206,15 +206,15 @@ export default {
 
     setupAudioCallListener() {
       // Prevent duplicate registration
-      if (this.audioCallListenerRegistered || !shared.peers.local.audio) return;
+      if (this.audioCallListenerRegistered || !this.shared.peers.local.audio) return;
       this.audioCallListenerRegistered = true;
 
-      shared.peers.local.audio.on("call", (call) => {
+      this.shared.peers.local.audio.on("call", (call) => {
         msg.i("Incoming audio call");
 
         // Answer with local audio stream if available, otherwise answer without stream
-        if (shared.app.audioStream) {
-          call.answer(shared.app.audioStream);
+        if (this.shared.app.audioStream) {
+          call.answer(this.shared.app.audioStream);
         } else {
           // If no local stream, just answer to receive remote audio
           call.answer();
@@ -233,20 +233,14 @@ export default {
           msg.i("Audio call closed");
         });
 
-        shared.peers.remote.audio = call;
+        this.shared.peers.remote.audio = call;
       });
     },
 
     playRemoteAudio(remoteAudioStream) {
       // Create or reuse audio element to play remote audio
-      let audioElement = document.getElementById("remote-audio");
-      if (!audioElement) {
-        audioElement = document.createElement("audio");
-        audioElement.id = "remote-audio";
-        audioElement.autoplay = true;
-        audioElement.playsInline = true; // iOS compatibility
-        document.body.appendChild(audioElement);
-      }
+      const audioElement = this.$refs.remoteAudio || null;
+      if (!audioElement) return;
 
       // For some browsers, we need to handle autoplay restrictions
       audioElement.srcObject = remoteAudioStream;
@@ -260,17 +254,17 @@ export default {
     },
 
     startAudioCall() {
-      if (!shared.app.audioStream || !shared.peers.remote.data) {
+      if (!this.shared.app.audioStream || !this.shared.peers.remote.data) {
         msg.w("Cannot start audio call: missing audio stream or data connection");
         return;
       }
 
-      if (!shared.peers.local.audio) {
+      if (!this.shared.peers.local.audio) {
         msg.e("Audio peer not initialized");
         return;
       }
 
-      const peerID = this.isClient ? shared.app.roomID : shared.app.guestID;
+      const peerID = this.isClient ? this.shared.app.roomID : this.shared.app.guestID;
 
       if (!peerID) {
         msg.e("Cannot start audio call: peer ID not available");
@@ -278,13 +272,13 @@ export default {
       }
 
       // Close existing audio call if any
-      if (shared.peers.remote.audio) {
-        shared.peers.remote.audio.close();
+      if (this.shared.peers.remote.audio) {
+        this.shared.peers.remote.audio.close();
       }
 
       try {
         // Make an audio call to the remote peer
-        const audioCall = shared.peers.local.audio.call(`${peerID}-audio`, shared.app.audioStream);
+        const audioCall = this.shared.peers.local.audio.call(`${peerID}-audio`, this.shared.app.audioStream);
 
         if (!audioCall) {
           msg.e("Failed to initiate audio call");
@@ -304,7 +298,7 @@ export default {
           msg.i("Outgoing audio call closed");
         });
 
-        shared.peers.remote.audio = audioCall;
+        this.shared.peers.remote.audio = audioCall;
         msg.i(`Audio call initiated to ${peerID}-audio`);
       } catch (error) {
         msg.e("Failed to start audio call:", error);
@@ -313,29 +307,27 @@ export default {
 
     stopAudioCall() {
       // Stop local audio stream
-      if (shared.app.audioStream) {
-        shared.app.audioStream.getTracks().forEach((track) => track.stop());
-        shared.app.audioStream = null;
+      if (this.shared.app.audioStream) {
+        this.shared.app.audioStream.getTracks().forEach((track) => track.stop());
+        this.shared.app.audioStream = null;
       }
 
       // Close remote audio call
-      if (shared.peers.remote.audio) {
-        shared.peers.remote.audio.close();
-        shared.peers.remote.audio = null;
+      if (this.shared.peers.remote.audio) {
+        this.shared.peers.remote.audio.close();
+        this.shared.peers.remote.audio = null;
       }
 
       // Remove remote audio element
-      const audioElement = document.getElementById("remote-audio");
-      if (audioElement) {
-        audioElement.remove();
-      }
+      const audioElement = this.$refs.remoteAudio;
+      if (audioElement) audioElement.srcObject = null;
     },
     copyShareLink(silent = false) {
       const link = `${this.locationOrigin}/?join=${this.roomID}`;
       navigator.clipboard.writeText(link).then(() => {
         if (!silent) {
           mduiSnackbar({
-            message: shared.app.i18n.t("StreamView.messages.copiedToClipboard"),
+            message: this.shared.app.i18n.t("StreamView.messages.copiedToClipboard"),
           });
         }
       });
@@ -343,13 +335,13 @@ export default {
     copyRoomID() {
       navigator.clipboard.writeText(this.roomID).then(() => {
         mduiSnackbar({
-          message: shared.app.i18n.t("StreamView.messages.copiedToClipboard"),
+          message: this.shared.app.i18n.t("StreamView.messages.copiedToClipboard"),
         });
       });
     },
     connectToPeer() {
-      const remotePeerId = `${shared.app.roomID}-data`;
-      const dataPeer = shared.peers.local.data;
+      const remotePeerId = `${this.shared.app.roomID}-data`;
+      const dataPeer = this.shared.peers.local.data;
 
       if (!dataPeer) {
         msg.w("Connection aborted: dataPeer is null (possibly returning to home)");
@@ -372,25 +364,27 @@ export default {
 
       // 连接成功回调
       conn.on("open", () => {
-        conn.send(comm.client.greet(shared.app.guestID));
-        msg.i(`Connection established with ${shared.app.roomID}.`);
-        shared.peers.local.video.on("call", (call) => {
+        conn.send(comm.client.greet(this.shared.app.guestID));
+        msg.i(`Connection established with ${this.shared.app.roomID}.`);
+        this.shared.peers.local.video.on("call", (call) => {
           call.answer();
           call.on("stream", (stream) => {
             msg.i("Received video stream");
-            const video = document.getElementById("video-player-stream");
-            video.srcObject = stream;
-            video.load();
-            video.play();
+            const video = this.getVideoElement();
+            if (video) {
+              video.srcObject = stream;
+              video.load();
+              video.play();
+            }
           });
         });
 
         // Setup audio call listener (will be used when voice is enabled)
         this.setupAudioCallListener();
         this.isReady = true;
-        shared.peers.remote.data = conn;
+        this.shared.peers.remote.data = conn;
         // 启动RTT定时测量（点对点模式）
-        if (shared.app.method == 0) {
+        if (this.shared.app.method == 0) {
           if (this.rttTimer) clearInterval(this.rttTimer);
           const rttInterval =
             (import.meta.env.VITE_LATENCY_MEASUREMENT_INTERVAL_SECONDS
@@ -406,13 +400,14 @@ export default {
       // 数据接收处理
       conn.on("data", (data) => {
         const commMsg = comm.resolve(data.toString());
-        const video = document.getElementById("video-player-stream");
+        const video = this.getVideoElement();
         switch (commMsg.command) {
           case "origin":
-            shared.app.method = 1;
-            video.src = commMsg.data.ori;
-            shared.app.syncThread = setInterval(
+            this.shared.app.method = 1;
+            if (video) video.src = commMsg.data.ori;
+            this.shared.app.syncThread = setInterval(
               () => {
+                if (!video) return;
                 msg.i(`Sending playback progress: ${video.currentTime}`);
                 conn.send(comm.client.progress(video.currentTime, Date.now()));
               },
@@ -420,13 +415,13 @@ export default {
             );
             break;
           case "play":
-            video.play();
+            video?.play();
             break;
           case "pause":
-            video.pause();
+            video?.pause();
             break;
           case "seek":
-            video.currentTime = commMsg.data.time;
+            if (video) video.currentTime = commMsg.data.time;
             break;
           case "latency":
             this.playbackDelta = parseFloat(commMsg.data.lat);
@@ -457,7 +452,7 @@ export default {
             // Setup listener to receive incoming audio calls
             this.setupAudioCallListener();
             // If we also have voice enabled, initiate the call
-            if (shared.app.isVoiceEnabled && shared.app.audioStream) {
+            if (this.shared.app.isVoiceEnabled && this.shared.app.audioStream) {
               this.startAudioCall();
             }
             break;
@@ -484,7 +479,7 @@ export default {
 
       // 错误处理和重试
       conn.on("error", (err) => {
-        msg.e(`Failed to establish connection with ${shared.app.roomID}: ${err.message}`);
+        msg.e(`Failed to establish connection with ${this.shared.app.roomID}: ${err.message}`);
         this.connectionAttempts++;
         // 延迟重试
         if (this.connectionAttempts < this.maxAttempts) {
@@ -497,11 +492,11 @@ export default {
       // 连接关闭处理
       conn.on("close", () => {
         msg.w("Connection closed");
-        shared.peers.remote.data = null;
+        this.shared.peers.remote.data = null;
         this.isReady = false;
         this.remoteVoiceEnabled = false;
-        const video = document.getElementById("video-player-stream");
-        video.pause();
+        const video = this.getVideoElement();
+        video?.pause();
         if (this.rttTimer) clearInterval(this.rttTimer);
         this.rtt = null;
         // Clean up voice call on disconnect
@@ -525,7 +520,7 @@ export default {
 
     if (this.isClient) {
       // 接收者端逻辑
-      const dataPeer = shared.peers.local.data;
+      const dataPeer = this.shared.peers.local.data;
 
       // 确保peer已经就绪后再连接
       if (dataPeer.open) {
@@ -540,12 +535,12 @@ export default {
       const comm = new Comm();
 
       // 处理连接请求
-      shared.peers.local.data.on("connection", (conn) => {
+      this.shared.peers.local.data.on("connection", (conn) => {
         conn.on("open", function () {
           msg.i(`Received connection from ${conn.peer}`);
-          shared.peers.remote.data = conn;
+          that.shared.peers.remote.data = conn;
           // 启动RTT定时测量（点对点模式）
-          if (shared.app.method == 0) {
+          if (that.shared.app.method == 0) {
             if (that.rttTimer) clearInterval(that.rttTimer);
             const rttInterval =
               (import.meta.env.VITE_LATENCY_MEASUREMENT_INTERVAL_SECONDS
@@ -566,16 +561,17 @@ export default {
           const status = commMsg.command;
           const peerID = commMsg.data ? commMsg.data.gid : undefined;
           switch (status) {
-          case "connected": {
+            case "connected": {
               msg.i(`Connection established with ${conn.peer}`);
               that.isReady = true;
-              const video = document.getElementById("video-player-stream");
+              const video = that.getVideoElement();
 
-              if (shared.app.method == 0) {
+              if (that.shared.app.method == 0) {
                 // P2P 模式：捕获视频流并发送
                 let videoEnded = false;
 
                 const captureAndCall = () => {
+                  if (!video) return;
                   let stream;
                   try {
                     stream = video.captureStream();
@@ -583,8 +579,8 @@ export default {
                     stream = video.mozCaptureStream();
                     msg.w(`Error: ${e} Attempting mozCaptureStream()...`);
                   }
-                  const call = shared.peers.local.video.call(`${peerID}-video`, stream);
-                  shared.peers.remote.videoCall = call;
+                  const call = that.shared.peers.local.video.call(`${peerID}-video`, stream);
+                  that.shared.peers.remote.videoCall = call;
                   msg.i("Video stream call initiated");
                 };
 
@@ -592,26 +588,26 @@ export default {
                 captureAndCall();
 
                 // 监听视频结束事件
-                video.addEventListener("ended", () => {
+                video?.addEventListener("ended", () => {
                   videoEnded = true;
                   msg.i("Host video ended, stream tracks may have ended");
                 });
 
                 // 当视频从结束状态恢复播放时，重新捕获流
-                video.addEventListener("playing", () => {
+                video?.addEventListener("playing", () => {
                   if (videoEnded) {
                     msg.i("Host video resumed from ended state, re-capturing stream");
                     videoEnded = false;
                     // 关闭旧的 call
-                    if (shared.peers.remote.videoCall) {
-                      shared.peers.remote.videoCall.close();
+                    if (that.shared.peers.remote.videoCall) {
+                      that.shared.peers.remote.videoCall.close();
                     }
                     // 重新捕获并发起新的 call
                     captureAndCall();
                   }
                 });
 
-                shared.app.pingThread = setInterval(
+                that.shared.app.pingThread = setInterval(
                   () => {
                     conn.send(comm.host.timestamp());
                   },
@@ -619,29 +615,30 @@ export default {
                 );
               } else {
                 // 同源模式：发送视频 URL 并同步播放控制
-                conn.send(comm.host.origin(shared.app.videoURL));
-                video.addEventListener("play", () => {
+                conn.send(comm.host.origin(that.shared.app.videoURL));
+                video?.addEventListener("play", () => {
                   conn.send(comm.host.play());
                 });
-                video.addEventListener("pause", () => {
+                video?.addEventListener("pause", () => {
                   conn.send(comm.host.pause());
                 });
-                video.addEventListener("seeking", () => {
+                video?.addEventListener("seeking", () => {
+                  if (!video) return;
                   conn.send(comm.host.seek(video.currentTime));
                 });
               }
               break;
             }
             case "progress": {
-              const video = document.getElementById("video-player-stream");
+              const video = that.getVideoElement();
               const time = parseFloat(commMsg.data.cur);
               const atu = parseFloat(commMsg.data.atu);
               const offset = (Date.now() - atu) / 1e3;
-              const delta = video.currentTime - (time + offset);
+              const delta = video ? video.currentTime - (time + offset) : 0;
               if (Math.abs(delta) > (import.meta.env.VITE_MAX_ACCEPTABLE_DELAY_SECONDS ?? 3)) {
                 msg.w(`Attempting to force sync due to too much latency: ${delta}`);
                 that.playbackDelta = delta;
-                conn.send(comm.host.seek(video.currentTime + offset));
+                if (video) conn.send(comm.host.seek(video.currentTime + offset));
               } else {
                 msg.i(`Received status report from the peer. Delta: ${delta}`);
                 that.playbackDelta = delta;
@@ -672,7 +669,7 @@ export default {
               // Setup listener to receive incoming audio calls
               that.setupAudioCallListener();
               // If we also have voice enabled, initiate the call
-              if (shared.app.isVoiceEnabled && shared.app.audioStream) {
+              if (that.shared.app.isVoiceEnabled && that.shared.app.audioStream) {
                 that.startAudioCall();
               }
               break;
@@ -700,11 +697,11 @@ export default {
         // 连接关闭处理
         conn.on("close", () => {
           msg.w("Connection closed");
-          shared.peers.remote.data = null;
+          that.shared.peers.remote.data = null;
           that.isReady = false;
           that.remoteVoiceEnabled = false;
-          const video = document.getElementById("video-player-stream");
-          video.pause();
+          const video = that.getVideoElement();
+          video?.pause();
           if (that.rttTimer) clearInterval(that.rttTimer);
           that.rtt = null;
           // Clean up voice call on disconnect
@@ -712,17 +709,18 @@ export default {
         });
       });
 
-      ((el) => {
-        if (shared.app.screenStream) {
-          el.srcObject = shared.app.screenStream;
-        } else el.src = shared.app.videoURL;
-        el.load();
-      })(document.querySelector("#video-player-stream"));
+      const videoEl = this.getVideoElement();
+      if (videoEl) {
+        if (this.shared.app.screenStream) {
+          videoEl.srcObject = this.shared.app.screenStream;
+        } else videoEl.src = this.shared.app.videoURL;
+        videoEl.load();
+      }
     }
   },
   beforeUnmount() {
-    if (shared.app.syncThread) clearInterval(shared.app.syncThread);
-    if (shared.app.pingThread) clearInterval(shared.app.pingThread);
+    if (this.shared.app.syncThread) clearInterval(this.shared.app.syncThread);
+    if (this.shared.app.pingThread) clearInterval(this.shared.app.pingThread);
     if (this.rttTimer) clearInterval(this.rttTimer);
 
     // Clean up voice call resources
@@ -743,7 +741,8 @@ export default {
 .stream-container {
   display: flex;
   flex-direction: column;
-  padding: 2rem 2rem 80px 2rem; /* 增加底部内边距 */
+  padding: 2rem 2rem 80px 2rem;
+  /* 增加底部内边距 */
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
@@ -858,6 +857,10 @@ export default {
   color: rgb(var(--mdui-color-on-surface-variant));
   font-size: 0.9rem;
   margin: 0;
+}
+
+.remote-audio {
+  display: none;
 }
 
 @media (max-width: 600px) {

@@ -1,6 +1,7 @@
 {
   "Common": {
-    "reset": "重置"
+    "reset": "重置",
+    "loading": "加载中"
   },
   "App": {
     "versionLiteral": "版本",

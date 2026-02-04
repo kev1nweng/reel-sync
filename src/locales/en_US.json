@@ -1,6 +1,7 @@
 {
   "Common": {
-    "reset": "Reset"
+    "reset": "Reset",
+    "loading": "Loading"
   },
   "App": {
     "versionLiteral": "Version",
