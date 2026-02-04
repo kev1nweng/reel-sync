@@ -389,7 +389,7 @@ export default {
                 credential: result.iceServers.credential,
               };
             }
-            return { urls: url };
+            return { url };
           }),
         };
         return cfg;
@@ -399,30 +399,10 @@ export default {
       }
     },
 
-    buildPeerOptions(cfg) {
-      const peerOptions = cfg ? { config: cfg } : {};
-      const peerServerUrl = import.meta.env.VITE_PEER_SERVER_URL;
-      if (peerServerUrl) {
-        try {
-          const url = new URL(peerServerUrl);
-          peerOptions.host = url.hostname;
-          peerOptions.path = url.pathname;
-          peerOptions.key = import.meta.env.VITE_PEER_SERVER_KEY;
-          if (url.port) peerOptions.port = Number(url.port);
-          peerOptions.path = url.pathname && url.pathname !== "/" ? url.pathname : "/peerjs";
-          peerOptions.secure = url.protocol === "https:";
-        } catch (error) {
-          msg.e("Invalid VITE_PEER_SERVER_URL:", error);
-        }
-      }
-      return peerOptions;
-    },
-
     // 创建新房间(发送者端)
     async createRoom() {
       const cfg = (await this.getTurnNode()) ?? null;
       const id = new PeerID().id;
-      const peerOptions = this.buildPeerOptions(cfg);
 
       if (!cfg) {
         mduiSnackbar({
@@ -433,9 +413,9 @@ export default {
       }
 
       this.shared.app.roomID = id.raw;
-      this.shared.peers.local.data = new Peer(id.data, peerOptions);
-      this.shared.peers.local.video = new Peer(id.video, peerOptions);
-      this.shared.peers.local.audio = new Peer(id.audio, peerOptions);
+      this.shared.peers.local.data = new Peer(id.data, cfg ? { config: cfg } : null);
+      this.shared.peers.local.video = new Peer(id.video, cfg ? { config: cfg } : null);
+      this.shared.peers.local.audio = new Peer(id.audio, cfg ? { config: cfg } : null);
       this.$router.push("/stream");
     },
 
@@ -443,7 +423,6 @@ export default {
     async joinRoom() {
       const cfg = (await this.getTurnNode()) ?? null;
       const id = new PeerID().id;
-      const peerOptions = this.buildPeerOptions(cfg);
 
       if (!cfg) {
         mduiSnackbar({
@@ -454,9 +433,9 @@ export default {
       }
 
       this.shared.app.guestID = id.raw;
-      this.shared.peers.local.data = new Peer(id.data, peerOptions);
-      this.shared.peers.local.video = new Peer(id.video, peerOptions);
-      this.shared.peers.local.audio = new Peer(id.audio, peerOptions);
+      this.shared.peers.local.data = new Peer(id.data, cfg ? { config: cfg } : null);
+      this.shared.peers.local.video = new Peer(id.video, cfg ? { config: cfg } : null);
+      this.shared.peers.local.audio = new Peer(id.audio, cfg ? { config: cfg } : null);
       this.$router.push("/stream");
     },
 
