@@ -119,7 +119,8 @@
               <span class="no-registration-hint">{{ $t("StartView.messages.noRegistration") }}</span>
               <mdui-button @click="onCreateRequest" id="create-room-button" ref="createRoomButton"
                 :disabled="forceCreateDisabled || ((!isVideoReady && !isOriginReady) || isLoading)"
-                :loading="isLoading">{{ isLoading ? $t("Common.loading") : $t("StartView.buttons.createRoom") }}</mdui-button>
+                :loading="isLoading">{{ isLoading ? $t("Common.loading") : $t("StartView.buttons.createRoom")
+                }}</mdui-button>
             </div>
           </div>
 
@@ -132,7 +133,8 @@
             <div class="action-bar">
               <span class="no-registration-hint">{{ $t("StartView.messages.noRegistration") }}</span>
               <mdui-button @click="onJoinRequest" id="join-room-button" ref="joinRoomButton"
-                :disabled="!isRoomReady || isLoading" :loading="isLoading">{{ isLoading ? $t("Common.loading") : $t("StartView.buttons.joinRoom")
+                :disabled="!isRoomReady || isLoading" :loading="isLoading">{{ isLoading ? $t("Common.loading") :
+                  $t("StartView.buttons.joinRoom")
                 }}</mdui-button>
             </div>
           </div>

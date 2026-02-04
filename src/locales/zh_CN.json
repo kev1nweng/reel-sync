@@ -64,7 +64,8 @@
       "full": "完全支持",
       "partial": "功能不完整",
       "none": "不支持"
-    },    "buttons": {
+    },
+    "buttons": {
       "uploadVideo": "加载视频文件",
       "uploadVideoDescription": "从您的设备选择一个本地视频文件进行播放和分享。",
       "createRoom": "创建房间",

@@ -1,71 +1,72 @@
 <template>
   <div class="stream-root">
     <div class="stream-container">
-    <div class="header-section">
-      <div class="title-group">
-        <h1 style="font-weight: bold;">{{ $t("StreamView.title") }}</h1>
-        <div id="status">
-          <span class="status-dot" :style="{ color: isReady ? '#4caf50' : '#f44336' }">⬤</span>
-          {{ isReady ? $t("StreamView.messages.connected") : $t("StreamView.messages.disconnected") }}
+      <div class="header-section">
+        <div class="title-group">
+          <h1 style="font-weight: bold;">{{ $t("StreamView.title") }}</h1>
+          <div id="status">
+            <span class="status-dot" :style="{ color: isReady ? '#4caf50' : '#f44336' }">⬤</span>
+            {{ isReady ? $t("StreamView.messages.connected") : $t("StreamView.messages.disconnected") }}
+          </div>
+        </div>
+
+        <!-- Voice Toggle -->
+        <div v-if="isReady" class="voice-controls">
+          <mdui-switch id="voice-switch" ref="voiceSwitch" @change="toggleVoice" :checked="isVoiceEnabled"
+            checked-icon="mic--rounded" unchecked-icon="mic_off--rounded"></mdui-switch>
+          <label>{{ $t("StreamView.labels.voiceToggle") }}</label>
         </div>
       </div>
 
-      <!-- Voice Toggle -->
-      <div v-if="isReady" class="voice-controls">
-        <mdui-switch id="voice-switch" ref="voiceSwitch" @change="toggleVoice" :checked="isVoiceEnabled"
-          checked-icon="mic--rounded" unchecked-icon="mic_off--rounded"></mdui-switch>
-        <label>{{ $t("StreamView.labels.voiceToggle") }}</label>
-      </div>
-    </div>
+      <mdui-card variant="outlined" class="video-card">
+        <reelsync-video-player id="video-player-stream" ref="videoPlayerStream"
+          v-show="isReady"></reelsync-video-player>
 
-    <mdui-card variant="outlined" class="video-card">
-      <reelsync-video-player id="video-player-stream" ref="videoPlayerStream" v-show="isReady"></reelsync-video-player>
-
-      <div v-if="!isReady" class="loading-overlay">
-        <reelsync-loading-ring id="loading"></reelsync-loading-ring>
-        <h3>{{ loadingDescription }}</h3>
-        <p v-if="isConnectionRestricted" class="error-text">
-          {{ $t("StreamView.messages.connectionRestricted") }}
-        </p>
-        <p class="hint-text">{{ hint }}</p>
-      </div>
-    </mdui-card>
-
-    <div class="info-section">
-      <mdui-card variant="outlined" clickable class="info-group" @click="copyRoomID">
-        <span class="label">{{ $t("StreamView.messages.roomID", { roleDescription, roomID: "" }) }}</span>
-        <span class="value monospace">{{ roomID }}</span>
+        <div v-if="!isReady" class="loading-overlay">
+          <reelsync-loading-ring id="loading"></reelsync-loading-ring>
+          <h3>{{ loadingDescription }}</h3>
+          <p v-if="isConnectionRestricted" class="error-text">
+            {{ $t("StreamView.messages.connectionRestricted") }}
+          </p>
+          <p class="hint-text">{{ hint }}</p>
+        </div>
       </mdui-card>
 
-      <mdui-card v-if="!isClient" variant="outlined" clickable class="info-group" @click="copyShareLink(false)">
-        <span class="label">{{ $t("StreamView.messages.shareLink") }}</span>
-        <span class="value monospace">{{ locationOrigin }}/?join={{ roomID }}</span>
-      </mdui-card>
+      <div class="info-section">
+        <mdui-card variant="outlined" clickable class="info-group" @click="copyRoomID">
+          <span class="label">{{ $t("StreamView.messages.roomID", { roleDescription, roomID: "" }) }}</span>
+          <span class="value monospace">{{ roomID }}</span>
+        </mdui-card>
 
-      <mdui-card v-if="isReady" variant="outlined" class="info-group">
-        <span class="label">{{ $t("StreamView.messages.networkInfo") }}</span>
-        <span class="value">
-          {{
-            !isClient
-              ? $t("StreamView.messages.pushing", {
-                m: method == 1 ? $t("StreamView.messages.sameOriginLiteral") : $t("StreamView.messages.p2pLiteral"),
-              })
-              : $t("StreamView.messages.watching")
-          }}<span v-if="playbackDelta !== null || rtt !== null" class="latency">
-            ({{ method == 1 ? $t("StreamView.messages.delta") : $t("StreamView.messages.latency") }}:
+        <mdui-card v-if="!isClient" variant="outlined" clickable class="info-group" @click="copyShareLink(false)">
+          <span class="label">{{ $t("StreamView.messages.shareLink") }}</span>
+          <span class="value monospace">{{ locationOrigin }}/?join={{ roomID }}</span>
+        </mdui-card>
+
+        <mdui-card v-if="isReady" variant="outlined" class="info-group">
+          <span class="label">{{ $t("StreamView.messages.networkInfo") }}</span>
+          <span class="value">
             {{
-              method == 1
-                ? playbackDelta !== null
-                  ? Math.round(playbackDelta * 1e3) + "ms"
-                  : $t("StreamView.messages.measuringLiteral")
-                : rtt !== null
-                  ? Math.round(rtt * 1e3) + "ms"
-                  : $t("StreamView.messages.measuringLiteral")
-            }})
+              !isClient
+                ? $t("StreamView.messages.pushing", {
+                  m: method == 1 ? $t("StreamView.messages.sameOriginLiteral") : $t("StreamView.messages.p2pLiteral"),
+                })
+                : $t("StreamView.messages.watching")
+            }}<span v-if="playbackDelta !== null || rtt !== null" class="latency">
+              ({{ method == 1 ? $t("StreamView.messages.delta") : $t("StreamView.messages.latency") }}:
+              {{
+                method == 1
+                  ? playbackDelta !== null
+                    ? Math.round(playbackDelta * 1e3) + "ms"
+                    : $t("StreamView.messages.measuringLiteral")
+                  : rtt !== null
+                    ? Math.round(rtt * 1e3) + "ms"
+                    : $t("StreamView.messages.measuringLiteral")
+              }})
+            </span>
           </span>
-        </span>
-      </mdui-card>
-    </div>
+        </mdui-card>
+      </div>
     </div>
     <audio ref="remoteAudio" class="remote-audio" autoplay playsinline></audio>
   </div>
