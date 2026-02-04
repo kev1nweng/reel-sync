@@ -406,6 +406,8 @@ export default {
         try {
           const url = new URL(peerServerUrl);
           peerOptions.host = url.hostname;
+          peerOptions.path = url.pathname;
+          peerOptions.key = import.meta.env.VITE_PEER_SERVER_KEY;
           if (url.port) peerOptions.port = Number(url.port);
           peerOptions.path = url.pathname && url.pathname !== "/" ? url.pathname : "/peerjs";
           peerOptions.secure = url.protocol === "https:";
