@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-deprecated-slot-attribute -->
 <template>
   <transition name="background-fade" mode="out-in">
     <div v-if="backgroundUrl" :key="backgroundUrl" id="app-background"
