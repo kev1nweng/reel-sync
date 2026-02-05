@@ -148,7 +148,19 @@
       }
     },
     "labels": {
-      "voiceToggle": "Voice Call"
+      "voiceToggle": "Voice Call",
+      "videoQuality": "Video Quality"
+    },
+    "qualityPresets": {
+      "low": "Low",
+      "medium": "Med",
+      "high": "High",
+      "ultra": "Ultra",
+      "unlimited": "Auto"
+    },
+    "qualityDescriptions": {
+      "detail": "{resolution}, {fps} fps, up to {bitrate}",
+      "unlimited": "No limits. Determined by browser."
     }
   }
 }

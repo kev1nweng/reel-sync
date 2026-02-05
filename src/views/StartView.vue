@@ -154,6 +154,7 @@
 import { PeerID } from "@/utils/peer-id";
 import { useSharedStore } from "@/stores/shared";
 import { msg } from "@/utils/msg";
+import { buildDisplayMediaConstraints } from "@/utils/video-quality";
 
 import Peer from "peerjs";
 import VideoInput from "@/components/VideoInput.vue";
@@ -331,10 +332,8 @@ export default {
         return;
       }
       try {
-        this.shared.app.screenStream = await navigator.mediaDevices.getDisplayMedia({
-          video: true,
-          audio: true,
-        });
+        const displayConstraints = buildDisplayMediaConstraints(this.shared.app.videoQuality);
+        this.shared.app.screenStream = await navigator.mediaDevices.getDisplayMedia(displayConstraints);
         this.onScreenShareRequested();
       } catch (error) {
         msg.e("Failed to request screen share:", error);
@@ -889,6 +888,24 @@ export default {
   gap: 1rem;
   margin-top: auto;
   padding-top: 2rem;
+}
+
+.quality-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.quality-buttons {
+  width: 100%;
+}
+
+.quality-description {
+  font-size: 0.8rem;
+  color: rgb(var(--mdui-color-on-surface-variant));
+  opacity: 0.8;
+  margin: 0;
+  min-height: 1.2em;
 }
 
 .no-registration-hint {

@@ -9,6 +9,7 @@ export const useSharedStore = defineStore("shared", {
       roomID: "",
       guestID: "",
       videoURL: "",
+      videoQuality: "unlimited",
       screenStream: null,
       syncThread: null,
       pingThread: null,

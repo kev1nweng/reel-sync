@@ -76,7 +76,8 @@
     "labels": {
       "sourceURL": "源 URL",
       "roomID": "房间 ID",
-      "selectSource": "选择媒体源"
+      "selectSource": "选择媒体源",
+      "videoQuality": "视频质量"
     },
     "guide": {
       "step1": "选择您的角色（发送者/接收者）",
@@ -148,7 +149,19 @@
       }
     },
     "labels": {
-      "voiceToggle": "语音通话"
+      "voiceToggle": "语音通话",
+      "videoQuality": "视频质量"
+    },
+    "qualityPresets": {
+      "low": "流畅",
+      "medium": "清晰",
+      "high": "高清",
+      "ultra": "超清",
+      "unlimited": "自动"
+    },
+    "qualityDescriptions": {
+      "detail": "分辨率 {resolution}，{fps} 帧/秒，最高 {bitrate}",
+      "unlimited": "不限制分辨率、帧率和码率，由浏览器自行决定"
     }
   }
 }

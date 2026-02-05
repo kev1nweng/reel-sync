@@ -67,6 +67,30 @@
           </span>
         </mdui-card>
       </div>
+
+      <!-- Video Quality Selector (host P2P mode only) -->
+      <mdui-card v-if="!isClient && method == 0" variant="elevated" class="quality-card">
+        <span class="label">{{ $t("StreamView.labels.videoQuality") }}</span>
+        <mdui-segmented-button-group selects="single" :value="shared.app.videoQuality" @change="onQualityChange"
+          full-width class="quality-buttons">
+          <mdui-segmented-button value="low">
+            {{ $t("StreamView.qualityPresets.low") }}
+          </mdui-segmented-button>
+          <mdui-segmented-button value="medium">
+            {{ $t("StreamView.qualityPresets.medium") }}
+          </mdui-segmented-button>
+          <mdui-segmented-button value="high">
+            {{ $t("StreamView.qualityPresets.high") }}
+          </mdui-segmented-button>
+          <mdui-segmented-button value="ultra">
+            {{ $t("StreamView.qualityPresets.ultra") }}
+          </mdui-segmented-button>
+          <mdui-segmented-button value="unlimited">
+            {{ $t("StreamView.qualityPresets.unlimited") }}
+          </mdui-segmented-button>
+        </mdui-segmented-button-group>
+        <span class="quality-description">{{ qualityDescription }}</span>
+      </mdui-card>
     </div>
     <audio ref="remoteAudio" class="remote-audio" autoplay playsinline></audio>
   </div>
@@ -76,6 +100,7 @@
 import { useSharedStore } from "@/stores/shared";
 import { msg } from "@/utils/msg";
 import { Comm } from "@/utils/comm";
+import { createSdpTransform, applyBitrateLimit, applyTrackConstraints, QualityPresets } from "@/utils/video-quality";
 import { alert as mduiAlert } from "mdui/functions/alert";
 import { snackbar as mduiSnackbar } from "mdui/functions/snackbar";
 
@@ -129,10 +154,33 @@ export default {
     isVoiceEnabled() {
       return this.shared.app.isVoiceEnabled;
     },
+    qualityDescription() {
+      const preset = this.shared.app.videoQuality;
+      const q = QualityPresets[preset];
+      if (!q || preset === "unlimited") {
+        return this.$t("StreamView.qualityDescriptions.unlimited");
+      }
+      const w = q.video.width?.ideal || "?";
+      const h = q.video.height?.ideal || "?";
+      const fps = q.video.frameRate?.ideal || "?";
+      const mbps = (q.maxBitrate / 1_000_000).toFixed(1);
+      return this.$t("StreamView.qualityDescriptions.detail", {
+        resolution: `${w}×${h}`,
+        fps,
+        bitrate: `${mbps} Mbps`,
+      });
+    },
   },
   methods: {
     getVideoElement() {
       return this.$refs.videoPlayerStream?.$el ?? null;
+    },
+    onQualityChange(event) {
+      const value = event?.target?.value;
+      if (value && QualityPresets[value]) {
+        this.shared.app.videoQuality = value;
+        msg.i(`Video quality changed to: ${value}`);
+      }
     },
     async toggleVoice(event) {
       const checked = event?.target?.checked ?? this.$refs.voiceSwitch?.checked;
@@ -580,8 +628,32 @@ export default {
                     stream = video.mozCaptureStream();
                     msg.w(`Error: ${e} Attempting mozCaptureStream()...`);
                   }
-                  const call = that.shared.peers.local.video.call(`${peerID}-video`, stream);
+
+                  // Apply track constraints (resolution/framerate) to captured stream
+                  const videoTrack = stream.getVideoTracks()[0];
+                  if (videoTrack) {
+                    applyTrackConstraints(videoTrack, that.shared.app.videoQuality)
+                      .then((ok) => ok && msg.i("Track constraints applied"))
+                      .catch(() => { });
+                  }
+
+                  // Build call options with SDP bandwidth transform
+                  const sdpTransform = createSdpTransform(that.shared.app.videoQuality);
+                  const callOpts = sdpTransform ? { sdpTransform } : {};
+                  const call = that.shared.peers.local.video.call(`${peerID}-video`, stream, callOpts);
                   that.shared.peers.remote.videoCall = call;
+
+                  // Apply bitrate limit via RTCRtpSender once connection is active
+                  if (call?.peerConnection) {
+                    call.peerConnection.addEventListener("connectionstatechange", () => {
+                      if (call.peerConnection.connectionState === "connected") {
+                        applyBitrateLimit(call.peerConnection, that.shared.app.videoQuality)
+                          .then((ok) => ok && msg.i("Bitrate limit applied"))
+                          .catch(() => { });
+                      }
+                    });
+                  }
+
                   msg.i("Video stream call initiated");
                 };
 
@@ -862,6 +934,24 @@ export default {
 
 .remote-audio {
   display: none;
+}
+
+.quality-card {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.quality-buttons {
+  margin-top: 0.25rem;
+}
+
+.quality-description {
+  font-size: 0.8rem;
+  color: rgb(var(--mdui-color-on-surface-variant));
+  margin-top: 0.25rem;
+  opacity: 0.85;
 }
 
 @media (max-width: 600px) {
