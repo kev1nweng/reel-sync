@@ -8,7 +8,7 @@
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
 ![Vercel](https://img.shields.io/badge/vercel-%23000000.svg?style=for-the-badge&logo=vercel&logoColor=white)
 
-随时随地与他人同步观看视频或共享屏幕。无需注册，即点即用。 | Watch videos in sync or share your screen with others. No signup, click and go.
+随时随地与他人同步观看视频或共享屏幕。无需注册，即点即用 | Watch videos in sync or share your screen with others. No signup, click and go.
 
 ![ReelSync 截图](docs/screenshot.png)
 
@@ -61,7 +61,7 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && pnpm i && pn
 > 同源模式下，视频播放进度同步对网络的要求较高；较高的网络延迟可能导致频繁的强制同步。
 > 若无法保证良好的网络环境，请将最大可接受延迟时间调高一些（至少 1 秒钟）。
 
-- `VITE_TURN_SERVER_SOURCE_URL` - 你的 ICE/TURN（STUN）服务器列表地址（响应格式参考 Cloudflare Realtime Kit）
+- `VITE_TURN_SERVER_SOURCE_URL` - 你的 ICE/TURN（STUN）服务器列表地址（参考 Cloudflare Realtime Kit）
 - `VITE_MAX_ACCEPTABLE_DELAY_SECONDS` - 最大可接受延迟时间（秒）
 - `VITE_LATENCY_MEASUREMENT_INTERVAL_SECONDS` - RTT 延迟测量间隔时间（秒）
 - `VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS` - 同源模式下视频进度同步间隔时间（秒）
@@ -82,12 +82,28 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && pnpm i && pn
 
 有关更多信息，请参阅 [LICENSE](LICENSE) 文件。
 
-## 一行命令开始开发
+## 开发
 
-推荐使用 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (禁用 Vetur).
+推荐使用 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)（禁用 Vetur）。
+
+安装依赖：
 
 ```bash
-git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && (command -v pnpm >/dev/null 2>&1 && pnpm i && pnpm dev || (npm i && npm run dev))
+git clone https://github.com/kev1nweng/reel-sync
+cd reel-sync
+pnpm i
+```
+
+启动开发服务器：
+
+```bash
+pnpm dev
+```
+
+构建：
+
+```bash
+pnpm build
 ```
 
 ## 星标历史记录

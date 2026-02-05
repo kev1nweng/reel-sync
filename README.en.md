@@ -8,7 +8,7 @@
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
 ![Vercel](https://img.shields.io/badge/vercel-%23000000.svg?style=for-the-badge&logo=vercel&logoColor=white)
 
-随时随地与他人同步观看视频或共享屏幕。无需注册，即点即用。 | Watch videos in sync or share your screen with others. No signup, click and go.
+随时随地与他人同步观看视频或共享屏幕。无需注册，即点即用 | Watch videos in sync or share your screen with others. No signup, click and go.
 
 ![ReelSync Screenshot](docs/screenshot.en.png)
 
@@ -83,12 +83,28 @@ The source code of this project is released under the **GPL-3.0 License**.
 
 For more information, please refer to the [LICENSE](LICENSE) file.
 
-## Start Developing In One Line
+## Development
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) are recommended.
+[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (disable Vetur) are recommended.
+
+Install dependencies:
 
 ```bash
-git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && (command -v pnpm >/dev/null 2>&1 && pnpm i && pnpm dev || (npm i && npm run dev))
+git clone https://github.com/kev1nweng/reel-sync
+cd reel-sync
+pnpm i
+```
+
+Start the dev server:
+
+```bash
+pnpm dev
+```
+
+Build:
+
+```bash
+pnpm build
 ```
 
 ## Star History
