@@ -359,9 +359,9 @@ export default {
 
     // 获取TURN服务器配置
     async getTurnNode() {
-      const url = import.meta.env.VITE_NODE_SERVER_URL;
+      const url = import.meta.env.VITE_TURN_SERVER_SOURCE_URL;
       if (!url) {
-        msg.e("VITE_NODE_SERVER_URL is not configured");
+        msg.e("VITE_TURN_SERVER_SOURCE_URL is not configured");
         return false;
       }
       const data = {
