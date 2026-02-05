@@ -1,4 +1,4 @@
-# reel-sync
+# ReelSync
 
 **English / [简体中文](README.md)**
 
@@ -8,22 +8,47 @@
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
 ![Vercel](https://img.shields.io/badge/vercel-%23000000.svg?style=for-the-badge&logo=vercel&logoColor=white)
 
-随时随地与他人同步观看视频或共享屏幕 | Watch videos in sync or share your screen with others anytime, anywhere.
+随时随地与他人同步观看视频或共享屏幕。无需注册，即点即用。 | Watch videos in sync or share your screen with others. No signup, click and go.
 
 ![ReelSync Screenshot](docs/screenshot.en.png)
 
-As mentioned in the introduction, this is a real-time video streaming tool **based on modern Web technologies (e.g. WebRTC)**.
+ReelSync is a "share a link and it just works" watch-together / screen-sharing app built with **WebRTC and other modern Web technologies**.
 
-- With TURN/STUN servers configured, it allows users to **share local videos (or online video streams) with any other user on the Internet**, without worrying about cross-platform, cross-device, or cross-network issues.
-- Due to its working principle, users do not need to register or log in, and video stream data will not be stored on the server because it is a **peer-to-peer** application.
-- In the future, more features will be added, such as **screen sharing, real-time chat**, etc.
+Think of it as:
+
+- **No signup, no accounts**: the link is the session.
+- **Open-link experience**: hosts create a room and share the link; guests open it and join.
+- **Cross-platform**: runs in modern browsers (best on desktop; mobile can join as a viewer but screen sharing is limited).
+- **Peer-to-peer & privacy-first**: media is sent end-to-end over WebRTC; no server-side storage/transcoding/recording.
+- **Open source (GPL-3.0)**: self-hostable and auditable.
+- **Multiple sources**:
+  - Local video file (P2P mode)
+  - Screen sharing (P2P mode)
+  - Online video URL (Same-origin mode: both sides load the same URL; only controls/progress are synced)
+
+> Privacy still depends on the ICE/TURN and signaling services you choose. Prefer trusted providers or self-hosting.
+
+## What makes it different
+
+Compared with many watch-together tools that require accounts, centralized playback servers, or platform-specific players, ReelSync focuses on:
+
+- **Link = session**: share once, join instantly.
+- **Two complementary modes**:
+  - **P2P mode**: stream your local video or screen directly to your peer.
+  - **Same-origin mode**: sync playback without sending the media stream (bandwidth-friendly when both can access the same URL).
+- **Privacy-first by design**: no server-side media storage/transcoding/recording.
 
 ## Deployment
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/kev1nweng/reel-sync&env=VITE_NODE_SERVER_URL&env=VITE_MAX_ACCEPTABLE_DELAY_SECONDS&project-name=reel-sync&repository-name=reel-sync)⠀←⠀Click this button to deploy on Vercel (recommended), **or:**
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/kev1nweng/reel-sync&env=VITE_TURN_SERVER_SOURCE_URL&env=VITE_MAX_ACCEPTABLE_DELAY_SECONDS&env=VITE_LATENCY_MEASUREMENT_INTERVAL_SECONDS&env=VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS&env=VITE_ADSENSE_ACCOUNT&project-name=reel-sync&repository-name=reel-sync)⠀←⠀Click this button to deploy on Vercel (recommended), **or:**
+
+Self-hosting (static hosting) best practice:
+
+- Build the project in CI or locally.
+- Deploy the `dist/` directory to any static hosting (Nginx / Caddy / GitHub Pages / Cloudflare Pages, etc.).
 
 ```bash
-git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run build && npm run preview
+git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && pnpm i && pnpm build
 ```
 
 ## Environment Variables
@@ -32,54 +57,30 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
 > In same-origin mode, video playback synchronization has high network requirements; high network latency may cause frequent forced synchronization.
 > If a stable network environment cannot be guaranteed, please increase the maximum acceptable latency (at least 1 second).
 
-- `VITE_NODE_SERVER_URL` - Your `iceServer` server list address (Refer to Cloudflare Call for API documentation)
-- `VITE_MAX_ACCEPTABLE_DELAY_SECONDS` - Maximum acceptable delay time (in seconds)
-- `VITE_LATENCY_MEASUREMENT_INTERVAL_SECONDS` - RTT latency measurement interval (in seconds)
-- `VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS` - Sync interval time for video progress in same-origin mode (in seconds)
+This project follows Vite env var conventions. Recommended workflow:
 
-## Roadmap
+1. Copy `.env.example` to `.env`
+2. Adjust values as needed
 
-- [ ] Browser Compatibility
-  - [x] Mozilla Firefox
-    - [x] Issue with receiving but not sending due to lack of `captureStream()` support
-    - [x] Homepage style issue (`padding` not displaying correctly)
-  - [ ] ~~Safari (and all browsers using Apple Webkit)~~
-    - [ ] ~~Issue with receiving but not sending due to lack of `captureStream()` support~~
+- `VITE_TURN_SERVER_SOURCE_URL`: API endpoint returning ICE servers (TURN/STUN). The response format is similar to Cloudflare Realtime Kit.
+  - It is only used to fetch `iceServers` config; media is not uploaded via this endpoint.
+- `VITE_MAX_ACCEPTABLE_DELAY_SECONDS`: max allowed drift in Same-origin mode (seconds) before forced resync.
+- `VITE_LATENCY_MEASUREMENT_INTERVAL_SECONDS`: RTT measurement interval in P2P mode (seconds).
+- `VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS`: progress sync interval in Same-origin mode (seconds).
+- `VITE_ADSENSE_ACCOUNT` (optional): inject AdSense meta into `index.html`.
 
-- [x] Peer-to-peer mode
-  - [x] WebRTC real-time video streaming
-  - [x] Screen sharing
-  - [ ] Webcam streaming
+## Browser / platform notes
 
-- [x] Same-origin mode
-  - [x] WebRTC playback progress and behavior communication
-  - [x] End-to-end playback progress synchronization
-  - [x] Delay measurement
-  - [x] Playback progress synchronization considering network delay
-  - [ ] ~~Client node video operation requests~~
+- **Safari**: due to API limitations, P2P capture/streaming may be unavailable or unstable.
+- **Firefox**: system audio during screen sharing is typically not available (browser limitation).
+- **Mobile**: screen sharing is usually unavailable; joining as a viewer is supported.
 
-- [ ] Real-time chat
-  - [ ] WebRTC text message transmission
-  - [ ] WebRTC voice message transmission
+## Security & privacy
 
-- [ ] User settings
-  - [ ] Custom settings UI
-  - [x] `localStorage API` configuration storage
-
-- [ ] Cross-platform applications
-  - [ ] Native WebView Android application
-  - [ ] ~~Capacitor iOS application~~
-
-- [x] i18n multilingual support
-  - [x] StartView UI (CN/EN)
-  - [x] StreamView UI (CN/EN)
-  - [x] ~~msg (CN/EN)~~
-  - [x] Manual switch
-
-- [ ] Other features  
-  - [x] Direct share link
-  - [x] Background image customization
-  - [x] Advanced synchronization based on RTT (Round-Trip Time)
+- Media is sent end-to-end over WebRTC.
+- In P2P mode, your video/screen stream goes directly to your peer; when needed, TURN may relay **encrypted traffic**.
+- This project does not implement server-side media storage/transcoding/recording.
+- Choose trusted ICE/TURN and signaling services; self-host if you need stronger guarantees.
 
 ## License
 
@@ -96,7 +97,7 @@ For more information, please refer to the [LICENSE](LICENSE) file.
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) are recommended.
 
 ```bash
-git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm i
+git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && (command -v pnpm >/dev/null 2>&1 && pnpm i && pnpm dev || (npm i && npm run dev))
 ```
 
 ## Star History

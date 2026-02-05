@@ -8,22 +8,47 @@
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
 ![Vercel](https://img.shields.io/badge/vercel-%23000000.svg?style=for-the-badge&logo=vercel&logoColor=white)
 
-随时随地与他人同步观看视频或共享屏幕 | Watch videos in sync or share your screen with others anytime, anywhere.
+随时随地与他人同步观看视频或共享屏幕。无需注册，即点即用。 | Watch videos in sync or share your screen with others. No signup, click and go.
 
 ![ReelSync 截图](docs/screenshot.png)
 
-如简介所言，这是一个 **基于现代 Web 技术（如 WebRTC）的** 实时视频流共享工具。
+ReelSync 是一个同步观影 / 屏幕共享工具，基于 **WebRTC 以及其它现代 Web 技术**。
 
-- 在配置了 TURN / STUN 服务器的条件下，她允许用户 **向互联网上任意其他用户分享本地的视频（或在线视频流）**，而无需担心跨平台、跨设备、跨网络的问题。
-- 出于她 **端到端** 的工作原理，用户不需要有任何形式的注册登录行为，视频流数据也不会被存储在服务器上。
-- 在未来，更多特性将会被加入，如 **屏幕共享、实时聊天** 等。
+核心特点如下：
+
+- **无需注册登录**：链接就是会话。
+- **分享直链，打开即加入**：房主创建房间并分享链接；访客打开链接即可加入（支持 `/?join=ROOM_ID`）。
+- **跨平台**：运行于现代浏览器（桌面体验最佳；移动端可加入观看但屏幕共享受限）。
+- **点对点、隐私优先**：媒体通过 WebRTC 端到端传输；不做服务端存储 / 转码 / 录制。
+- **开源（GPL-3.0）**：可自部署、可审计。
+- **多种来源**：
+  - 本地视频文件（点对点模式）
+  - 屏幕共享（点对点模式）
+  - 在线视频 URL（同源模式：双方加载同一 URL，仅同步控制与进度）
+
+> 隐私与安全边界仍取决于你所选择的 ICE/TURN 与信令服务。若有更强保障诉求，建议自建或选择可信服务。
+
+## 与其他类似项目相比的特点
+
+很多“同步观影”工具要么要求注册账户、要么依赖中心化播放服务器、要么绑定特定平台播放器。ReelSync 更聚焦于：
+
+- **链接即房间**：分享一次，随开随用。
+- **两种互补模式**：
+  - **点对点模式**：把本地视频或屏幕直接推给对方。
+  - **同源模式**：不传输媒体流，只同步播放行为（当双方都能访问同一 URL 时更省带宽）。
+- **隐私优先的工程取舍**：不做服务端媒体留存与处理。
 
 ## 部署
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/kev1nweng/reel-sync&env=VITE_NODE_SERVER_URL&env=VITE_MAX_ACCEPTABLE_DELAY_SECONDS&project-name=reel-sync&repository-name=reel-sync)⠀←⠀点击这个按钮部署到 Vercel（推荐），**或者：**
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/kev1nweng/reel-sync&env=VITE_TURN_SERVER_SOURCE_URL&env=VITE_MAX_ACCEPTABLE_DELAY_SECONDS&env=VITE_LATENCY_MEASUREMENT_INTERVAL_SECONDS&env=VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS&env=VITE_ADSENSE_ACCOUNT&project-name=reel-sync&repository-name=reel-sync)⠀←⠀点击这个按钮部署到 Vercel（推荐），**或者：**
+
+自部署（静态托管）的最佳实践：
+
+- 在本地或 CI 中执行构建产物生成。
+- 将 `dist/` 目录部署到任意静态托管（Nginx / Caddy / GitHub Pages / Cloudflare Pages 等）。
 
 ```bash
-git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run build && npm run preview
+git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && pnpm i && pnpm build
 ```
 
 ## 环境变量
@@ -32,54 +57,29 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
 > 同源模式下，视频播放进度同步对网络的要求较高；较高的网络延迟可能导致频繁的强制同步。
 > 若无法保证良好的网络环境，请将最大可接受延迟时间调高一些（至少 1 秒钟）。
 
-- `VITE_NODE_SERVER_URL` - 你的 `iceServer` 服务器列表地址（API 格式参考 Cloudflare Call）
+- `VITE_TURN_SERVER_SOURCE_URL` - 你的 ICE/TURN（STUN）服务器列表地址（响应格式参考 Cloudflare Realtime Kit）
 - `VITE_MAX_ACCEPTABLE_DELAY_SECONDS` - 最大可接受延迟时间（秒）
 - `VITE_LATENCY_MEASUREMENT_INTERVAL_SECONDS` - RTT 延迟测量间隔时间（秒）
 - `VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS` - 同源模式下视频进度同步间隔时间（秒）
+- `VITE_ADSENSE_ACCOUNT`（可选）- 构建时向 `index.html` 注入 AdSense meta
 
-## 路线图
+本项目遵循 Vite 环境变量约定。推荐流程：
 
-- [x] 浏览器适配
-  - [x] Mozilla Firefox
-    - [x] 因不支持 `captureStream()` 可接收不可发送的问题
-    - [x] 主页样式错误问题（`padding` 未被正确显示）
-  - [ ] ~~Safari (以及所有利用 Apple Webkit 的浏览器)~~
-    - [ ] ~~因不支持 `captureStream()` 可接收不可发送的问题~~
+1. 复制 `.env.example` 为 `.env`
+2. 按需修改
 
-- [x] 点对点模式
-  - [x] WebRTC 实时视频流传输
-  - [x] 屏幕共享（桌面视频流传输）
-  - [ ] 用户摄像头视频流传输
+## 浏览器 / 平台说明
 
-- [x] 同源模式
-  - [x] WebRTC 播放进度和行为通讯
-  - [x] 端到端播放进度同步
-  - [x] 延迟测量
-  - [x] 考虑网络延迟的播放进度同步
-  - [ ] ~~接收端视频操作请求~~
+- **Safari**：受 API 限制，点对点采集/推流可能不可用或不稳定。
+- **Firefox**：屏幕共享的“系统音频”通常不可用（浏览器限制）。
+- **移动端**：通常不支持屏幕共享；可作为观看端加入。
 
-- [ ] 实时聊天
-  - [ ] WebRTC 文字消息传输
-  - [ ] WebRTC 语音消息传输
+## 安全与隐私
 
-- [ ] 用户设置
-  - [ ] 自定义设置 UI
-  - [x] `localStorage API` 配置存储
-
-- [ ] 跨平台应用
-  - [ ] 原生 WebView 安卓应用
-  - [ ] ~~Capacitor iOS 应用~~
-
-- [x] i18n 多语言支持
-  - [x] StartView UI (CN/EN)
-  - [x] StreamView UI (CN/EN)
-  - [x] ~~msg (CN/EN)~~
-  - [x] 手动切换
-
-- [ ] 其他功能
-  - [x] 分享直链
-  - [x] 自定义背景图
-  - [x] 基于 RTT（往返延迟）的增强同步
+- 媒体通过 WebRTC 端到端传输。
+- 点对点模式下，你的视频/屏幕流会直连对方；必要时 TURN 会中继**加密后的流量**。
+- 本项目不实现服务端媒体存储 / 转码 / 录制。
+- 请谨慎选择 ICE/TURN 与信令服务；如需更强保障建议自建。
 
 ## 许可证
 
@@ -96,7 +96,7 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm run buil
 推荐使用 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (禁用 Vetur).
 
 ```bash
-git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm i
+git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && (command -v pnpm >/dev/null 2>&1 && pnpm i && pnpm dev || (npm i && npm run dev))
 ```
 
 ## 星标历史记录
