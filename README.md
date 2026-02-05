@@ -101,4 +101,4 @@ git clone https://github.com/kev1nweng/reel-sync && cd reel-sync && npm i
 
 ## 星标历史记录
 
-[![Star History Chart](https://api.star-history.com/svg?repos=kev1nweng/reel-sync&type=Date)](https://www.star-history.com/#kev1nweng/reel-sync&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=kev1nweng/reel-sync&type=date&legend=top-left)](https://www.star-history.com/#kev1nweng/reel-sync&type=date&legend=top-left)
