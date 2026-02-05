@@ -26,17 +26,21 @@ Think of it as:
   - Screen sharing (P2P mode)
   - Online video URL (Same-origin mode: both sides load the same URL; only controls/progress are synced)
 
+> [!WARNING]
 > Privacy still depends on the ICE/TURN and signaling services you choose. Prefer trusted providers or self-hosting.
 
-## What makes it different
+## Compatibility
 
-Compared with many watch-together tools that require accounts, centralized playback servers, or platform-specific players, ReelSync focuses on:
+- **Safari**: due to API limitations, P2P capture/streaming may be unavailable or unstable.
+- **Firefox**: system audio during screen sharing is typically not available (browser limitation).
+- **Mobile**: screen sharing is usually unavailable; joining as a viewer is supported.
 
-- **Link = session**: share once, join instantly.
-- **Two complementary modes**:
-  - **P2P mode**: stream your local video or screen directly to your peer.
-  - **Same-origin mode**: sync playback without sending the media stream (bandwidth-friendly when both can access the same URL).
-- **Privacy-first by design**: no server-side media storage/transcoding/recording.
+## Security & privacy
+
+- Media is sent end-to-end over WebRTC.
+- In P2P mode, your video/screen stream goes directly to your peer; when needed, TURN may relay **encrypted traffic**.
+- This project does not implement server-side media storage/transcoding/recording.
+- Choose trusted ICE/TURN and signaling services; self-host if you need stronger guarantees.
 
 ## Deployment
 
@@ -68,19 +72,6 @@ This project follows Vite env var conventions. Recommended workflow:
 - `VITE_LATENCY_MEASUREMENT_INTERVAL_SECONDS`: RTT measurement interval in P2P mode (seconds).
 - `VITE_SAME_ORIGIN_SYNC_INTERVAL_SECONDS`: progress sync interval in Same-origin mode (seconds).
 - `VITE_ADSENSE_ACCOUNT` (optional): inject AdSense meta into `index.html`.
-
-## Browser / platform notes
-
-- **Safari**: due to API limitations, P2P capture/streaming may be unavailable or unstable.
-- **Firefox**: system audio during screen sharing is typically not available (browser limitation).
-- **Mobile**: screen sharing is usually unavailable; joining as a viewer is supported.
-
-## Security & privacy
-
-- Media is sent end-to-end over WebRTC.
-- In P2P mode, your video/screen stream goes directly to your peer; when needed, TURN may relay **encrypted traffic**.
-- This project does not implement server-side media storage/transcoding/recording.
-- Choose trusted ICE/TURN and signaling services; self-host if you need stronger guarantees.
 
 ## License
 
