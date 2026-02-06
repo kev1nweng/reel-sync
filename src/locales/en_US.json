@@ -79,9 +79,9 @@
       "selectSource": "Select Media Source"
     },
     "guide": {
-      "step1": "Choose your role (Host or Client)",
-      "step2": "Prepare your video file or web link",
-      "step3": "Create or join a room to sync up"
+      "step1": "Choose Peer-to-Peer or Same-Origin mode",
+      "step2": "Upload a file, share your screen, or provide a video link",
+      "step3": "Create a room and share the link with your partner"
     },
     "modes": {
       "name": {
@@ -89,8 +89,8 @@
         "client": "Client Mode"
       },
       "description": {
-        "host": "Easily create a room and share your local video stream with others in real-time.",
-        "client": "Join an existing room and watch shared video streams together with your partners."
+        "host": "You may create a room and share video streams with others in real-time.",
+        "client": "You may join a room created by others and watch video streams in sync."
       },
       "combinedDescription": {
         "hostP2P": "Choose a video file from your device or share your screen to watch together with your partner in real-time.",
